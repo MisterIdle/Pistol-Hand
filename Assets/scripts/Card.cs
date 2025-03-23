@@ -9,6 +9,7 @@ public class Card : MonoBehaviour
     private float BoundX;
     private float BoundY;
     Vector3 screenBounds;
+    private string CardName;
 
     private void Start()
     {
@@ -17,6 +18,7 @@ public class Card : MonoBehaviour
         BoundX = GetComponent<Renderer>().bounds.size.x / 2;
         BoundY = GetComponent<Renderer>().bounds.size.y / 2;
         screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
+        CardName = gameObject.name;
     }
     private void FixedUpdate()
     {
@@ -68,7 +70,7 @@ public class Card : MonoBehaviour
 
             if (Collider != null && Collider.gameObject == gameObject)
             {
-                Debug.Log("I'm heeeeeeere");
+                Debug.Log("Salut je suis la carte " + CardName);
             }
         }
     }
