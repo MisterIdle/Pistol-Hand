@@ -32,7 +32,9 @@ public class CardsSpawn : MonoBehaviour
         for (int i = 0; i < NbCards; i++)
         {
             GameObject card = Instantiate(CardPrefab, new Vector3(Random.Range(-BoundX, BoundX), Random.Range(-BoundY, BoundY), 0), Quaternion.identity);
+            card.gameObject.name = "Card " + (i + 1);
             card.transform.Rotate(0, 0, Random.Range(-Rotate, Rotate));
+            card.GetComponent<SpriteRenderer>().color = new Color(Random.value, Random.value, Random.value, 0);
         }
     }
 }
