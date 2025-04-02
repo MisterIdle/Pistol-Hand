@@ -1,160 +1,179 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement")]
-    [SerializeField] private float _maxSpeed = 8f;
-    [SerializeField] private float _acceleration = 50f;
-    [SerializeField] private float _deceleration = 60f;
-    [SerializeField] private float _airControlMultiplier = 0.5f;
-    private SpriteRenderer _sR;
-    private Rigidbody2D _rb;
-
-    [Header("Input")]
-    public bool IsKeyboard;
-    private Vector2 movement;
-    private bool jumpPressed = false;
-    private Camera mainCamera;
+    [Header("Player Movement")]
+    [SerializeField] private float maxSpeed = 10f;
+    [SerializeField] private float acceleration = 60f;
+    [SerializeField] private float deceleration = 70f;
+    [SerializeField] private float airControl = 0.6f;
 
     [Header("Jump")]
-    public Transform groundCheck;
-    [SerializeField] private float _jumpForce = 12f;
-    [SerializeField] private float _coyoteTime = 0.15f;
-    [SerializeField] private float _jumpBufferTime = 0.1f;
-    private float _coyoteTimeCounter;
-    private float _jumpBufferCounter;
+    [SerializeField] private float jumpForce = 14f;
+    [SerializeField] private float gravityMultiplier = 2f;
+    [SerializeField] private float coyoteTime = 0.15f;
+    [SerializeField] private float jumpBufferTime = 0.1f;
+    [SerializeField] private float maxFallSpeed = 10f;
+
+    [Header("Ground Detection")]
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private LayerMask groundLayer;
+
+    [Header("Hand Control")]
+    [SerializeField] private Transform hand;
+    [SerializeField] private float handSpeed = 7f;
+    [SerializeField] private float handMaxDistance = 4f;
+
+    private Rigidbody2D rb;
+    private SpriteRenderer sprite;
+    private Vector2 movementInput;
+    private Vector2 lookInput;
+    private bool jumpRequested;
+    private float coyoteTimeCounter;
+    private float jumpBufferCounter;
+    private bool isJumping;
 
     private void Awake()
     {
-        mainCamera = Camera.main;
-        _rb = GetComponent<Rigidbody2D>();
-        _sR = GetComponent<SpriteRenderer>();
-    }
-
-    private void Start()
-    {
-        InitializePlayer();
+        rb = GetComponent<Rigidbody2D>();
+        sprite = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
     {
-        UpdateCoyoteTimeCounter();
-        UpdateJumpBufferCounter();
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            RestartLevel();
+        }
+
+        UpdateTimers();
+        MoveHand();
+        ClampHandDistance();
     }
 
     private void FixedUpdate()
     {
         HandleMovement();
         HandleJump();
+        ApplyGravity();
     }
 
-    private void InitializePlayer()
+    private void UpdateTimers()
     {
-        Debug.Log("PlayerController Start");
-        string controlScheme = GetComponent<PlayerInput>().currentControlScheme;
-        Debug.Log("Control Scheme: " + controlScheme);
+        if (IsGrounded()) 
+        {
+            coyoteTimeCounter = coyoteTime;
+            isJumping = false;
+        }
+        else 
+        {
+            coyoteTimeCounter -= Time.deltaTime;
+        }
 
-        IsKeyboard = controlScheme == "Keyboard&Mouse";
-        Debug.Log("IsKeyboard: " + IsKeyboard);
-    }
-
-    private void UpdateCoyoteTimeCounter()
-    {
-        if (IsGrounded())
-        {
-            _coyoteTimeCounter = _coyoteTime;
-        }
-        else
-        {
-            _coyoteTimeCounter -= Time.deltaTime;
-        }
-    }
-
-    private void UpdateJumpBufferCounter()
-    {
-        if (jumpPressed)
-        {
-            _jumpBufferCounter = _jumpBufferTime;
-        }
-        else
-        {
-            _jumpBufferCounter -= Time.deltaTime;
-        }
+        if (jumpRequested) 
+            jumpBufferCounter = jumpBufferTime;
+        else 
+            jumpBufferCounter -= Time.deltaTime;
     }
 
     private void HandleMovement()
     {
-        float targetSpeed = movement.x * _maxSpeed;
-        float speedDiff = targetSpeed - _rb.linearVelocity.x;
+        float targetSpeed = movementInput.x * maxSpeed;
+        float speedDiff = targetSpeed - rb.linearVelocity.x;
+        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? acceleration : deceleration;
+        if (!IsGrounded()) accelRate *= airControl;
 
-        float accelRate = (Mathf.Abs(targetSpeed) > 0.01f) ? _acceleration : _deceleration;
+        rb.AddForce(Vector2.right * speedDiff * accelRate);
 
-        if (!IsGrounded())
-        {
-            accelRate *= _airControlMultiplier;
-        }
-
-        float movementForce = speedDiff * accelRate;
-
-        _rb.AddForce(new Vector2(movementForce, 0));
-
-        if (movement.x > 0.1f) _sR.flipX = false;
-        else if (movement.x < -0.1f) _sR.flipX = true;
-
-        if (Mathf.Abs(_rb.linearVelocity.x) > _maxSpeed)
-        {
-            _rb.linearVelocity = new Vector2(Mathf.Sign(_rb.linearVelocity.x) * _maxSpeed, _rb.linearVelocity.y);
-        }
+        sprite.flipX = movementInput.x < -0.1f;
     }
 
     private void HandleJump()
     {
-        if (_jumpBufferCounter > 0 && _coyoteTimeCounter > 0)
+        if (jumpBufferCounter > 0 && coyoteTimeCounter > 0 && !isJumping) 
         {
-            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, _jumpForce);
-            _jumpBufferCounter = 0f;
-            Debug.Log("Jumped with coyote time or buffer");
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            isJumping = true;
+            jumpRequested = false;
+        }
+        else if (jumpRequested && coyoteTimeCounter > 0) 
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            isJumping = true;
+            jumpRequested = false;
+        }
+        else if (IsGrounded() && rb.linearVelocity.y < 0) 
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0);
+        }
+    }
+
+    private void ApplyGravity()
+    {
+        if (!IsGrounded() && rb.linearVelocity.y < maxFallSpeed)
+        {
+            rb.gravityScale = gravityMultiplier;
+        }
+        else
+        {
+            rb.gravityScale = 1f;
+        }
+    }
+
+    private void MoveHand()
+    {
+        Vector3 direction = new Vector3(lookInput.x, lookInput.y, 0).normalized;
+        hand.position = Vector3.MoveTowards(hand.position, hand.position + direction * handSpeed, handSpeed * Time.deltaTime);
+    }
+
+    private void ClampHandDistance()
+    {
+        float distance = Vector3.Distance(hand.position, transform.position);
+        if (distance > handMaxDistance)
+        {
+            Vector3 direction = (hand.position - transform.position).normalized;
+            hand.position = transform.position + direction * handMaxDistance;
         }
     }
 
     private bool IsGrounded()
     {
-        BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
-        Vector2 boxSize = new Vector2(boxCollider.size.x - 0.1f, 0.1f);
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(groundCheck.position, boxSize, 0f);
-        foreach (Collider2D collider in colliders)
-        {
-            if (collider.gameObject != gameObject)
-            {
-                return true;
-            }
-        }
-        return false;
+        Vector2 start = new Vector2(groundCheck.position.x - sprite.bounds.extents.x, groundCheck.position.y);
+        Vector2 end = new Vector2(groundCheck.position.x + sprite.bounds.extents.x, groundCheck.position.y);
+        return Physics2D.OverlapArea(start, end, groundLayer);
     }
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        movement = context.ReadValue<Vector2>();
+        movementInput = context.ReadValue<Vector2>();
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            jumpPressed = true;
+            jumpRequested = true;
+            jumpBufferCounter = jumpBufferTime;
         }
-        if (context.canceled)
+        else if (context.performed)
         {
-            jumpPressed = false;
+            jumpRequested = true;
+        }
+        else if (context.canceled)
+        {
+            jumpRequested = false;
         }
     }
 
-    private void OnDrawGizmos()
+    public void OnLook(InputAction.CallbackContext context)
     {
-        Gizmos.color = Color.red;
-        BoxCollider2D boxCollider = GetComponent<BoxCollider2D>();
-        Vector2 boxSize = new Vector2(boxCollider.size.x - 0.1f, 0.1f);
-        Gizmos.DrawWireCube(groundCheck.position, boxSize);
+        lookInput = context.ReadValue<Vector2>();
+    }
+
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
