@@ -4,12 +4,12 @@
 TagManager:
   serializedVersion: 3
   tags:
-  - Card
+  - Ground
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - 
