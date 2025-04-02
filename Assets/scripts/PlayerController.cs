@@ -104,7 +104,7 @@ public class PlayerController : MonoBehaviour
 
         if (Mathf.Abs(_rb.linearVelocity.x) > _maxSpeed)
         {
-            _rb.linearVelocity = new Vector2(Mathf.Sign(_rb.linearVelocity.x) * _maxSpeed, _rb.linearVelocity.y);
+            _rb.linearVelocity =  new Vector2(Mathf.Sign(_rb.linearVelocity.x) * _maxSpeed, _rb.linearVelocity.y);
         }
     }
 
