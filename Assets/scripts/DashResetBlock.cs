@@ -27,18 +27,20 @@ public class DashResetBlock : MonoBehaviour
         if (isOnCooldown && cooldownCount < cooldownCountMax)
         {
             cooldownCount += Time.deltaTime;
-            FadeOut();
+
+            if (spriteRenderer.color.a > colorAlpha) FadeOut();
         }
-        else if (isOnCooldown && cooldownCount >= cooldownCountMax && spriteRenderer.color.a < colorAlpha)
+        else if (!isOnCooldown && spriteRenderer.color.a < 1)
         {
             FadeIn();
         }
 
-        spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, spriteRenderer.color.b, Mathf.Clamp(spriteRenderer.color.a, 0f, 1f));
-
-        if (spriteRenderer.color.a >= colorAlpha)
+        if (spriteRenderer.color.a <= colorAlpha && cooldownCount >= cooldownCountMax)
         {
             isOnCooldown = false;
+        }
+        else if (spriteRenderer.color.a >= 1)
+        {
             cooldownCount = 0;
         }
     }
@@ -61,6 +63,9 @@ public class DashResetBlock : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            if (spriteRenderer.color.a < 1) return;
+            PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
+            if (! isOnCooldown) playerController.lastDashTime = 0;
             Debug.Log("reseted dash");
             isOnCooldown = true;
         }

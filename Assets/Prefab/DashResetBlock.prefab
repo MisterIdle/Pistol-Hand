@@ -103,9 +103,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isOnCooldown: 0
   cooldownCount: 0
-  colorAlpha: 0.1
-  cooldownCountMax: 2
-  fadeSpeed: 3
+  colorAlpha: 0.2
+  cooldownCountMax: 5
+  fadeSpeed: 1
 --- !u!60 &1145925346980493729
 PolygonCollider2D:
   m_ObjectHideFlags: 0

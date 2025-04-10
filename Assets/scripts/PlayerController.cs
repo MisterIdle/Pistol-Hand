@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashDuration = 0.2f;
     [SerializeField] private float dashCooldown = 1f;
     private bool isDashing = false;
-    private float lastDashTime = 0f;
+    public float lastDashTime = 0f;
     private Vector2 hitedForce = new Vector2(0, 0);
     private bool canDash = true;
 
