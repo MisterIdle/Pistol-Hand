@@ -102,9 +102,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c29311021f22cd45a28adf9e64d2bb0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 40
-  damage: 1
-  rb: {fileID: 4954595672448540591}
   shooter: {fileID: 0}
 --- !u!50 &4954595672448540591
 Rigidbody2D:
@@ -121,7 +118,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2

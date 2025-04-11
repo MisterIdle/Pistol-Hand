@@ -9,7 +9,7 @@ public class PlayersManager : MonoBehaviour
     public void OnPlayerJoin()
     {
         playerController = FindAnyObjectByType<PlayerController>();
-        playerController.playerID = PlayerID;
+        playerController.PlayerID = PlayerID;
         GameManager.Instance.currentPlayers++;
 
         Debug.Log("Player " + PlayerID + " joined the game!");

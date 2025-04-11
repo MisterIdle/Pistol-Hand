@@ -76,7 +76,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -119,7 +119,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6773542280060055942}
@@ -169,7 +169,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -193,34 +193,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 149dfe32f2e0b33468edc4f97b793cb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifes: 3
-  playerID: 0
-  maxSpeed: 10
-  acceleration: 60
-  deceleration: 70
-  airControl: 1
-  stunned: 0
-  canJump: 1
-  jumpForce: 10
-  gravityMultiplier: 2
-  coyoteTime: 0.15
-  jumpBufferTime: 0.5
-  maxFallSpeed: 10
-  projectilePrefab: {fileID: 7652273231687865750, guid: 1353036d6cbbadd4b801bdd3acfd8e1e, type: 3}
-  shootPoint: {fileID: 1476292541497834023}
-  shootForce: 10
-  shootCooldown: 0.5
-  dashSpeed: 20
-  dashDuration: 0.2
-  dashCooldown: 1
-  invulnerabilityDuration: 0.5
-  groundCheck: {fileID: 6773542280060055942}
-  groundLayer:
+  Lifes: 4
+  PlayerID: 0
+  Wins: 0
+  IsDead: 0
+  _maxSpeed: 10
+  _acceleration: 60
+  _deceleration: 70
+  _airControl: 0.6
+  _jumpForce: 12
+  _gravityMultiplier: 2
+  _maxFallSpeed: 10
+  _coyoteTime: 0.15
+  _jumpBufferTime: 0.3
+  _dashSpeed: 20
+  _dashDuration: 0.2
+  _dashCooldown: 1
+  _projectilePrefab: {fileID: 7652273231687865750, guid: 1353036d6cbbadd4b801bdd3acfd8e1e, type: 3}
+  _shootPoint: {fileID: 1476292541497834023}
+  _shootForce: 20
+  _shootCooldown: 0.5
+  _invulnerabilityDuration: 0.5
+  _groundCheck: {fileID: 6773542280060055942}
+  _groundLayer:
     serializedVersion: 2
     m_Bits: 8
   hand: {fileID: 1294991957395979940}
-  handSpeed: 7
-  handMaxDistance: 1.5
+  _handSpeed: 7
+  _handMaxDistance: 1
 --- !u!114 &2954489285419996480
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -67,7 +67,7 @@ public class GameManager : MonoBehaviour
         PlayerController winner = null;
         foreach (PlayerController player in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
         {
-            if (!player.isDead)
+            if (!player.IsDead)
             {
                 winner = player;
                 break;
@@ -76,11 +76,11 @@ public class GameManager : MonoBehaviour
 
         if (winner != null)
         {
-            winner.wins++;
+            winner.Wins++;
 
-            Debug.Log("Winner: " + winner.name + " with " + winner.wins + " wins!");
+            Debug.Log("Winner: " + winner.name + " with " + winner.Wins + " wins!");
 
-            if (winner.wins >= needToWin)
+            if (winner.Wins >= needToWin)
             {
                 StartCoroutine(StartFinishGame(winner));
             }
@@ -120,7 +120,7 @@ public class GameManager : MonoBehaviour
 
         foreach (PlayerController player in FindObjectsByType<PlayerController>(FindObjectsSortMode.None))
         {
-            player.wins = 0;
+            player.Wins = 0;
         }
 
         playersDeath = 0;
