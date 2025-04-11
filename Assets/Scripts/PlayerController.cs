@@ -48,7 +48,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private LayerMask _groundLayer;
 
     [Header("Hand")]
-    [SerializeField] private Transform hand;
+    [SerializeField] private Transform _hand;
+    [SerializeField] private SpriteRenderer _handSprite;
     [SerializeField] private float _handSpeed = 7f;
     [SerializeField] private float _handMaxDistance = 1.5f;
     
@@ -58,6 +59,7 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D _rb;
     private SpriteRenderer _spriteRender;
+    private Collider2D _collider;
 
     private Vector2 _movementInput;
     private Vector2 _lookInput;
@@ -79,6 +81,8 @@ public class PlayerController : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody2D>();
         _spriteRender = GetComponent<SpriteRenderer>();
+        _handSprite = _hand.GetComponent<SpriteRenderer>();
+        _collider = GetComponent<Collider2D>();
 
         _dashTrail.emitting = false;
 
@@ -149,14 +153,14 @@ public class PlayerController : MonoBehaviour
     private void UpdateHand()
     {
         Vector3 dir = new Vector3(_lookInput.x, _lookInput.y).normalized;
-        hand.position = Vector3.MoveTowards(hand.position, hand.position + dir * _handSpeed, _handSpeed * Time.deltaTime);
+        _hand.position = Vector3.MoveTowards(_hand.position, _hand.position + dir * _handSpeed, _handSpeed * Time.deltaTime);
 
-        Vector3 toHand = hand.position - transform.position;
-        hand.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(toHand.y, toHand.x) * Mathf.Rad2Deg);
+        Vector3 toHand = _hand.position - transform.position;
+        _hand.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(toHand.y, toHand.x) * Mathf.Rad2Deg);
 
         if (toHand.magnitude > _handMaxDistance)
         {
-            hand.position = transform.position + toHand.normalized * _handMaxDistance;
+            _hand.position = transform.position + toHand.normalized * _handMaxDistance;
         }
     }
 
@@ -170,8 +174,8 @@ public class PlayerController : MonoBehaviour
     {
         if (!_shooting || _shootTimer > 0f) return; 
 
-        Vector3 dir = (hand.position - transform.position).normalized;
-        GameObject bullet = Instantiate(_projectilePrefab, _shootPoint.position, hand.rotation);
+        Vector3 dir = (_hand.position - transform.position).normalized;
+        GameObject bullet = Instantiate(_projectilePrefab, _shootPoint.position, _hand.rotation);
         bullet.GetComponent<Rigidbody2D>().AddForce(dir * _shootForce, ForceMode2D.Impulse);
 
         Bullet bulletScript = bullet.GetComponent<Bullet>();
@@ -190,7 +194,7 @@ public class PlayerController : MonoBehaviour
         _lastDashTime = Time.time;
         _canMoveHand = false;
 
-        Vector2 dir = (hand.position - transform.position).normalized;
+        Vector2 dir = (_hand.position - transform.position).normalized;
         _rb.linearVelocity = dir * _dashSpeed;
 
         StartCoroutine(StopDash());
@@ -212,7 +216,7 @@ public class PlayerController : MonoBehaviour
 
     private void Punch()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(hand.position, _hitDistance);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(_hand.position, _hitDistance);
         foreach (var hit in hits)
         {
             if (hit.CompareTag("Player"))
@@ -299,12 +303,10 @@ public class PlayerController : MonoBehaviour
         IsDead = true;
 
         _spriteRender.enabled = false;
-        GetComponent<Collider2D>().enabled = false;
+        _collider.enabled = false;
+        _handSprite.enabled = false;
 
-        if (GameManager.Instance.CurrentState == GameManager.GameState.WaitingForPlayers)
-        {
-            GameManager.Instance.PlayerReadyCount++;
-        }
+        GameManager.Instance.PlayerDeath++;
     }
 
     public void KillPlayer()
@@ -327,7 +329,8 @@ public class PlayerController : MonoBehaviour
 
         _spriteRender.color = Color.white;
         _spriteRender.enabled = true;
-        GetComponent<Collider2D>().enabled = true;  
+        _collider.enabled = true;
+        _handSprite.enabled = true;
 
         _rb.linearVelocity = Vector2.zero;
         _rb.angularVelocity = 0f;

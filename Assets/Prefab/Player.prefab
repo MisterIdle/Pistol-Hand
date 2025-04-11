@@ -222,7 +222,8 @@ MonoBehaviour:
   _groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  hand: {fileID: 1294991957395979940}
+  _hand: {fileID: 1294991957395979940}
+  _handSprite: {fileID: 3905339446647980527}
   _handSpeed: 7
   _handMaxDistance: 1
   _dashTrail: {fileID: 4132532537398355302}

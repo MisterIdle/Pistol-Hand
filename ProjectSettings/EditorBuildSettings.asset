@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Match.unity
     guid: b02fd7bac061be542970274079f2b2eb
+  - enabled: 1
+    path: Assets/Scenes/Trophy.unity
+    guid: 85108ee28868a73409b77630a2137243
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
