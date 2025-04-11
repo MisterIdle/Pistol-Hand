@@ -194,7 +194,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 149dfe32f2e0b33468edc4f97b793cb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Lifes: 3
+  Lifes: 2
   PlayerID: 0
   Wins: 0
   IsDead: 0
@@ -210,11 +210,13 @@ MonoBehaviour:
   _dashSpeed: 20
   _dashDuration: 0.2
   _dashCooldown: 1
-  _hitDistance: 0.5
   _projectilePrefab: {fileID: 7652273231687865750, guid: 1353036d6cbbadd4b801bdd3acfd8e1e, type: 3}
   _shootPoint: {fileID: 1476292541497834023}
   _shootForce: 20
   _shootCooldown: 0.5
+  _hitDistance: 0.5
+  _pistolHitForce: 1
+  _punchHitForce: 3
   _invulnerabilityDuration: 0.5
   _groundCheck: {fileID: 6773542280060055942}
   _groundLayer:
@@ -503,15 +505,15 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.14101961
+        value: 0.2008547
         inSlope: 0
         outSlope: 0
         tangentMode: 0
         weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
+        inWeight: 0
+        outWeight: 0
       - serializedVersion: 3
-        time: 1
+        time: 0.9763794
         value: 0
         inSlope: 0
         outSlope: 0

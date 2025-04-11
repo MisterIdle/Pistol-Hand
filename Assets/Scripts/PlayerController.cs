@@ -28,13 +28,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _dashSpeed = 20f;
     [SerializeField] private float _dashDuration = 0.2f;
     [SerializeField] private float _dashCooldown = 1f;
-    [SerializeField] private float _hitDistance = 0.5f;
 
     [Header("Shoot")]
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform _shootPoint;
     [SerializeField] private float _shootForce = 20f;
     [SerializeField] private float _shootCooldown = 0.5f;
+
+    [Header("Hit")]
+    [SerializeField] private float _hitDistance = 0.5f;
+    [SerializeField] private float _pistolHitForce = 5f;
+    [SerializeField] private float _punchHitForce = 10f;
 
     [Header("Invulnerability")]
     [SerializeField] private float _invulnerabilityDuration = 0.5f;
@@ -203,9 +207,7 @@ public class PlayerController : MonoBehaviour
 
     public void ResetDash()
     {
-        _isDashing = false;
-        _rb.linearVelocity = Vector2.zero;
-        _canMoveHand = true;
+        _lastDashTime = Time.time - _dashCooldown;
     }
 
     private void Punch()
@@ -232,13 +234,14 @@ public class PlayerController : MonoBehaviour
 
         StartCoroutine(Stun());
         StartCoroutine(Invulnerability());
-
         StartCoroutine(FlashRed());
 
+        Vector2 knockbackDirection = new Vector2(dir.x, Mathf.Abs(dir.y) * 0.5f).normalized;
+
         if (pistol)
-            _rb.AddForce(new Vector2(-dir.x, 1f) * force, ForceMode2D.Impulse);
+            _rb.AddForce(knockbackDirection * _pistolHitForce * force, ForceMode2D.Impulse);
         else
-            _rb.AddForce(new Vector2(dir.x, 0.5f) * force, ForceMode2D.Impulse);
+            _rb.AddForce(knockbackDirection * _punchHitForce * force, ForceMode2D.Impulse);
 
         Lifes--;
     }
@@ -275,6 +278,8 @@ public class PlayerController : MonoBehaviour
 
     private void CheckBounds()
     {
+        if (GameManager.Instance.LoadNextMap || IsDead) return;
+
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
         if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0)
         {
@@ -284,31 +289,48 @@ public class PlayerController : MonoBehaviour
 
     private void HandleDeath()
     {
-        if (Lifes > 0) return;
+        if (Lifes > 0 || IsDead) return;
 
         Instantiate(_blastPrefab, transform.position, Quaternion.identity);
+
         _rb.simulated = false;
         _canJump = false;
         _canMoveHand = false;
         IsDead = true;
 
-        gameObject.SetActive(false);
+        _spriteRender.enabled = false;
+        GetComponent<Collider2D>().enabled = false;
 
-        if(GameManager.Instance.CurrentState == GameManager.GameState.WaitingForPlayers)
+        if (GameManager.Instance.CurrentState == GameManager.GameState.WaitingForPlayers)
         {
             GameManager.Instance.PlayerReadyCount++;
         }
     }
 
+    public void KillPlayer()
+    {
+        Lifes = 0;
+        HandleDeath();
+    }
+
     public void Respawn()
     {
         Lifes = 4;
+        IsDead = false; 
+
         _rb.simulated = true;
         _canJump = true;
         _canMoveHand = true;
-        IsDead = false;
+        _stunned = false;
+        _isDashing = false;
+        _isInvulnerable = false;    
 
-        gameObject.SetActive(true);
+        _spriteRender.color = Color.white;
+        _spriteRender.enabled = true;
+        GetComponent<Collider2D>().enabled = true;  
+
+        _rb.linearVelocity = Vector2.zero;
+        _rb.angularVelocity = 0f;
     }
 
     public void OnMove(InputAction.CallbackContext ctx) 

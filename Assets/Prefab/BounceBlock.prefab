@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5023558857252542047}
   - component: {fileID: 760575673874565915}
   - component: {fileID: 5616375104546526313}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: BounceBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e5a00e4e16ac7e449a6d261e0efe26e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bounceForce: 10
+  _bounceForce: 10
 --- !u!61 &5616375104546526313
 BoxCollider2D:
   m_ObjectHideFlags: 0
