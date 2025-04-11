@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _dashSpeed = 20f;
     [SerializeField] private float _dashDuration = 0.2f;
     [SerializeField] private float _dashCooldown = 1f;
+    [SerializeField] private float _hitDistance = 0.5f;
 
     [Header("Shoot")]
     [SerializeField] private GameObject _projectilePrefab;
@@ -46,6 +47,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform hand;
     [SerializeField] private float _handSpeed = 7f;
     [SerializeField] private float _handMaxDistance = 1.5f;
+    
+    [Header("Feel")]
+    [SerializeField] private TrailRenderer _dashTrail;
+    [SerializeField] private GameObject _blastPrefab;
 
     private Rigidbody2D _rb;
     private SpriteRenderer _spriteRender;
@@ -71,8 +76,9 @@ public class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _spriteRender = GetComponent<SpriteRenderer>();
 
+        _dashTrail.emitting = false;
+
         DontDestroyOnLoad(gameObject);
-        gameObject.name = $"Player {PlayerID}";
     }
 
     public void Update()
@@ -129,10 +135,6 @@ public class PlayerController : MonoBehaviour
             _isJumping = true;
             _jumpBufferCounter = 0;
         }
-        else if (IsGrounded() && _rb.linearVelocity.y < 0)
-        {
-            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, 0);
-        }
     }
 
     private void ApplyGravity()
@@ -180,6 +182,7 @@ public class PlayerController : MonoBehaviour
         if (_isDashing || Time.time < _lastDashTime + _dashCooldown) return;
 
         _isDashing = true;
+        _dashTrail.emitting = true;
         _lastDashTime = Time.time;
         _canMoveHand = false;
 
@@ -195,6 +198,7 @@ public class PlayerController : MonoBehaviour
         _isDashing = false;
         _rb.linearVelocity = Vector2.zero;
         _canMoveHand = true;
+        _dashTrail.emitting = false;
     }
 
     public void ResetDash()
@@ -206,7 +210,7 @@ public class PlayerController : MonoBehaviour
 
     private void Punch()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(hand.position, 1f);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(hand.position, _hitDistance);
         foreach (var hit in hits)
         {
             if (hit.CompareTag("Player"))
@@ -222,11 +226,14 @@ public class PlayerController : MonoBehaviour
 
     public void TakeHit(int force, GameObject source, bool pistol)
     {
-        if (Lifes <= 0 || _isDashing || _stunned || _isInvulnerable) return;
+        if (_isInvulnerable) return;
 
         Vector2 dir = (transform.position - source.transform.position).normalized;
+
         StartCoroutine(Stun());
         StartCoroutine(Invulnerability());
+
+        StartCoroutine(FlashRed());
 
         if (pistol)
             _rb.AddForce(new Vector2(-dir.x, 1f) * force, ForceMode2D.Impulse);
@@ -234,6 +241,15 @@ public class PlayerController : MonoBehaviour
             _rb.AddForce(new Vector2(dir.x, 0.5f) * force, ForceMode2D.Impulse);
 
         Lifes--;
+    }
+
+    private IEnumerator FlashRed()
+    {
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        Color originalColor = spriteRenderer.color;
+        spriteRenderer.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        spriteRenderer.color = originalColor;
     }
 
     private IEnumerator Invulnerability()
@@ -245,6 +261,9 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator Stun()
     {
+        GameManager.Instance.ShakeCamera(0.5f, 0.5f);
+        GameManager.Instance.StartCoroutine(GameManager.Instance.StunAndSlowMotion());
+
         _stunned = true;
         _spriteRender.color = Color.red;
         yield return new WaitForSeconds(_invulnerabilityDuration);
@@ -267,26 +286,29 @@ public class PlayerController : MonoBehaviour
     {
         if (Lifes > 0) return;
 
-        IsDead = true;
+        Instantiate(_blastPrefab, transform.position, Quaternion.identity);
+        _rb.simulated = false;
         _canJump = false;
         _canMoveHand = false;
-        enabled = false;
-        _rb.simulated = false;
-        _spriteRender.color = Color.clear;
+        IsDead = true;
 
-        GameManager.Instance.playersDeath++;
+        gameObject.SetActive(false);
+
+        if(GameManager.Instance.CurrentState == GameManager.GameState.WaitingForPlayers)
+        {
+            GameManager.Instance.PlayerReadyCount++;
+        }
     }
 
     public void Respawn()
     {
-        IsDead = false;
+        Lifes = 4;
+        _rb.simulated = true;
         _canJump = true;
         _canMoveHand = true;
-        enabled = true;
-        _rb.simulated = true;
-        _spriteRender.color = Color.white;
-        Lifes = 4;
-        transform.position = Vector3.zero;
+        IsDead = false;
+
+        gameObject.SetActive(true);
     }
 
     public void OnMove(InputAction.CallbackContext ctx) 
