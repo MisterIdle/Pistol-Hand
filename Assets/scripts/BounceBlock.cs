@@ -8,10 +8,9 @@ public class BounceBlock : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            Rigidbody2D playerRigidbody = collision.gameObject.GetComponent<Rigidbody2D>();
-            if (playerRigidbody != null)
+            if (collision.rigidbody != null)
             {
-                playerRigidbody.AddForce(Vector2.up * bounceForce, ForceMode2D.Impulse);
+                collision.rigidbody.AddForce(Vector2.up * bounceForce, ForceMode2D.Impulse);
             }
         }
     }
