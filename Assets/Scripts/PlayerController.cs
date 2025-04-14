@@ -268,8 +268,8 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator Stun()
     {
-        GameManager.Instance.ShakeCamera(0.5f, 0.5f);
-        GameManager.Instance.StartCoroutine(GameManager.Instance.StunAndSlowMotion());
+        CameraManager.Instance.ShakeCamera(0.5f, 0.5f);
+        GameManager.Instance.StartCoroutine(CameraManager.Instance.SlowMotion());
 
         _stunned = true;
         _spriteRender.color = Color.red;
@@ -282,7 +282,11 @@ public class PlayerController : MonoBehaviour
 
     private void CheckBounds()
     {
-        if (GameManager.Instance.LoadNextMap || IsDead) return;
+        if (GameManager.Instance.CurrentState == GameState.Playing && MatchManager.Instance.LoadNextMap ) return;
+
+        if (IsDead) return;
+
+        if (GameManager.Instance.CheckPlayer()) return;
 
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
         if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0)
@@ -336,6 +340,11 @@ public class PlayerController : MonoBehaviour
         _rb.angularVelocity = 0f;
     }
 
+    public void SetPosition(Vector3 position)
+    {
+        _rb.position = position;
+    }
+
     public void OnMove(InputAction.CallbackContext ctx) 
     {
         _movementInput = ctx.ReadValue<Vector2>();
@@ -366,5 +375,13 @@ public class PlayerController : MonoBehaviour
     public void OnLook(InputAction.CallbackContext ctx) 
     { 
         if (_canMoveHand) _lookInput = ctx.ReadValue<Vector2>(); 
+    }
+    
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(transform.position, _hand.position);
+        Gizmos.DrawWireSphere(_hand.position, _hitDistance);
+        Gizmos.DrawWireSphere(_hand.position, _handMaxDistance);
     }
 }

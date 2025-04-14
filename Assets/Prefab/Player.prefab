@@ -194,19 +194,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 149dfe32f2e0b33468edc4f97b793cb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Lifes: 2
+  Lifes: 4
   PlayerID: 0
   Wins: 0
   IsDead: 0
   _maxSpeed: 10
   _acceleration: 60
   _deceleration: 70
-  _airControl: 1
-  _jumpForce: 12
+  _airControl: 0.6
+  _jumpForce: 14
   _gravityMultiplier: 2
   _maxFallSpeed: 10
   _coyoteTime: 0.15
-  _jumpBufferTime: 0.2
+  _jumpBufferTime: 0.1
   _dashSpeed: 20
   _dashDuration: 0.2
   _dashCooldown: 1
@@ -225,7 +225,7 @@ MonoBehaviour:
   _hand: {fileID: 1294991957395979940}
   _handSprite: {fileID: 3905339446647980527}
   _handSpeed: 7
-  _handMaxDistance: 1
+  _handMaxDistance: 1.5
   _dashTrail: {fileID: 4132532537398355302}
   _blastPrefab: {fileID: 8690182350583564340, guid: 08f76d027e817884baf2b5616108ade2, type: 3}
 --- !u!114 &2954489285419996480

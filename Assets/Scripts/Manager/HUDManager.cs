@@ -17,4 +17,14 @@ public class HUDManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
+
+    public void FadeIn(float time)
+    {
+        transition.CrossFadeAlpha(1, time, false);
+    }
+
+    public void FadeOut(float time)
+    {
+        transition.CrossFadeAlpha(0, time, false);
+    }
 }

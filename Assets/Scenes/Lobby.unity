@@ -211,6 +211,7 @@ GameObject:
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
+  - component: {fileID: 519420034}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -330,7 +331,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.67479026, y: -0.8012578, z: -8.8992}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -368,6 +369,18 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &519420034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bdee971baa818c4ba8955b179f6bce3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &560458979
 GameObject:
   m_ObjectHideFlags: 0
@@ -756,8 +769,8 @@ Transform:
   m_GameObject: {fileID: 961096163}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.6477, y: -5.65, z: 0}
-  m_LocalScale: {x: 18.553095, y: 0.4682, z: 1}
+  m_LocalPosition: {x: 0.04, y: -4.81, z: 0}
+  m_LocalScale: {x: 18.553095, y: 0.4099091, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -850,6 +863,7 @@ GameObject:
   - component: {fileID: 1185218007}
   - component: {fileID: 1185218006}
   - component: {fileID: 1185218008}
+  - component: {fileID: 1185218009}
   m_Layer: 0
   m_Name: CinemachineCamera
   m_TagString: Untagged
@@ -909,7 +923,7 @@ Transform:
   m_GameObject: {fileID: 1185218005}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.67479026, y: -0.8012578, z: -8.8992}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -932,6 +946,23 @@ MonoBehaviour:
   AmplitudeGain: 0
   FrequencyGain: 1
   m_NoiseOffsets: {x: -940.176, y: -536.3319, z: 216.57385}
+--- !u!114 &1185218009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185218005}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e2c70fa68851bdb47967c9b7462edbb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _slowFactor: 0.05
+  _slowDuration: 0.02
+  _shakeTime: 0
+  _transitionHeight: 50
+  _virtualCamera: {fileID: 1185218006}
 --- !u!1 &1435522321
 GameObject:
   m_ObjectHideFlags: 0
@@ -963,6 +994,98 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1533270185
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1533270187}
+  - component: {fileID: 1533270186}
+  m_Layer: 0
+  m_Name: Spline
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1533270186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533270185}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dab5c7d4c32e743048dfca98e2d5914f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Spline:
+    m_EditModeType: 1
+    m_Knots: []
+    m_MetaData: []
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Splines:
+  - m_EditModeType: 1
+    m_Knots:
+    - Position:
+        x: 0
+        y: 0
+        z: 0
+      TangentIn:
+        x: -0
+        y: -0
+        z: -0
+      TangentOut:
+        x: 0
+        y: 0
+        z: 0
+      Rotation:
+        value:
+          x: -0.70710665
+          y: 0
+          z: -0
+          w: 0.7071068
+    m_MetaData:
+    - Mode: 0
+      Tension: 0.5
+    m_Closed: 0
+    m_IntData:
+      m_Data: []
+    m_FloatData:
+      m_Data: []
+    m_Float4Data:
+      m_Data: []
+    m_ObjectData:
+      m_Data: []
+  m_Knots:
+    m_KnotsLink: []
+--- !u!4 &1533270187
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533270185}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -30.574738, y: 25.989948, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1706215308
 GameObject:
   m_ObjectHideFlags: 0
@@ -975,7 +1098,7 @@ GameObject:
   - component: {fileID: 1706215309}
   - component: {fileID: 1706215311}
   m_Layer: 0
-  m_Name: PlayerManager
+  m_Name: LobbyManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1001,7 +1124,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1706215311}
-        m_TargetAssemblyTypeName: PlayersManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: LobbyManager, Assembly-CSharp
         m_MethodName: OnPlayerJoin
         m_Mode: 1
         m_Arguments:
@@ -1072,6 +1195,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d7ceed5af6b4344988ea80ed136b9d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _playerID: 0
+  LoadNextMap: 0
 --- !u!1 &1751620504
 GameObject:
   m_ObjectHideFlags: 0
@@ -1147,21 +1272,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11a076eb237dd5d4c888db47d468ff5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MaxPlayers: 4
   MinPlayers: 2
-  PlayerDeath: 0
   PlayerCount: 0
-  winsToWin: 2
-  _lobbyScene: {fileID: 102900000, guid: 8c9cfa26abfee488c85f1582747f6a02, type: 3}
-  _matchAreaScene: {fileID: 102900000, guid: b02fd7bac061be542970274079f2b2eb, type: 3}
-  _trophyScene: {fileID: 102900000, guid: 85108ee28868a73409b77630a2137243, type: 3}
-  slowfactor: 0.05
-  slowDuration: 0.02
-  shakeTime: 0
-  virtualCamera: {fileID: 0}
-  spawnPoints: []
-  LoadNextMap: 0
-  AnimationEnd: 0
+  PlayerDeath: 0
+  LobbySceneName: Lobby
+  GameSceneName: Match
+  TrophySceneName: Trophy
 --- !u!1 &2053068933
 GameObject:
   m_ObjectHideFlags: 0
@@ -1210,3 +1326,4 @@ SceneRoots:
   - {fileID: 1435522322}
   - {fileID: 1706215310}
   - {fileID: 1169012659}
+  - {fileID: 1533270187}

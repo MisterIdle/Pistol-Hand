@@ -6,7 +6,7 @@ public class Bullet : MonoBehaviour
 
     void Start()
     {
-        Destroy(gameObject, 5f);
+        Destroy(gameObject, 3f);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -14,7 +14,6 @@ public class Bullet : MonoBehaviour
         if (collision.gameObject.tag == "Player")
         {
             PlayerController players = collision.gameObject.GetComponent<PlayerController>();
-
             if (players != shooter)
             {
                 players.TakeHit(5, gameObject, true);
