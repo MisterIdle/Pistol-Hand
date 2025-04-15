@@ -1,56 +1,37 @@
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using System.Linq;
 using UnityEngine;
 
 public class MatchManager : BaseManager
 {
     public static MatchManager Instance { get; private set; }
     
-    [Header("Game Settings")]
-    [SerializeField] private int _winsToWin = 3;
-    public int WinsToWin => _winsToWin;
-    
     [Header("Spawn System")]
-    private Transform[] _spawnPoints;
-    public bool LoadNextMap = false;
+    public bool LoadNextMap = true;
+    public bool FirstMatch = true;
 
     private void Awake()
+    {
+        InitializeSingleton();
+        GameManager.SetGameState(GameState.Playing);
+    }
+
+    private void InitializeSingleton()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
-        else if (Instance != this)
+        else
         {
             Destroy(gameObject);
-            return;
         }
-
-        GameManager.SetGameState(GameState.Playing);
-        StartCoroutine(NewMatch());
-
-        var players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
-        foreach (var player in players)
-        {
-            player.Wins = 0;
-        }
-        
-        InitializeSpawnSystem();
     }
 
     public void InMatch()
     {
         if (GameManager.CheckPlayer())
-        {
             StartCoroutine(NewMatch());
-        }
-    }
-
-    private void InitializeSpawnSystem()
-    {
-        RefreshSpawnPoints();
     }
 
     public IEnumerator NewMatch()
@@ -58,55 +39,54 @@ public class MatchManager : BaseManager
         if (LoadNextMap) yield break;
         LoadNextMap = true;
 
-        yield return new WaitForSeconds(1f);
-        yield return CameraManager.MoveCameraTransition(true, 1f);
-
-        var players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
-        foreach (var player in players)
+        if (FirstMatch)
         {
-            if (!player.IsDead) 
+            foreach (var p in GameManager.GetAllPlayers())
+                p.Wins = 0;
+
+            FirstMatch = false;
+        }
+        else
+        {
+            foreach (var p in GameManager.GetAllPlayers())
             {
-                player.Wins++;
-                if (player.Wins >= _winsToWin)
+                if (p.IsDead) continue;
+                p.Wins++;
+
+                if (p.Wins >= GameManager.NeedToWin)
                 {
-                    GameManager.SetGameState(GameState.Trophy);
-                    yield return SceneLoader.LoadScene(GameManager.TrophySceneName);
+                    Debug.Log($"Player {p.PlayerID} wins the match!");
+                    LoadNextMap = false;
+                    StartCoroutine(TeleportToTrophy());
                     yield break;
                 }
             }
-            
         }
-        
-        RefreshSpawnPoints();
-        ResetAllPlayers();
+
+        yield return new WaitForSeconds(1f);
+        yield return CameraManager.MoveCameraTransition(true, 1f);
+
+        GameManager.ResetAllPlayers();
+        GameManager.SetSpawnPoints();
+        GameManager.PlaceAllPlayers();
 
         yield return CameraManager.MoveCameraTransition(false, 1f);
         LoadNextMap = false;
     }
 
-    private void RefreshSpawnPoints()
+
+    private IEnumerator TeleportToTrophy()
     {
-        var spawnObjects = GameObject.FindGameObjectsWithTag("PlayerSpawn");
-        _spawnPoints = new Transform[spawnObjects.Length];
-        for (int i = 0; i < spawnObjects.Length; i++)
-            _spawnPoints[i] = spawnObjects[i].transform;
-    }
+        if (LoadNextMap) yield break;
+        LoadNextMap = true;
 
-    public void ResetAllPlayers()
-    {
-        var players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
-        var availableSpawns = new List<Transform>(_spawnPoints);
+        GameManager.SetGameState(GameState.Trophy);
 
-        foreach (var player in players)
-        {
-            var spawnPoint = availableSpawns.Count > 0 ? 
-                availableSpawns[Random.Range(0, availableSpawns.Count)] : 
-                _spawnPoints[Random.Range(0, _spawnPoints.Length)];
-            
-            player.Respawn();
-            player.SetPosition(spawnPoint.position);
-        }
+        yield return new WaitForSeconds(1f);
+        yield return CameraManager.MoveCameraTransition(true, 1f);
 
-        GameManager.PlayerDeath = 0;
+        LoadNextMap = false;
+        yield return SceneLoader.LoadScene(GameManager.TrophySceneName);
+        
     }
 }

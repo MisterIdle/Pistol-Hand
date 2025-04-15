@@ -1,7 +1,6 @@
-using UnityEngine;
 using UnityEngine.UI;
 
-public class HUDManager : MonoBehaviour
+public class HUDManager : BaseManager
 {
     public Image transition;
 
@@ -9,13 +8,20 @@ public class HUDManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        InitializeSingleton();
+    }
+
+    private void InitializeSingleton()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
         {
             Destroy(gameObject);
-            return;
         }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
     }
 
     public void FadeIn(float time)

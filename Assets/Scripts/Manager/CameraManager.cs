@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Cinemachine;
 using System.Collections;
 
-public class CameraManager : MonoBehaviour
+public class CameraManager : BaseManager
 {
     public static CameraManager Instance { get; private set; }
     public float slowfactor = 0.05f;
@@ -13,16 +13,21 @@ public class CameraManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
+        InitializeSingleton();
+        _cinemachineCam = GetComponent<CinemachineCamera>();
+    }
+
+    private void InitializeSingleton()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
         {
             Destroy(gameObject);
-            return;
         }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        _cinemachineCam = GetComponent<CinemachineCamera>();
     }
 
     public void Update()

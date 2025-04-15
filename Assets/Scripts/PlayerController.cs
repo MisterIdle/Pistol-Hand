@@ -6,7 +6,9 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     [Header("Stats")]
-    [SerializeField] public int Lifes = 4;
+        private int _baseHealth = 3;
+
+    [SerializeField] public int Lifes;
     [SerializeField] public int PlayerID;
     [SerializeField] public int Wins;
     [SerializeField] public bool IsDead;
@@ -85,6 +87,7 @@ public class PlayerController : MonoBehaviour
         _collider = GetComponent<Collider2D>();
 
         _dashTrail.emitting = false;
+        Lifes = _baseHealth;
 
         DontDestroyOnLoad(gameObject);
     }
@@ -321,7 +324,7 @@ public class PlayerController : MonoBehaviour
 
     public void Respawn()
     {
-        Lifes = 4;
+        Lifes = _baseHealth;
         IsDead = false; 
 
         _rb.simulated = true;

@@ -1,5 +1,7 @@
 using UnityEngine;
+using System.Linq;
 
+[DefaultExecutionOrder(-100)]
 public class GameManager : BaseManager
 {
     public static GameManager Instance { get; private set; }
@@ -9,6 +11,8 @@ public class GameManager : BaseManager
     public int MinPlayers = 2;
     public int PlayerCount;
     public int PlayerDeath;
+    public int NeedToWin = 3;
+    [SerializeField] public Transform[] _spawnPoints;
 
     [Header("Scene Settings")]
     public string LobbySceneName = "Lobby";
@@ -16,6 +20,14 @@ public class GameManager : BaseManager
     public string TrophySceneName = "Trophy";
 
     private void Awake()
+    {
+        InitializeSingleton();
+
+        Time.fixedDeltaTime = Time.timeScale * 0.02f;
+        Time.timeScale = 1f;
+    }
+
+    private void InitializeSingleton()
     {
         if (Instance == null)
         {
@@ -26,11 +38,6 @@ public class GameManager : BaseManager
         {
             Destroy(gameObject);
         }
-
-        Time.fixedDeltaTime = Time.timeScale * 0.02f;
-        Time.timeScale = 1f;
-
-        HUDManager.Instance.FadeOut(0.5f);
     }
 
     private void Update()
@@ -42,8 +49,6 @@ public class GameManager : BaseManager
                 break;
             case GameState.Playing:
                 MatchManager.InMatch();
-                break;
-            case GameState.Trophy:
                 break;
         }
     }
@@ -62,5 +67,39 @@ public class GameManager : BaseManager
     public bool CheckPlayer() 
     {
         return PlayerDeath == PlayerCount - 1 && PlayerCount >= MinPlayers;
+    }
+
+    public PlayerController[] GetAllPlayers()
+    {
+        PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
+        return players;
+    }
+
+    public void ResetAllPlayers()
+    {
+        PlayerController[] players = GetAllPlayers();
+        foreach (PlayerController player in players)
+        {
+            player.Respawn();
+            PlayerDeath = 0;
+        }
+    }
+
+    public void SetSpawnPoints()
+    {
+        _spawnPoints = GameObject.FindGameObjectsWithTag("PlayerSpawn")
+            .Select(go => go.transform)
+            .ToArray();
+    }
+
+    public void PlaceAllPlayers()
+    {
+        var players = GameManager.GetAllPlayers();
+        var shuffledSpawnPoints = _spawnPoints.OrderBy(x => Random.value).ToArray();
+        for (int i = 0; i < players.Length; i++)
+        {
+            var spawnPoint = shuffledSpawnPoints[i % shuffledSpawnPoints.Length];
+            players[i].SetPosition(spawnPoint.position);
+        }
     }
 }

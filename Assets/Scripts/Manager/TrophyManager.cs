@@ -1,20 +1,22 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class TrophyManager : MonoBehaviour
+public class TrophyManager : BaseManager
 {
     public static TrophyManager Instance { get; private set; }
-
-    [SerializeField] private string _trophySceneName = "Trophy";
-    public bool AnimationEnd { get; set; } = false;
+    public bool AnimationEnd = false;
 
     private void Awake()
+    {
+        InitializeSingleton();
+        StartCoroutine(EndAnimation());
+    }
+
+    private void InitializeSingleton()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -22,45 +24,36 @@ public class TrophyManager : MonoBehaviour
         }
     }
 
-    public void StartTrophySequence()
-    {
-        StartCoroutine(TrophySequence());
-    }
-
-    private IEnumerator TrophySequence()
-    {
-        yield return new WaitForSeconds(1f);
-        yield return SceneLoader.LoadScene(_trophySceneName);
-        yield return StartCoroutine(EndAnimation());
-    }
-
     private IEnumerator EndAnimation()
     {
         if (AnimationEnd) yield break;
         AnimationEnd = true;
 
+        yield return CameraManager.MoveCameraTransition(false, 1f);
+        
+        GameManager.ResetAllPlayers();
+        GameManager.SetSpawnPoints();
+        GameManager.PlaceAllPlayers();
+
         yield return new WaitForSeconds(3f);
 
-        var players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
-        var nonWinners = new List<PlayerController>(players);
-        nonWinners.RemoveAll(p => p.Wins >= MatchManager.Instance.WinsToWin);
-
-        yield return new WaitForSeconds(2f);
-
-        while (nonWinners.Count > 0)
-        {
-            int index = Random.Range(0, nonWinners.Count);
-            PlayerController playerToExplode = nonWinners[index];
-
-            //playerToExplode.KillPlayer();
-            nonWinners.RemoveAt(index);
-
-            yield return new WaitForSeconds(0.7f);
+        foreach (var player in GameManager.GetAllPlayers()) {
+            if (player.Wins != GameManager.NeedToWin) {
+                player.KillPlayer();
+                yield return new WaitForSeconds(2f);
+            }
         }
 
+        HUDManager.FadeIn(1f);
         yield return new WaitForSeconds(2f);
 
-        AnimationEnd = false;
-        yield return LobbyManager.Instance.ReturnLobby();
+        foreach (var player in GameManager.GetAllPlayers()) {
+            Destroy(player.gameObject);
+        }
+
+        GameManager.PlayerCount = 0;
+        GameManager.PlayerDeath = 0;
+
+        yield return SceneLoader.LoadScene(GameManager.LobbySceneName);
     }
 }
