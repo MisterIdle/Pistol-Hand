@@ -387,4 +387,13 @@ public class PlayerController : MonoBehaviour
         Gizmos.DrawWireSphere(_hand.position, _hitDistance);
         Gizmos.DrawWireSphere(_hand.position, _handMaxDistance);
     }
+
+    public void OnAdjustVolume(InputAction.CallbackContext context)
+    {
+        Vector2 dpadInput = context.ReadValue<Vector2>();
+
+        if (context.canceled) dpadInput = Vector2.zero;
+
+        AudioManager.instance.OnAdjustVolumeFromPlayer(dpadInput);
+    }
 }

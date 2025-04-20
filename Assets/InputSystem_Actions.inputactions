@@ -800,6 +800,34 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Gameplay",
+            "id": "f4fa6626-cc70-4782-ac4a-9ee49f9ce193",
+            "actions": [
+                {
+                    "name": "AdjustVolume",
+                    "type": "Value",
+                    "id": "ecd23e2b-6064-44b0-bdda-d4c595e16fcf",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "609f8078-011c-45a6-ba6d-bc207053cdeb",
+                    "path": "<Gamepad>/dpad",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "AdjustVolume",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [

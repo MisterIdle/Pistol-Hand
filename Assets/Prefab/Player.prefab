@@ -373,6 +373,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 3d3ed8c9-f363-465c-b8ac-ff42b9688c43
     m_ActionName: Player/Dash
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 3453670601001217476}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnAdjustVolume
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: ecd23e2b-6064-44b0-bdda-d4c595e16fcf
+    m_ActionName: 'Gameplay/AdjustVolume[/XInputControllerWindows/dpad]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
