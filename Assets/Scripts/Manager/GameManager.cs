@@ -18,6 +18,8 @@ public class GameManager : BaseManager
     public string LobbySceneName = "Lobby";
     public string GameSceneName = "Match";
     public string TrophySceneName = "Trophy";
+    public string EditorSceneName = "Editor";
+    public float GridSize = 0.5f;
 
     private void Awake()
     {

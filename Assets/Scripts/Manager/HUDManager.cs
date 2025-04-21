@@ -1,8 +1,10 @@
 using UnityEngine.UI;
+using UnityEngine;
 
 public class HUDManager : BaseManager
 {
     public Image transition;
+    public Button editorButton;
 
     public static HUDManager Instance { get; private set; }
 
@@ -32,5 +34,11 @@ public class HUDManager : BaseManager
     public void FadeOut(float time)
     {
         transition.CrossFadeAlpha(0, time, false);
+    }
+
+    public void ChangeToEditorScene()
+    {
+        StartCoroutine(SceneLoader.LoadScene(GameManager.EditorSceneName));
+        Debug.Log("Change to Editor Scene");
     }
 }

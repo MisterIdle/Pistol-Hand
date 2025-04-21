@@ -118,6 +118,16 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         ApplyGravity();
 
+        if (IsGrounded())
+        {
+            Vector2 pos = transform.position;
+            RaycastHit2D hit = Physics2D.Raycast(pos, Vector2.down, 0.1f, LayerMask.GetMask("Ground"));
+            if (!hit)
+            {
+                transform.position += Vector3.down * 0.01f;
+            }
+        }
+
         if (IsGrounded()) _isJumping = false;
     }
 
@@ -285,7 +295,7 @@ public class PlayerController : MonoBehaviour
 
     private void CheckBounds()
     {
-        if (GameManager.Instance.CurrentState == GameState.Playing && MatchManager.Instance.LoadNextMap ) return;
+        if (GameManager.Instance.CurrentState == GameState.Playing && MatchManager.Instance.IsLoading ) return;
 
         if (IsDead) return;
 
@@ -378,14 +388,6 @@ public class PlayerController : MonoBehaviour
     public void OnLook(InputAction.CallbackContext ctx) 
     { 
         if (_canMoveHand) _lookInput = ctx.ReadValue<Vector2>(); 
-    }
-    
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position, _hand.position);
-        Gizmos.DrawWireSphere(_hand.position, _hitDistance);
-        Gizmos.DrawWireSphere(_hand.position, _handMaxDistance);
     }
 
     public void OnAdjustVolume(InputAction.CallbackContext context)
