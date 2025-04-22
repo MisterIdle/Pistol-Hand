@@ -36,7 +36,7 @@ public class HUDManager : BaseManager
         transition.CrossFadeAlpha(0, time, false);
     }
 
-    public void ChangeToEditorScene()
+    public void OnEditorButtonClick()
     {
         StartCoroutine(SceneLoader.LoadScene(GameManager.EditorSceneName));
         Debug.Log("Change to Editor Scene");

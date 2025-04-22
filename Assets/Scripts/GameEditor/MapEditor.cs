@@ -6,6 +6,10 @@ public class MapEditor : BaseManager
 {
     public BlockDatabase blockDatabase;
 
+    // Interdiction de changer ses valeurs!
+    private Vector2 buildAreaMin = new Vector2(-8, -5);
+    private Vector2 buildAreaMax = new Vector2(8, 5);
+
     private List<PlacedBlock> placedBlocks = new();
     private GameObject ghostBlock;
     private int currentBlockIndex = 0;
@@ -20,6 +24,17 @@ public class MapEditor : BaseManager
         CreateGhostBlock();
 
         GameManager.SetGameState(GameState.Editor);
+
+        foreach (var player in GameManager.GetAllPlayers())
+        {
+            Destroy(player.gameObject);
+        }
+
+        CameraManager.ChangeCameraLens(6.5f);
+        CameraManager.SetCameraPosition(new Vector3(0, -1f, -10));
+
+        HUDManager.gameObject.SetActive(false);
+
     }
 
     private void Update()
@@ -40,9 +55,6 @@ public class MapEditor : BaseManager
         }
 
         UpdateGhostBlock(gridPos);
-
-        if (Input.GetKeyDown(KeyCode.F1))
-            SaveMap();
     }
 
     private void HandleScrollInput()
@@ -60,7 +72,7 @@ public class MapEditor : BaseManager
 
     private void PlaceBlock(Vector3 pos)
     {
-        if (IsBlockAt(pos)) return;
+        if (!IsInBuildArea(pos) || IsBlockAt(pos)) return;
 
         var blockData = blockDatabase.blocks[currentBlockIndex];
         GameObject obj = Instantiate(blockData.prefab, pos, Quaternion.identity);
@@ -69,6 +81,8 @@ public class MapEditor : BaseManager
 
     private void RemoveBlock(Vector3 pos)
     {
+        if (!IsInBuildArea(pos)) return;
+
         for (int i = placedBlocks.Count - 1; i >= 0; i--)
         {
             if (placedBlocks[i].instance != null && placedBlocks[i].instance.transform.position == pos)
@@ -97,7 +111,10 @@ public class MapEditor : BaseManager
     private void UpdateGhostBlock(Vector3 pos)
     {
         if (ghostBlock != null)
+        {
             ghostBlock.transform.position = pos;
+            ghostBlock.SetActive(IsInBuildArea(pos));
+        }
     }
 
     private Vector3 GetMouseGridPosition()
@@ -125,7 +142,13 @@ public class MapEditor : BaseManager
         return false;
     }
 
-    private void SaveMap()
+    private bool IsInBuildArea(Vector3 pos)
+    {
+        return pos.x >= buildAreaMin.x && pos.x <= buildAreaMax.x &&
+               pos.y >= buildAreaMin.y && pos.y <= buildAreaMax.y;
+    }
+
+    public void SaveMap(string mapName)
     {
         var mapData = new MapData();
 
@@ -144,14 +167,54 @@ public class MapEditor : BaseManager
         string folder = Application.dataPath + "/Save";
         if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
 
-        string path = folder + "/map_" + System.DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".json";
+        string path = folder + "/map_" + mapName + ".json";
         File.WriteAllText(path, JsonUtility.ToJson(mapData, true));
         Debug.Log("Map saved to: " + path);
     }
+
+
+    public void LoadMap(string mapName)
+    {
+        string path = Application.dataPath + "/Save/" + mapName + ".json";
+        if (!File.Exists(path)) return;
+
+        string json = File.ReadAllText(path);
+        MapData mapData = JsonUtility.FromJson<MapData>(json);
+
+        foreach (var block in placedBlocks)
+        {
+            if (block.instance != null)
+                Destroy(block.instance);
+        }
+        placedBlocks.Clear();
+
+        foreach (var data in mapData.blocks)
+        {
+            var blockData = blockDatabase.blocks.Find(b => b.id == data.blockID);
+            if (blockData != null)
+            {
+                GameObject obj = Instantiate(blockData.prefab, data.position, Quaternion.identity);
+                placedBlocks.Add(new PlacedBlock { id = data.blockID, instance = obj });
+            }
+        }
+
+        Debug.Log("Map loaded: " + mapName);
+    }
+
 
     private class PlacedBlock
     {
         public string id;
         public GameObject instance;
+    }
+
+    // Draw gizmo for build area
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(new Vector3(buildAreaMin.x, buildAreaMin.y), new Vector3(buildAreaMax.x, buildAreaMin.y));
+        Gizmos.DrawLine(new Vector3(buildAreaMax.x, buildAreaMin.y), new Vector3(buildAreaMax.x, buildAreaMax.y));
+        Gizmos.DrawLine(new Vector3(buildAreaMax.x, buildAreaMax.y), new Vector3(buildAreaMin.x, buildAreaMax.y));
+        Gizmos.DrawLine(new Vector3(buildAreaMin.x, buildAreaMax.y), new Vector3(buildAreaMin.x, buildAreaMin.y));
     }
 }

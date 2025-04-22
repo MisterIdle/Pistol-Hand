@@ -80,4 +80,14 @@ public class CameraManager : BaseManager
             yield return null;
         }
     }
+
+    public void ChangeCameraLens(float newLens)
+    {
+        _cinemachineCam.Lens.OrthographicSize = newLens;
+    }
+
+    public void SetCameraPosition(Vector3 newPos)
+    {
+        _cinemachineCam.transform.position = newPos;
+    }
 }

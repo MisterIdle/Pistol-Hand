@@ -75,7 +75,7 @@ public class MatchManager : BaseManager
         LoadRandomMap();
 
         yield return new WaitForSeconds(1f);
-        
+
         GameManager.ResetAllPlayers();
         GameManager.SetSpawnPoints();
         GameManager.PlaceAllPlayers();
@@ -106,20 +106,23 @@ public class MatchManager : BaseManager
         {
             Debug.LogError("Save directory not found: " + directoryPath);
             return;
-        }
+        }   
 
         string[] files = Directory.GetFiles(directoryPath, "*.json");
         if (files.Length == 0)
         {
             Debug.LogError("No map files found in directory: " + directoryPath);
             return;
-        }
+        }   
+
+        foreach (Transform child in blocks.transform)
+            Destroy(child.gameObject);  
 
         string randomFile = files[Random.Range(0, files.Length)];
-        Debug.Log("Loading random map: " + randomFile);
+        Debug.Log("Loading random map: " + randomFile); 
 
         string json = File.ReadAllText(randomFile);
-        MapData mapData = JsonUtility.FromJson<MapData>(json);
+        MapData mapData = JsonUtility.FromJson<MapData>(json);  
 
         foreach (var data in mapData.blocks)
         {
@@ -131,6 +134,7 @@ public class MatchManager : BaseManager
             }
         }
     }
+
 
     private Vector3 SnapToGrid(Vector3 pos)
     {

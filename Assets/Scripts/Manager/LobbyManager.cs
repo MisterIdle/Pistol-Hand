@@ -14,6 +14,11 @@ public class LobbyManager : BaseManager
         InitializeSingleton();
         GameManager.SetGameState(GameState.WaitingForPlayers);
         HUDManager.FadeOut(1f);
+
+        CameraManager.ChangeCameraLens(5f);
+        CameraManager.SetCameraPosition(new Vector3(0, 0, -10));
+
+        HUDManager.gameObject.SetActive(true);
     }
 
     private void InitializeSingleton()

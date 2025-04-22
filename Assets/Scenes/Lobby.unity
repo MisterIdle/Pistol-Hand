@@ -395,7 +395,7 @@ GameObject:
   - component: {fileID: 560458980}
   - component: {fileID: 560458984}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: GlobalHUD
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -907,7 +907,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 560458984}
         m_TargetAssemblyTypeName: HUDManager, Assembly-CSharp
-        m_MethodName: ChangeToEditorScene
+        m_MethodName: OnEditorButtonClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1294,7 +1294,7 @@ Transform:
   m_GameObject: {fileID: 1798133682}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.7842484, y: -3.2559617, z: -0.10095016}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
