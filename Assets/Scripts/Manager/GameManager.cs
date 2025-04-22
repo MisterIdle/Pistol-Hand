@@ -52,6 +52,9 @@ public class GameManager : BaseManager
             case GameState.Playing:
                 MatchManager.InMatch();
                 break;
+            case GameState.Editor:
+                MapTester.InTestMatch();
+                break;
         }
     }
 
@@ -109,5 +112,17 @@ public class GameManager : BaseManager
             var spawnPoint = shuffledSpawnPoints[i % shuffledSpawnPoints.Length];
             players[i].SetPosition(spawnPoint.position);
         }
+    }
+
+    public void PlacePlayer(PlayerController player)
+    {
+        if (_spawnPoints == null || _spawnPoints.Length == 0)
+        {
+            Debug.LogError("No spawn points found! Stopping the game.");
+            return;
+        }
+
+        var randomSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
+        player.transform.position = randomSpawnPoint.position;
     }
 }

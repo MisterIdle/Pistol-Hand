@@ -8,4 +8,6 @@ public abstract class BaseManager : MonoBehaviour
     protected CameraManager CameraManager => CameraManager.Instance;
     protected MatchManager MatchManager => MatchManager.Instance;
     protected TrophyManager TrophyManager => TrophyManager.Instance;
+    protected MapEditor MapEditor => MapEditor.Instance;
+    protected MapTester MapTester => MapTester.Instance;
 }

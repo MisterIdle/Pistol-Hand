@@ -81,13 +81,35 @@ public class CameraManager : BaseManager
         }
     }
 
-    public void ChangeCameraLens(float newLens)
+    public IEnumerator ChangeCameraLens(float newLens, float duration)
     {
+        float originalLens = _cinemachineCam.Lens.OrthographicSize;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsedTime / duration);
+            _cinemachineCam.Lens.OrthographicSize = Mathf.Lerp(originalLens, newLens, t);
+            yield return null;
+        }
+
         _cinemachineCam.Lens.OrthographicSize = newLens;
     }
 
-    public void SetCameraPosition(Vector3 newPos)
+    public IEnumerator SetCameraPosition(Vector3 newPos, float duration)
     {
+        Vector3 originalPos = _cinemachineCam.transform.position;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsedTime / duration);
+            _cinemachineCam.transform.position = Vector3.Lerp(originalPos, newPos, t);
+            yield return null;
+        }
+
         _cinemachineCam.transform.position = newPos;
     }
 }

@@ -1,22 +1,43 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 
 public class MapEditor : BaseManager
 {
+    public static MapEditor Instance { get; private set; }
+
     public BlockDatabase blockDatabase;
 
-    // Interdiction de changer ses valeurs!
-    private Vector2 buildAreaMin = new Vector2(-8, -5);
-    private Vector2 buildAreaMax = new Vector2(8, 5);
+    [SerializeField] private Vector2 buildAreaMin = new Vector2(-9, -5);
+    [SerializeField] private Vector2 buildAreaMax = new Vector2(9, 5);
 
     private List<PlacedBlock> placedBlocks = new();
     private GameObject ghostBlock;
+    private GameObject mirrorGhostBlock;
     private int currentBlockIndex = 0;
 
     private Camera cam;
     private Vector3 lastPlacedPos = Vector3.positiveInfinity;
     private Vector3 lastRemovedPos = Vector3.positiveInfinity;
+
+    public void Awake()
+    {
+        InitializeSingleton();
+    }
+
+    private void InitializeSingleton()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
 
     private void Start()
     {
@@ -30,15 +51,16 @@ public class MapEditor : BaseManager
             Destroy(player.gameObject);
         }
 
-        CameraManager.ChangeCameraLens(6.5f);
-        CameraManager.SetCameraPosition(new Vector3(0, -1f, -10));
-
-        HUDManager.gameObject.SetActive(false);
-
+        HUDManager.EnableHUD(true);
+        StartCoroutine(CameraManager.ChangeCameraLens(6.5f, 0f));
+        StartCoroutine(CameraManager.SetCameraPosition(new Vector3(-1.5f, -1f, -10), 0f));
+        HUDManager.Instance.editorButton.gameObject.SetActive(false);
     }
 
     private void Update()
     {
+        if (MapTester.Instance.InTestMode) return;
+
         Vector3 gridPos = GetMouseGridPosition();
         HandleScrollInput();
 
@@ -70,14 +92,32 @@ public class MapEditor : BaseManager
         }
     }
 
+    public void SetBlockIndex(int index)
+    {
+        currentBlockIndex = index;
+        Destroy(ghostBlock);
+        CreateGhostBlock();
+    }
+
     private void PlaceBlock(Vector3 pos)
     {
-        if (!IsInBuildArea(pos) || IsBlockAt(pos)) return;
+        if (!IsInBuildArea(pos) || IsBlockAt(pos) || HUDEditorManager.Instance.errorImage.gameObject.activeSelf) return;
 
         var blockData = blockDatabase.blocks[currentBlockIndex];
         GameObject obj = Instantiate(blockData.prefab, pos, Quaternion.identity);
         placedBlocks.Add(new PlacedBlock { id = blockData.id, instance = obj });
+
+        if (HUDEditorManager.Instance.mirrorModeToggle.isOn)
+        {
+            Vector3 mirrorPos = new Vector3(-pos.x, pos.y, pos.z);
+            if (IsInBuildArea(mirrorPos) && !IsBlockAt(mirrorPos))
+            {
+                GameObject mirrorObj = Instantiate(blockData.prefab, mirrorPos, Quaternion.identity);
+                placedBlocks.Add(new PlacedBlock { id = blockData.id, instance = mirrorObj });
+            }
+        }
     }
+
 
     private void RemoveBlock(Vector3 pos)
     {
@@ -89,7 +129,21 @@ public class MapEditor : BaseManager
             {
                 Destroy(placedBlocks[i].instance);
                 placedBlocks.RemoveAt(i);
-                return;
+                break;
+            }
+        }
+
+        if (HUDEditorManager.Instance.mirrorModeToggle.isOn)
+        {
+            Vector3 mirrorPos = new Vector3(-pos.x, pos.y, pos.z);
+            for (int i = placedBlocks.Count - 1; i >= 0; i--)
+            {
+                if (placedBlocks[i].instance != null && placedBlocks[i].instance.transform.position == mirrorPos)
+                {
+                    Destroy(placedBlocks[i].instance);
+                    placedBlocks.RemoveAt(i);
+                    break;
+                }
             }
         }
     }
@@ -106,6 +160,12 @@ public class MapEditor : BaseManager
         {
             c.enabled = false;
         }
+
+        if (mirrorGhostBlock != null)
+        {
+            Destroy(mirrorGhostBlock);
+            mirrorGhostBlock = null;
+        }
     }
 
     private void UpdateGhostBlock(Vector3 pos)
@@ -113,9 +173,31 @@ public class MapEditor : BaseManager
         if (ghostBlock != null)
         {
             ghostBlock.transform.position = pos;
-            ghostBlock.SetActive(IsInBuildArea(pos));
+            ghostBlock.SetActive(IsInBuildArea(pos) && !HUDEditorManager.Instance.errorImage.gameObject.activeSelf);
+        }
+
+        if (HUDEditorManager.Instance.mirrorModeToggle.isOn && ghostBlock != null)
+        {
+            if (mirrorGhostBlock == null)
+            {
+                mirrorGhostBlock = Instantiate(blockDatabase.blocks[currentBlockIndex].prefab);
+                foreach (var r in mirrorGhostBlock.GetComponentsInChildren<SpriteRenderer>())
+                    r.color = new Color(r.color.r, r.color.g, r.color.b, 0.4f);
+                foreach (var c in mirrorGhostBlock.GetComponentsInChildren<Collider2D>())
+                    c.enabled = false;
+            }
+
+            Vector3 mirrorPos = new Vector3(-pos.x, pos.y, pos.z);
+            mirrorGhostBlock.transform.position = mirrorPos;
+            mirrorGhostBlock.SetActive(IsInBuildArea(mirrorPos));
+        }
+        else if (mirrorGhostBlock != null)
+        {
+            Destroy(mirrorGhostBlock);
+            mirrorGhostBlock = null;
         }
     }
+
 
     private Vector3 GetMouseGridPosition()
     {
@@ -150,12 +232,19 @@ public class MapEditor : BaseManager
 
     public void SaveMap(string mapName)
     {
+        string requiredBlockID = "4";
+        int requiredCount = 4;
+        int actualCount = 0;
+
         var mapData = new MapData();
 
         foreach (var block in placedBlocks)
         {
             if (block.instance != null)
             {
+                if (block.id == requiredBlockID)
+                    actualCount++;
+
                 mapData.blocks.Add(new BlockData
                 {
                     blockID = block.id,
@@ -164,14 +253,21 @@ public class MapEditor : BaseManager
             }
         }
 
+        if (actualCount < requiredCount)
+        {
+            HUDEditorManager.Instance.ErrorMessage($"Il faut au moins {requiredCount} blocs de type 'Spawn' pour sauvegarder la carte.");
+            return;
+        }
+
         string folder = Application.dataPath + "/Save";
         if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
 
         string path = folder + "/map_" + mapName + ".json";
         File.WriteAllText(path, JsonUtility.ToJson(mapData, true));
         Debug.Log("Map saved to: " + path);
-    }
 
+        HUDEditorManager.Instance.SuccessMessage($"Carte \"{mapName}\" sauvegardée.");
+    }
 
     public void LoadMap(string mapName)
     {
@@ -208,10 +304,9 @@ public class MapEditor : BaseManager
         public GameObject instance;
     }
 
-    // Draw gizmo for build area
-    private void OnDrawGizmos()
+    public void OnDrawGizmos()
     {
-        Gizmos.color = Color.green;
+        Gizmos.color = Color.red;
         Gizmos.DrawLine(new Vector3(buildAreaMin.x, buildAreaMin.y), new Vector3(buildAreaMax.x, buildAreaMin.y));
         Gizmos.DrawLine(new Vector3(buildAreaMax.x, buildAreaMin.y), new Vector3(buildAreaMax.x, buildAreaMax.y));
         Gizmos.DrawLine(new Vector3(buildAreaMax.x, buildAreaMax.y), new Vector3(buildAreaMin.x, buildAreaMax.y));

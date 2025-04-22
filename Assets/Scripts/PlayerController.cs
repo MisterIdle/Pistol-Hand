@@ -329,7 +329,6 @@ public class PlayerController : MonoBehaviour
     public void KillPlayer()
     {
         Lifes = 0;
-        HandleDeath();
     }
 
     public void Respawn()

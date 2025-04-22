@@ -13,12 +13,11 @@ public class LobbyManager : BaseManager
     {
         InitializeSingleton();
         GameManager.SetGameState(GameState.WaitingForPlayers);
-        HUDManager.FadeOut(1f);
 
-        CameraManager.ChangeCameraLens(5f);
-        CameraManager.SetCameraPosition(new Vector3(0, 0, -10));
-
-        HUDManager.gameObject.SetActive(true);
+        HUDManager.EnableHUD(true);
+        StartCoroutine(CameraManager.ChangeCameraLens(5f, 0f));
+        StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0, 0, -10), 0f));
+        HUDManager.Instance.editorButton.gameObject.SetActive(true);
     }
 
     private void InitializeSingleton()
@@ -35,16 +34,21 @@ public class LobbyManager : BaseManager
 
     public void OnPlayerJoin()
     {
-        var player = FindAnyObjectByType<PlayerController>();
-        if (player == null) return;
+        var players = GameManager.GetAllPlayers();
+        if (players == null) return;
 
-        player.PlayerID = _playerID;
-        player.name = $"Player {_playerID}";
+        int id = 0;
+        foreach (var player in players)
+        {
+            player.name = $"Player {id}";
+            player.PlayerID = id;
+            id++;
+        }
+
+        _playerID = id;
+        GameManager.PlayerCount = id;
 
         StartCoroutine(CameraManager.SlowMotion());
-
-        _playerID++;
-        GameManager.PlayerCount++;
     }
 
     public void InLobby()

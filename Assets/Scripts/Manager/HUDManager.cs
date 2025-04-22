@@ -1,5 +1,6 @@
 using UnityEngine.UI;
 using UnityEngine;
+using System.Collections;
 
 public class HUDManager : BaseManager
 {
@@ -26,19 +27,44 @@ public class HUDManager : BaseManager
         }
     }
 
-    public void FadeIn(float time)
+    public void EnableHUD(bool enable, float time = 1f)
     {
-        transition.CrossFadeAlpha(1, time, false);
+        if (enable)
+        {
+            StartCoroutine(FadeOut(time));
+        }
+        else
+        {
+            StartCoroutine(FadeIn(time));
+        }
     }
 
-    public void FadeOut(float time)
+    public IEnumerator FadeIn(float time)
     {
+        transition.gameObject.SetActive(true);
+        transition.canvasRenderer.SetAlpha(0);
+        transition.CrossFadeAlpha(1, time, false);
+        yield return new WaitForSeconds(time);
+    }
+
+    public IEnumerator FadeOut(float time)
+    {
+        transition.canvasRenderer.SetAlpha(1);
         transition.CrossFadeAlpha(0, time, false);
+        yield return new WaitForSeconds(time);
+        transition.gameObject.SetActive(false);
     }
 
     public void OnEditorButtonClick()
     {
+        StartCoroutine(GoToEditorScene());
+    }
+
+    public IEnumerator GoToEditorScene()
+    {
+        HUDManager.EnableHUD(false);
+        yield return new WaitForSeconds(1f);
+
         StartCoroutine(SceneLoader.LoadScene(GameManager.EditorSceneName));
-        Debug.Log("Change to Editor Scene");
     }
 }

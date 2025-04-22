@@ -44,7 +44,7 @@ public class TrophyManager : BaseManager
             }
         }
 
-        HUDManager.FadeIn(1f);
+        HUDManager.EnableHUD(false);
         yield return new WaitForSeconds(2f);
 
         foreach (var player in GameManager.GetAllPlayers()) {
