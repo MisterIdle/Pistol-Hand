@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 62ac2fa0e570f8d40b31c4ecdc6b953e
+guid: e60eb845f0863574c92ad827335958e3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1728379928979949314
-    second: tile_0070_0
+      213: -1626570117965912691
+    second: Floppy-Drive_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: tile_0070_0
+      name: Floppy-Drive_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 16
-        height: 16
+        width: 14
+        height: 14
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ef83c38ac9f8308e0800000000000000
-      internalID: -1728379928979949314
+      spriteID: d85606c78134d69e0800000000000000
+      internalID: -1626570117965912691
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      tile_0070_0: -1728379928979949314
+      Floppy-Drive_0: -1626570117965912691
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 54d8f50958bfb6444b720fd91aff041e
+guid: 6e7d29049e76d72478dd781dee9e19c7
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6538737339212252443
-    second: Message-Three-Dots_0
+      213: -1922979618149193216
+    second: Exit_0
+  - first:
+      213: -3985504364236080531
+    second: Exit_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +103,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Message-Three-Dots_0
+      name: Exit_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
-        width: 14
-        height: 13
+        y: 2
+        width: 9
+        height: 10
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +118,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5eabba0a80db145a0800000000000000
-      internalID: -6538737339212252443
+      spriteID: 00aa6e5c9343055e0800000000000000
+      internalID: -1922979618149193216
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Exit_1
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 0
+        width: 7
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6a70f695e4a0b8c0800000000000000
+      internalID: -3985504364236080531
       vertices: []
       indices: 
       edges: []
@@ -135,7 +160,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Message-Three-Dots_0: -6538737339212252443
+      Exit_0: -1922979618149193216
+      Exit_1: -3985504364236080531
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

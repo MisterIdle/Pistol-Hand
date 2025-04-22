@@ -16,6 +16,7 @@ public class HUDEditorManager : BaseManager
     public Toggle mirrorModeToggle;
     public Toggle knowCenter;
     public GameObject mirrorModeImage;
+    public GameObject killBoxImage;
 
     public GameObject editorUI;
     public GameObject testerUI;

@@ -61,6 +61,9 @@ public class MapTester : BaseManager
         HUDEditorManager.Instance.editorUI.SetActive(false);
         HUDEditorManager.Instance.testerUI.SetActive(true);
 
+        HUDEditorManager.Instance.mirrorModeImage.SetActive(false);
+        HUDEditorManager.Instance.killBoxImage.SetActive(false);
+
         GameManager.ResetAllPlayers();
         GameManager.SetSpawnPoints();
 
@@ -87,6 +90,9 @@ public class MapTester : BaseManager
         
         HUDEditorManager.Instance.editorUI.SetActive(true);
         HUDEditorManager.Instance.testerUI.SetActive(false);
+
+        HUDEditorManager.Instance.mirrorModeImage.SetActive(true);
+        HUDEditorManager.Instance.killBoxImage.SetActive(true);
 
         InTestMode = false;
     }
