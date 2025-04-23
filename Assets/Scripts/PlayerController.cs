@@ -1,4 +1,5 @@
 using System.Collections;
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -35,7 +36,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform _shootPoint;
     [SerializeField] private float _shootForce = 20f;
-    [SerializeField] private float _shootCooldown = 0.5f;
+    private float _shootCooldown;
 
     [Header("Hit")]
     [SerializeField] private float _hitDistance = 0.5f;
@@ -59,6 +60,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TrailRenderer _dashTrail;
     [SerializeField] private GameObject _blastPrefab;
 
+    [Header("Animation")]
+    [SerializeField] private Animator _animator;
+    [SerializeField] private Animator _handAnimator;
+
     private Rigidbody2D _rb;
     private SpriteRenderer _spriteRender;
     private Collider2D _collider;
@@ -77,6 +82,9 @@ public class PlayerController : MonoBehaviour
     private bool _canMoveHand = true;
     private bool _jumpRequested;
     private bool _shooting;
+    private bool _canDash = true;
+    private bool _isShooting;
+
     private bool _isInvulnerable;
 
     public void Awake()
@@ -104,6 +112,13 @@ public class PlayerController : MonoBehaviour
         }
 
         if (_isDashing) Punch();
+
+        _animator.SetFloat("Speed", _rb.linearVelocity.magnitude);
+        if (!_isDashing && !_shooting)
+        {
+            _animator.SetBool("Jump", !IsGrounded());
+        }
+        
 
         HandleDeath();
         HandleShooting();
@@ -145,7 +160,14 @@ public class PlayerController : MonoBehaviour
         if (!IsGrounded()) accelRate *= _airControl;
 
         _rb.AddForce(Vector2.right * speedDiff * accelRate);
-        _spriteRender.flipX = _movementInput.x < -0.1f;
+        if (_movementInput.x < -0.01f)
+        {
+            _spriteRender.flipX = true;
+        }
+        else if (_movementInput.x > 0.01f)
+        {
+            _spriteRender.flipX = false;
+        }
     }
 
     private void HandleJump()
@@ -169,7 +191,8 @@ public class PlayerController : MonoBehaviour
         _hand.position = Vector3.MoveTowards(_hand.position, _hand.position + dir * _handSpeed, _handSpeed * Time.deltaTime);
 
         Vector3 toHand = _hand.position - transform.position;
-        _hand.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(toHand.y, toHand.x) * Mathf.Rad2Deg);
+        float rotationOffset = _canDash ? 0 : -90;
+        _hand.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(toHand.y, toHand.x) * Mathf.Rad2Deg + rotationOffset);
 
         if (toHand.magnitude > _handMaxDistance)
         {
@@ -185,22 +208,60 @@ public class PlayerController : MonoBehaviour
 
     private void HandleShooting()
     {
-        if (!_shooting || _shootTimer > 0f) return; 
+        if (!_shooting || _isShooting || _shootTimer > 0f) return;  
 
-        Vector3 dir = (_hand.position - transform.position).normalized;
+        _isShooting = true;
+        _animator.SetBool("Jump", false);
+        _animator.SetBool("Dash", false);
+        _animator.SetBool("Crossbow", true);
+        _handAnimator.SetTrigger("Shoot");
+
+        Vector3 dir = (_hand.position - transform.position).normalized; 
+
         GameObject bullet = Instantiate(_projectilePrefab, _shootPoint.position, _hand.rotation);
-        bullet.GetComponent<Rigidbody2D>().AddForce(dir * _shootForce, ForceMode2D.Impulse);
+        bullet.GetComponent<Rigidbody2D>().AddForce(dir * _shootForce, ForceMode2D.Impulse);    
 
         Bullet bulletScript = bullet.GetComponent<Bullet>();
-        bulletScript.shooter = this;
+        bulletScript.shooter = this;    
 
-        _shootTimer = _shootCooldown;
+        StartCoroutine(ShootingCooldown());
     }
 
+    private IEnumerator ShootingCooldown()
+    {
+        AnimationClip shootClip = null;
+
+        foreach (AnimationClip clip in _animator.runtimeAnimatorController.animationClips)
+        {
+            if (clip.name == "Shoot")
+            {
+                shootClip = clip;
+                break;
+            }
+        }
+
+        if (shootClip != null)
+        {
+            yield return new WaitForSeconds(shootClip.length);
+        }
+        else
+        {
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        _isShooting = false;
+        _canDash = true;
+        _shootTimer = _shootCooldown;
+
+        _animator.SetBool("Crossbow", false);
+    }
 
     private void Dash()
     {
-        if (_isDashing || Time.time < _lastDashTime + _dashCooldown) return;
+        if (_isDashing || Time.time < _lastDashTime + _dashCooldown || !_canDash) return;
+
+        _animator.SetBool("Jump", false);
+        _animator.SetBool("Dash", true);
 
         _isDashing = true;
         _dashTrail.emitting = true;
@@ -209,6 +270,8 @@ public class PlayerController : MonoBehaviour
 
         Vector2 dir = (_hand.position - transform.position).normalized;
         _rb.linearVelocity = dir * _dashSpeed;
+
+        _spriteRender.flipX = dir.x < 0;
 
         StartCoroutine(StopDash());
     }
@@ -220,6 +283,8 @@ public class PlayerController : MonoBehaviour
         _rb.linearVelocity = Vector2.zero;
         _canMoveHand = true;
         _dashTrail.emitting = false;
+
+        _animator.SetBool("Dash", false);
     }
 
     public void ResetDash()
