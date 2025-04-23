@@ -133,16 +133,6 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         ApplyGravity();
 
-        if (IsGrounded())
-        {
-            Vector2 pos = transform.position;
-            RaycastHit2D hit = Physics2D.Raycast(pos, Vector2.down, 0.1f, LayerMask.GetMask("Ground"));
-            if (!hit)
-            {
-                transform.position += Vector3.down * 0.01f;
-            }
-        }
-
         if (IsGrounded()) _isJumping = false;
     }
 
@@ -202,9 +192,25 @@ public class PlayerController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        Vector2 playerSize = _spriteRender.bounds.size;
-        return Physics2D.OverlapBox(_groundCheck.position, new Vector2(playerSize.x * 0.9f, 0.1f), 0f, _groundLayer);
+        Vector2 position = _groundCheck.position;
+        Vector2 size = _spriteRender.bounds.size;
+        float rayLength = 0.2f;
+        float spacing = size.x * 0.4f;
+    
+        Vector2 left = position + Vector2.left * spacing;
+        Vector2 center = position;
+        Vector2 right = position + Vector2.right * spacing;
+    
+        return RaycastGround(left, rayLength) || RaycastGround(center, rayLength) || RaycastGround(right, rayLength);
     }
+    
+    private bool RaycastGround(Vector2 origin, float length)
+    {
+        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, length, _groundLayer);
+        Debug.DrawRay(origin, Vector2.down * length, hit ? Color.green : Color.red); // Debug
+        return hit.collider != null;
+    }
+
 
     private void HandleShooting()
     {
