@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2e5689d265b0554397f8b96430c6bc7, type: 3}
+  m_Name: Rule Tile GameObject
+  m_EditorClassIdentifier: 
+  centerSprite: {fileID: 21300000, guid: 0799f6efbef361741b203c5f5a1f8d22, type: 3}
+  singleSprite: {fileID: 21300000, guid: a83955f184a8004418df1d36fd96f634, type: 3}
+  defaultSprite: {fileID: 21300000, guid: 0799f6efbef361741b203c5f5a1f8d22, type: 3}
+  top: {fileID: 21300000, guid: e2819cfc66579a1458f2d2de6b9c3ebb, type: 3}
+  bottom: {fileID: 21300000, guid: 184e42fa18891544eb63fc0224cfbc15, type: 3}
+  left: {fileID: 21300000, guid: c1345993d24305e45a017ef4592afe7b, type: 3}
+  right: {fileID: 21300000, guid: 694ff07ff48ead24da5f401cf904f3f2, type: 3}
+  singleTop: {fileID: 21300000, guid: 7d4cd837b53a932418fa359c4458220b, type: 3}
+  singleBottom: {fileID: 21300000, guid: 57a3fc718c1f7644aa63b7c3cf1be3ed, type: 3}
+  singleLeft: {fileID: 21300000, guid: 569f64dce0fc2aa41b94afc70cdd0557, type: 3}
+  singleRight: {fileID: 21300000, guid: 29a5a48144683ea40b07f29a73b3f4f5, type: 3}
+  TopLeftCorner: {fileID: 21300000, guid: e09abe6ff88adab46a684b638b0f8379, type: 3}
+  TopRightCorner: {fileID: 21300000, guid: 454f04d0e42447141b2e0054450b504c, type: 3}
+  BottomLeftCorner: {fileID: 21300000, guid: 840745824dfbb50498ed25f29a7f5fb2, type: 3}
+  BottomRightCorner: {fileID: 21300000, guid: fd94b818dc1aa2742a7e19735b169eb0, type: 3}
+  verticalOpen: {fileID: 21300000, guid: 01d0074e7af672c439b519095d81ecab, type: 3}
+  horizontalOpen: {fileID: 21300000, guid: 19e639fe8bef30f4bb51ed71097c1649, type: 3}

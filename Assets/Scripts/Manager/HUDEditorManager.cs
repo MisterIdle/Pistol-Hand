@@ -83,7 +83,7 @@ public class HUDEditorManager : BaseManager
         MapEditor editor = FindAnyObjectByType<MapEditor>();
         if (editor != null)
         {
-            editor.LoadMap(selectedMap);
+            //editor.LoadMap(selectedMap);
             SuccessMessage($"Carte \"{selectedMap}\" chargée.");
         }
         else
@@ -104,7 +104,7 @@ public class HUDEditorManager : BaseManager
         MapEditor editor = FindAnyObjectByType<MapEditor>();
         if (editor != null)
         {
-            editor.SaveMap(mapName);
+            //editor.SaveMap(mapName);
             RefreshMapList();
         }
         else
@@ -179,7 +179,7 @@ public class HUDEditorManager : BaseManager
 
     public void OnBlockButtonClick(int blockIndex)
     {
-        MapEditor.Instance.SetBlockIndex(blockIndex);
+        //MapEditor.Instance.SetBlockIndex(blockIndex);
     }
 
     // Start/Stop
