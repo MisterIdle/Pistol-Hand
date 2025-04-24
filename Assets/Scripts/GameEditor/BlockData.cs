@@ -5,4 +5,6 @@ public class BlockData
 {
     public string blockID;
     public Vector3 position;
+    public string spriteName;
 }
+

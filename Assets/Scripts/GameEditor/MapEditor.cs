@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Security.Cryptography;
+using System.Text;
 
 public class MapEditor : BaseManager
 {
@@ -238,38 +241,68 @@ public class MapEditor : BaseManager
         string requiredBlockID = "4";
         int requiredCount = 4;
         int actualCount = 0;
-
+    
         var mapData = new MapData();
-
+    
         foreach (var block in placedBlocks)
         {
             if (block.instance != null)
             {
                 if (block.id == requiredBlockID)
                     actualCount++;
-
+    
+                var spriteRenderer = block.instance.GetComponentInChildren<SpriteRenderer>();
+                string spriteName = spriteRenderer?.sprite?.name ?? "";
+    
                 mapData.blocks.Add(new BlockData
                 {
                     blockID = block.id,
-                    position = block.instance.transform.position
+                    position = block.instance.transform.position,
+                    spriteName = spriteName
                 });
             }
         }
-
+    
         if (actualCount < requiredCount)
         {
             HUDEditorManager.Instance.ErrorMessage($"Il faut au moins {requiredCount} blocs de type 'Spawn' pour sauvegarder la carte.");
             return;
         }
-
+    
         string folder = Application.dataPath + "/Save";
         if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-
-        string path = folder + "/map_" + mapName + ".json";
-        File.WriteAllText(path, JsonUtility.ToJson(mapData, true));
-        Debug.Log("Map saved to: " + path);
-
+    
+        string path = folder + "/map_" + mapName + ".dat";
+    
+        string json = JsonUtility.ToJson(mapData, true);
+        byte[] compressed = Compress(json);
+        byte[] encrypted = Encrypt(compressed, "my_super_secret_key_123");
+    
+        File.WriteAllBytes(path, encrypted);
+    
         HUDEditorManager.Instance.SuccessMessage($"Carte \"{mapName}\" sauvegardée.");
+    }
+    
+    private byte[] Compress(string data)
+    {
+        byte[] raw = Encoding.UTF8.GetBytes(data);
+        using var output = new MemoryStream();
+        using (var gzip = new GZipStream(output, CompressionMode.Compress)) 
+            gzip.Write(raw, 0, raw.Length);
+        return output.ToArray();
+    }
+    
+    private byte[] Encrypt(byte[] data, string key)
+    {
+        using Aes aes = Aes.Create();
+        aes.Key = Encoding.UTF8.GetBytes(key.PadRight(32).Substring(0, 32));
+        aes.IV = new byte[16];
+    
+        using var encryptor = aes.CreateEncryptor();
+        using var output = new MemoryStream();
+        using (var cryptoStream = new CryptoStream(output, encryptor, CryptoStreamMode.Write))
+            cryptoStream.Write(data, 0, data.Length);
+        return output.ToArray();
     }
 
     public void LoadMap(string mapName)
