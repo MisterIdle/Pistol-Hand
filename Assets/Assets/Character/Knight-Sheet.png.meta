@@ -26,6 +26,9 @@ TextureImporter:
   - first:
       213: -3932984877469432071
     second: Knight-Sheet_7
+  - first:
+      213: -4875968243551452639
+    second: Knight-Sheet_8
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -296,11 +299,33 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Knight-Sheet_8
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 122c70b67b4155cb0800000000000000
+      internalID: -4875968243551452639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 51961c6c74d1cdb4e89665961808d14e
+    spriteID: 3eaba3b55c63e6a439b0e9ef176f5fbf
     internalID: 0
     vertices: []
     indices: 
@@ -318,6 +343,7 @@ TextureImporter:
       Knight-Sheet_5: -4749644223382611146
       Knight-Sheet_6: 8748350960195395503
       Knight-Sheet_7: -3932984877469432071
+      Knight-Sheet_8: -4875968243551452639
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

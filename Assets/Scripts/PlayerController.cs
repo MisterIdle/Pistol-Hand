@@ -1,14 +1,11 @@
 using System.Collections;
-using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Rigidbody2D), typeof(SpriteRenderer))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Stats")]
-        private int _baseHealth = 3;
-
+    private int _baseHealth = 3;
     [SerializeField] public int Lifes;
     [SerializeField] public int PlayerID;
     [SerializeField] public int Wins;
@@ -27,6 +24,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _coyoteTime = 0.15f;
     [SerializeField] private float _jumpBufferTime = 0.1f;
 
+    [Header("Hand")]
+    [SerializeField] private Transform _hand;
+    [SerializeField] private SpriteRenderer _handSprite;
+    [SerializeField] private float _handSpeed = 7f;
+    [SerializeField] private float _handMaxDistance = 1f;
+
     [Header("Dash")]
     [SerializeField] private float _dashSpeed = 20f;
     [SerializeField] private float _dashDuration = 0.2f;
@@ -36,26 +39,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform _shootPoint;
     [SerializeField] private float _shootForce = 20f;
-    private float _shootCooldown;
+    [SerializeField] private float _reloadTime = 0.5f;
 
     [Header("Hit")]
     [SerializeField] private float _hitDistance = 0.5f;
     [SerializeField] private float _pistolHitForce = 5f;
     [SerializeField] private float _punchHitForce = 10f;
 
-    [Header("Invulnerability")]
-    [SerializeField] private float _invulnerabilityDuration = 0.5f;
+    [Header("Stun")]
+    [SerializeField] private float _stunDuration = 0.5f;
+    [SerializeField] private float _stunRotationSpeed = 720f;
+
 
     [Header("Ground Check")]
     [SerializeField] private Transform _groundCheck;
     [SerializeField] private LayerMask _groundLayer;
 
-    [Header("Hand")]
-    [SerializeField] private Transform _hand;
-    [SerializeField] private SpriteRenderer _handSprite;
-    [SerializeField] private float _handSpeed = 7f;
-    [SerializeField] private float _handMaxDistance = 1.5f;
-    
     [Header("Feel")]
     [SerializeField] private TrailRenderer _dashTrail;
     [SerializeField] private GameObject _blastPrefab;
@@ -70,9 +69,11 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 _movementInput;
     private Vector2 _lookInput;
+    private bool _jumpRequested;
+    private bool _shooting;
+
     private float _coyoteCounter;
     private float _jumpBufferCounter;
-    private float _shootTimer;
     private float _lastDashTime;
 
     private bool _isJumping;
@@ -80,19 +81,19 @@ public class PlayerController : MonoBehaviour
     private bool _stunned;
     private bool _canJump = true;
     private bool _canMoveHand = true;
-    private bool _jumpRequested;
-    private bool _shooting;
-    private bool _canDash = true;
     private bool _isShooting;
+    private bool _isReloading;
+
+    private bool _wasGrounded;
 
     private bool _isInvulnerable;
 
     public void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
-        _spriteRender = GetComponent<SpriteRenderer>();
-        _handSprite = _hand.GetComponent<SpriteRenderer>();
+        _spriteRender = GetComponentInChildren<SpriteRenderer>();
         _collider = GetComponent<Collider2D>();
+        _handSprite = _hand.GetComponentInChildren<SpriteRenderer>();
 
         _dashTrail.emitting = false;
         Lifes = _baseHealth;
@@ -102,26 +103,21 @@ public class PlayerController : MonoBehaviour
 
     public void Update()
     {
-        _shootTimer = Mathf.Max(0f, _shootTimer - Time.deltaTime);
-
         UpdateJumpTimers();
 
-        if (_canMoveHand)
-        {
-            UpdateHand();
-        }
-
+        if (_canMoveHand) UpdateHand();
         if (_isDashing) Punch();
 
         _animator.SetFloat("Speed", _rb.linearVelocity.magnitude);
-        if (!_isDashing && !_shooting)
-        {
-            _animator.SetBool("Jump", !IsGrounded());
-        }
-        
 
-        HandleDeath();
-        HandleShooting();
+        if (!_isDashing && !_isReloading)
+            _animator.SetBool("Jump", !IsGrounded());
+        else
+            _animator.SetBool("Jump", false);
+
+
+        Death();
+        Shooting();
         CheckBounds();
     }
 
@@ -133,31 +129,31 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         ApplyGravity();
 
-        if (IsGrounded()) _isJumping = false;
+        bool groundedNow = IsGrounded();
+
+        if (!_wasGrounded && groundedNow)
+        {
+            _animator.SetTrigger("Land");
+        }
+
+        _wasGrounded = groundedNow;
+
+        if (groundedNow) _isJumping = false;
     }
 
-    private void UpdateJumpTimers()
-    {
-        _coyoteCounter = IsGrounded() ? _coyoteTime : _coyoteCounter - Time.deltaTime;
-        _jumpBufferCounter = _jumpRequested ? _jumpBufferTime : _jumpBufferCounter - Time.deltaTime;
-    }
 
     private void HandleMovement()
     {
         float targetSpeed = _movementInput.x * _maxSpeed;
         float speedDiff = targetSpeed - _rb.linearVelocity.x;
         float accelRate = Mathf.Abs(targetSpeed) > 0.01f ? _acceleration : _deceleration;
+
         if (!IsGrounded()) accelRate *= _airControl;
 
         _rb.AddForce(Vector2.right * speedDiff * accelRate);
-        if (_movementInput.x < -0.01f)
-        {
-            _spriteRender.flipX = true;
-        }
-        else if (_movementInput.x > 0.01f)
-        {
-            _spriteRender.flipX = false;
-        }
+
+        _spriteRender.flipX = _movementInput.x < -0.01f;
+        if (_movementInput.x > 0.01f) _spriteRender.flipX = false;
     }
 
     private void HandleJump()
@@ -175,19 +171,10 @@ public class PlayerController : MonoBehaviour
         _rb.gravityScale = (!IsGrounded() && _rb.linearVelocity.y < _maxFallSpeed) ? _gravityMultiplier : 1f;
     }
 
-    private void UpdateHand()
+    private void UpdateJumpTimers()
     {
-        Vector3 dir = new Vector3(_lookInput.x, _lookInput.y).normalized;
-        _hand.position = Vector3.MoveTowards(_hand.position, _hand.position + dir * _handSpeed, _handSpeed * Time.deltaTime);
-
-        Vector3 toHand = _hand.position - transform.position;
-        float rotationOffset = _canDash ? 0 : -90;
-        _hand.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(toHand.y, toHand.x) * Mathf.Rad2Deg + rotationOffset);
-
-        if (toHand.magnitude > _handMaxDistance)
-        {
-            _hand.position = transform.position + toHand.normalized * _handMaxDistance;
-        }
+        _coyoteCounter = IsGrounded() ? _coyoteTime : _coyoteCounter - Time.deltaTime;
+        _jumpBufferCounter = _jumpRequested ? _jumpBufferTime : _jumpBufferCounter - Time.deltaTime;
     }
 
     private bool IsGrounded()
@@ -196,78 +183,45 @@ public class PlayerController : MonoBehaviour
         Vector2 size = _spriteRender.bounds.size;
         float rayLength = 0.2f;
         float spacing = size.x * 0.4f;
-    
+
         Vector2 left = position + Vector2.left * spacing;
         Vector2 center = position;
         Vector2 right = position + Vector2.right * spacing;
-    
+
         return RaycastGround(left, rayLength) || RaycastGround(center, rayLength) || RaycastGround(right, rayLength);
     }
-    
+
     private bool RaycastGround(Vector2 origin, float length)
     {
         RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, length, _groundLayer);
-        Debug.DrawRay(origin, Vector2.down * length, hit ? Color.green : Color.red); // Debug
+        Debug.DrawRay(origin, Vector2.down * length, hit ? Color.green : Color.red);
         return hit.collider != null;
     }
 
-
-    private void HandleShooting()
+    private void UpdateHand()
     {
-        if (!_shooting || _isShooting || _shootTimer > 0f) return;  
+        Vector3 dir = new Vector3(_lookInput.x, _lookInput.y).normalized;
+        _hand.position = Vector3.MoveTowards(_hand.position, _hand.position + dir * _handSpeed, _handSpeed * Time.deltaTime);
 
-        _isShooting = true;
-        _animator.SetBool("Jump", false);
-        _animator.SetBool("Dash", false);
-        _animator.SetBool("Crossbow", true);
-        _handAnimator.SetTrigger("Shoot");
+        Vector3 toHand = _hand.position - transform.position;
+        
+        _hand.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(toHand.y, toHand.x) * Mathf.Rad2Deg);
 
-        Vector3 dir = (_hand.position - transform.position).normalized; 
+        _handSprite.flipY = toHand.x < 0;
+        _spriteRender.flipX = toHand.x < 0;
+        if (toHand.x > 0) _handSprite.flipX = false;
 
-        GameObject bullet = Instantiate(_projectilePrefab, _shootPoint.position, _hand.rotation);
-        bullet.GetComponent<Rigidbody2D>().AddForce(dir * _shootForce, ForceMode2D.Impulse);    
-
-        Bullet bulletScript = bullet.GetComponent<Bullet>();
-        bulletScript.shooter = this;    
-
-        StartCoroutine(ShootingCooldown());
-    }
-
-    private IEnumerator ShootingCooldown()
-    {
-        AnimationClip shootClip = null;
-
-        foreach (AnimationClip clip in _animator.runtimeAnimatorController.animationClips)
-        {
-            if (clip.name == "Shoot")
-            {
-                shootClip = clip;
-                break;
-            }
-        }
-
-        if (shootClip != null)
-        {
-            yield return new WaitForSeconds(shootClip.length);
-        }
-        else
-        {
-            yield return new WaitForSeconds(0.5f);
-        }
-
-        _isShooting = false;
-        _canDash = true;
-        _shootTimer = _shootCooldown;
-
-        _animator.SetBool("Crossbow", false);
+        if (toHand.magnitude > _handMaxDistance)
+            _hand.position = transform.position + toHand.normalized * _handMaxDistance;
     }
 
     private void Dash()
     {
-        if (_isDashing || Time.time < _lastDashTime + _dashCooldown || !_canDash) return;
+        if (_isDashing || Time.time < _lastDashTime + _dashCooldown) return;
 
         _animator.SetBool("Jump", false);
         _animator.SetBool("Dash", true);
+        _handAnimator.SetBool("Reload", false);
 
         _isDashing = true;
         _dashTrail.emitting = true;
@@ -290,13 +244,12 @@ public class PlayerController : MonoBehaviour
         _canMoveHand = true;
         _dashTrail.emitting = false;
 
+        _spriteRender.transform.rotation = Quaternion.identity;
+
         _animator.SetBool("Dash", false);
     }
 
-    public void ResetDash()
-    {
-        _lastDashTime = Time.time - _dashCooldown;
-    }
+    public void ResetDash() => _lastDashTime = Time.time - _dashCooldown;
 
     private void Punch()
     {
@@ -307,47 +260,79 @@ public class PlayerController : MonoBehaviour
             {
                 PlayerController target = hit.GetComponent<PlayerController>();
                 if (target.PlayerID != PlayerID)
-                {
                     target.TakeHit(10, gameObject, false);
-                }
             }
         }
     }
+
+    private void Shooting()
+    {
+        if (!_shooting || _isShooting || _isDashing || _isReloading) return;    
+
+        _isShooting = true;
+        _isReloading = true;   
+
+        _animator.SetBool("Shoot", true);
+
+        float reloadAnimDuration = 1f;
+        _handAnimator.speed = reloadAnimDuration / _reloadTime;
+        _handAnimator.SetTrigger("Shoot");
+
+        Vector3 dir = (_hand.position - transform.position).normalized;
+        GameObject bullet = Instantiate(_projectilePrefab, _shootPoint.position, _hand.rotation);
+
+        var bulletRb = bullet.GetComponent<Rigidbody2D>();
+        if (bulletRb != null)
+            bulletRb.AddForce(dir * _shootForce, ForceMode2D.Impulse);  
+
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+            bulletComponent.shooter = this; 
+
+        StartCoroutine(ShootingCooldown());
+    }   
+
+    private IEnumerator ShootingCooldown()
+    {
+        _handAnimator.SetBool("Reload", true);
+
+        yield return new WaitForSeconds(0.2f);
+
+        _animator.SetBool("Shoot", false);
+
+        yield return new WaitForSeconds(_reloadTime);  
+
+        _handAnimator.SetBool("Reload", false);
+        _handAnimator.speed = 1f;
+
+        if (_shooting)
+            _handAnimator.SetTrigger("Shoot"); 
+
+        _isReloading = false;
+        _isShooting = false;
+    }
+
 
     public void TakeHit(int force, GameObject source, bool pistol)
     {
         if (_isInvulnerable) return;
 
         Vector2 dir = (transform.position - source.transform.position).normalized;
+        Vector2 knockback = new Vector2(dir.x, Mathf.Abs(dir.y) * 0.5f).normalized;
 
-        StartCoroutine(Stun());
-        StartCoroutine(Invulnerability());
-        StartCoroutine(FlashRed());
-
-        Vector2 knockbackDirection = new Vector2(dir.x, Mathf.Abs(dir.y) * 0.5f).normalized;
-
-        if (pistol)
-            _rb.AddForce(knockbackDirection * _pistolHitForce * force, ForceMode2D.Impulse);
-        else
-            _rb.AddForce(knockbackDirection * _punchHitForce * force, ForceMode2D.Impulse);
+        _rb.AddForce(knockback * (pistol ? _pistolHitForce : _punchHitForce) * force, ForceMode2D.Impulse);
 
         Lifes--;
+        StartCoroutine(Stun());
+        StartCoroutine(FlashRed());
     }
 
     private IEnumerator FlashRed()
     {
-        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
-        Color originalColor = spriteRenderer.color;
-        spriteRenderer.color = Color.red;
+        Color original = _spriteRender.color;
+        _spriteRender.color = Color.red;
         yield return new WaitForSeconds(0.1f);
-        spriteRenderer.color = originalColor;
-    }
-
-    private IEnumerator Invulnerability()
-    {
-        _isInvulnerable = true;
-        yield return new WaitForSeconds(_invulnerabilityDuration);
-        _isInvulnerable = false;
+        _spriteRender.color = original;
     }
 
     private IEnumerator Stun()
@@ -355,31 +340,44 @@ public class PlayerController : MonoBehaviour
         CameraManager.Instance.ShakeCamera(0.5f, 0.5f);
         GameManager.Instance.StartCoroutine(CameraManager.Instance.SlowMotion());
 
+        _animator.SetBool("Hit", true);
+
         _stunned = true;
+        _isInvulnerable = true;
+        _canJump = false;
+        _canMoveHand = false;
         _spriteRender.color = Color.red;
-        yield return new WaitForSeconds(_invulnerabilityDuration);
+        _handSprite.enabled = false;
+
+        float elapsedTime = 0f;
+
+        while (elapsedTime < _stunDuration)
+        {
+            float rotationAmount = _stunRotationSpeed * Time.deltaTime;
+            transform.Rotate(0, 0, rotationAmount);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.rotation = Quaternion.identity;
         _spriteRender.color = Color.white;
+
+        _animator.SetBool("Hit", false);
+
+        if (Lifes <= 0) yield break;
+
         _stunned = false;
+        _isInvulnerable = false;
+        _canJump = true;
+        _canMoveHand = true;
+        _handSprite.enabled = true;
         _rb.linearVelocity = Vector2.zero;
         _canJump = true;
     }
 
-    private void CheckBounds()
-    {
-        if (GameManager.Instance.CurrentState == GameState.Playing && MatchManager.Instance.IsLoading ) return;
-
-        if (IsDead) return;
-
-        if (GameManager.Instance.CheckPlayer()) return;
-
-        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
-        if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0)
-        {
-            Lifes = 0;
-        }
-    }
-
-    private void HandleDeath()
+    public void KillPlayer() => Lifes = 0;
+    
+    private void Death()
     {
         if (Lifes > 0 || IsDead) return;
 
@@ -397,73 +395,62 @@ public class PlayerController : MonoBehaviour
         GameManager.Instance.PlayerDeath++;
     }
 
-    public void KillPlayer()
-    {
-        Lifes = 0;
-    }
-
     public void Respawn()
     {
         Lifes = _baseHealth;
-        IsDead = false; 
+        IsDead = false;
 
         _rb.simulated = true;
+        _rb.linearVelocity = Vector2.zero;
+        _rb.angularVelocity = 0f;
+
         _canJump = true;
         _canMoveHand = true;
         _stunned = false;
         _isDashing = false;
-        _isInvulnerable = false;    
+        _isInvulnerable = false;
 
         _spriteRender.color = Color.white;
         _spriteRender.enabled = true;
         _collider.enabled = true;
         _handSprite.enabled = true;
-
-        _rb.linearVelocity = Vector2.zero;
-        _rb.angularVelocity = 0f;
     }
 
-    public void SetPosition(Vector3 position)
+    private void CheckBounds()
     {
-        _rb.position = position;
+        if (GameManager.Instance.CurrentState == GameState.Playing && MatchManager.Instance.IsLoading) return;
+        if (IsDead || GameManager.Instance.CheckPlayer()) return;
+
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
+        if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0)
+            KillPlayer();
     }
 
-    public void OnMove(InputAction.CallbackContext ctx) 
-    {
-        _movementInput = ctx.ReadValue<Vector2>();
-    }
+    public void SetPosition(Vector3 position) => _rb.position = position;
+
+    public void OnMove(InputAction.CallbackContext ctx) => _movementInput = ctx.ReadValue<Vector2>();
 
     public void OnJump(InputAction.CallbackContext ctx)
     {
         _jumpRequested = ctx.ReadValue<float>() > 0;
-        if (_jumpRequested)
-        {
-            _jumpBufferCounter = _jumpBufferTime;
-        }
+        if (_jumpRequested) _jumpBufferCounter = _jumpBufferTime;
     }
 
-    public void OnShoot(InputAction.CallbackContext ctx)
+    public void OnShoot(InputAction.CallbackContext ctx) => _shooting = ctx.ReadValue<float>() > 0;
+
+    public void OnDash(InputAction.CallbackContext ctx)
     {
-        _shooting = ctx.ReadValue<float>() > 0;
+        if (ctx.performed) Dash();
     }
 
-    public void OnDash(InputAction.CallbackContext ctx) 
+    public void OnLook(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed) 
-        {
-            Dash(); 
-        }
-    }
-
-    public void OnLook(InputAction.CallbackContext ctx) 
-    { 
-        if (_canMoveHand) _lookInput = ctx.ReadValue<Vector2>(); 
+        if (_canMoveHand) _lookInput = ctx.ReadValue<Vector2>();
     }
 
     public void OnAdjustVolume(InputAction.CallbackContext context)
     {
         Vector2 dpadInput = context.ReadValue<Vector2>();
-
         if (context.canceled) dpadInput = Vector2.zero;
 
         AudioManager.instance.OnAdjustVolumeFromPlayer(dpadInput);
