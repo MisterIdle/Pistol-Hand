@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public static class TileManager
 {
@@ -34,6 +35,25 @@ public static class TileManager
         }
     }
 
+    public static string GetSpriteNameAtPosition(Vector3 position, List<MapEditor.PlacedBlock> placedBlocks)
+    {
+        Vector2Int gridPos = ToGridPosition(position);
+        RuleTiteApply tile = placedBlocks
+            .Where(block => block.instance != null)
+            .Select(block => new { Block = block, Tile = block.instance.GetComponent<RuleTiteApply>() })
+            .FirstOrDefault(pair => ToGridPosition(pair.Block.instance.transform.position) == gridPos)?.Tile;
+
+        if (tile != null)
+        {
+            SpriteRenderer spriteRenderer = tile.GetComponentInChildren<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                return spriteRenderer.sprite.name;
+            }
+        }
+        return null;
+    }
+
     private static Vector2Int ToGridPosition(Vector3 pos)
     {
         float size = GameManager.Instance.GridSize;
@@ -42,3 +62,4 @@ public static class TileManager
         return new Vector2Int(x, y);
     }
 }
+

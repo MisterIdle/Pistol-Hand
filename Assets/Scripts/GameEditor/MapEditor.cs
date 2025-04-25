@@ -199,7 +199,7 @@ public class MapEditor : BaseManager
                pos.y >= buildAreaMin.y && pos.y <= buildAreaMax.y;
     }
 
-    void RefreshAllTiles()
+    public void RefreshAllTiles()
     {
         TileManager.RefreshAllTiles(placedBlocks);
     }
@@ -208,6 +208,53 @@ public class MapEditor : BaseManager
     {
         return placedBlocks.Any(b => b.id == "4");
     }
+
+    public List<PlacedBlock> GetPlacedBlocks()
+    {
+        return placedBlocks;
+    }
+
+    public void LoadBlocksFromSaveData(List<SaveManager.MapSaveData.BlockData> loadedBlocks)
+    {
+        foreach (var placedBlock in placedBlocks)
+        {
+            if (placedBlock.instance != null)
+            {
+                Destroy(placedBlock.instance);
+            }
+        }
+        placedBlocks.Clear();
+
+        foreach (var blockData in loadedBlocks)
+        {
+            var blockPrefab = blockDatabase.blocks.FirstOrDefault(b => b.id == blockData.id)?.prefab;
+            if (blockPrefab != null)
+            {
+                GameObject blockInstance = Instantiate(blockPrefab, blockData.position, Quaternion.identity, map.transform);
+                placedBlocks.Add(new PlacedBlock { id = blockData.id, instance = blockInstance });
+            }
+            else
+            {
+                Debug.LogWarning($"Prefab for block ID {blockData.id} not found!");
+            }
+        }
+
+        RefreshAllTiles();
+    }
+
+    public void ClearMap()
+    {
+        foreach (var placedBlock in placedBlocks)
+        {
+            if (placedBlock.instance != null)
+            {
+                Destroy(placedBlock.instance);
+            }
+        }
+        placedBlocks.Clear();
+        RefreshAllTiles();
+    }
+
 
     public class PlacedBlock
     {

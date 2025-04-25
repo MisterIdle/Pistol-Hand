@@ -1,127 +1,104 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using UnityEngine;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 public static class SaveManager
 {
-    private static string key = "MapEditorInternalKey";
+    private static string saveDirectory = "Assets/Save";
 
-    private static string GetSaveFolderPath()
+    public static void SaveMap(string mapName, List<MapEditor.PlacedBlock> placedBlocks)
     {
-        string saveFolder = Path.Combine(Application.persistentDataPath, "Save");
-        if (!Directory.Exists(saveFolder))
+        if (!Directory.Exists(saveDirectory))
         {
-            Directory.CreateDirectory(saveFolder);
-            Debug.Log($"Dossier de sauvegarde créé : {saveFolder}");
+            Directory.CreateDirectory(saveDirectory);
         }
-        return saveFolder;
-    }
 
-    public static void SaveMap(string fileName, List<(string id, Vector3 pos, string sprite)> blocks)
-    {
-        string saveFolderPath = GetSaveFolderPath();
+        string path = Path.Combine(saveDirectory, mapName + ".map");
 
-        MapData mapData = new();
-        foreach (var block in blocks)
+        MapSaveData saveData = new MapSaveData
         {
-            mapData.blocks.Add(new BlockData
+            placedBlocks = placedBlocks.Select(b => new MapSaveData.BlockData
             {
-                blockID = block.id,
-                position = block.pos,
-                spriteName = block.sprite
-            });
-        }
+                id = b.id,
+                position = b.instance.transform.position
+            }).ToList()
+        };
 
-        string json = JsonUtility.ToJson(mapData);
-        byte[] encrypted = Encrypt(json);
-        File.WriteAllBytes(Path.Combine(saveFolderPath, fileName + ".map"), encrypted);
+        string json = JsonUtility.ToJson(saveData, true);
+
+        string encryptedData = EncryptDecrypt(json);
+
+        File.WriteAllText(path, encryptedData);
+        Debug.Log("Map saved to " + path);
     }
 
-    public static List<(string id, Vector3 pos)> LoadMap(string fileName)
+    public static List<MapSaveData.BlockData> LoadMap(string mapName)
     {
-        string path = Path.Combine(GetSaveFolderPath(), fileName + ".map");
-        if (!File.Exists(path)) return null;
+        string path = Path.Combine(saveDirectory, mapName + ".map");
 
-        byte[] data = File.ReadAllBytes(path);
-        string json = TryDecrypt(data);
-        if (string.IsNullOrEmpty(json)) return null;
-
-        MapData mapData = JsonUtility.FromJson<MapData>(json);
-        return mapData.blocks.Select(b => (b.blockID, b.position)).ToList();
-    }
-
-    public static List<(string id, Vector3 pos)> LoadRandomMap()
-    {
-        string saveFolder = GetSaveFolderPath();
-
-        var mapFiles = Directory.GetFiles(saveFolder, "*.map").ToList();
-
-        if (mapFiles.Count == 0)
+        if (!File.Exists(path))
         {
-            Debug.LogError("Aucune carte trouvée.");
+            Debug.LogWarning("Map file not found: " + path);
             return null;
         }
 
-        string randomMap = mapFiles[Random.Range(0, mapFiles.Count)];
-        string mapName = Path.GetFileNameWithoutExtension(randomMap);
+        string encryptedData = File.ReadAllText(path);
 
-        Debug.Log($"Carte aléatoire choisie : {mapName}");
-
-        return LoadMap(mapName);
-    }
-
-    private static string TryDecrypt(byte[] data)
-    {
-        try
+        if (string.IsNullOrEmpty(encryptedData))
         {
-            return Decrypt(data);
+            Debug.LogWarning("The map file is empty: " + path);
+            return null;
         }
-        catch
+        
+        string decryptedData = EncryptDecrypt(encryptedData);
+
+        MapSaveData saveData = JsonUtility.FromJson<MapSaveData>(decryptedData);
+
+        Debug.Log("Map loaded from " + path);
+        return saveData.placedBlocks;
+    }
+
+
+    public static void DeleteMap(string mapName)
+    {
+        string path = Path.Combine(saveDirectory, mapName + ".map");
+
+        if (File.Exists(path))
         {
-            try
-            {
-                return Encoding.UTF8.GetString(data);
-            }
-            catch
-            {
-                return null;
-            }
+            File.Delete(path);
+            Debug.Log("Map deleted: " + path);
+        }
+        else
+        {
+            Debug.LogWarning("Map file not found: " + path);
         }
     }
 
-    private static byte[] Encrypt(string plainText)
+    private static string EncryptDecrypt(string input)
     {
-        using Aes aes = Aes.Create();
-        aes.Key = GetKey();
-        aes.IV = new byte[16];
+        StringBuilder output = new StringBuilder(input.Length);
 
-        using MemoryStream ms = new();
-        using CryptoStream cs = new(ms, aes.CreateEncryptor(), CryptoStreamMode.Write);
-        using StreamWriter sw = new(cs, Encoding.UTF8);
-        sw.Write(plainText);
-        sw.Flush();
-        cs.FlushFinalBlock();
-        return ms.ToArray();
+        foreach (char c in input)
+        {
+            output.Append((char)(c ^ 0xAA)); 
+        }
+
+        return output.ToString();
     }
 
-    private static string Decrypt(byte[] cipherData)
-    {
-        using Aes aes = Aes.Create();
-        aes.Key = GetKey();
-        aes.IV = new byte[16];
 
-        using MemoryStream ms = new(cipherData);
-        using CryptoStream cs = new(ms, aes.CreateDecryptor(), CryptoStreamMode.Read);
-        using StreamReader sr = new(cs, Encoding.UTF8);
-        return sr.ReadToEnd();
-    }
-
-    private static byte[] GetKey()
+    [System.Serializable]
+    public class MapSaveData
     {
-        using SHA256 sha = SHA256.Create();
-        return sha.ComputeHash(Encoding.UTF8.GetBytes(key));
+        public List<BlockData> placedBlocks;
+
+        [System.Serializable]
+        public class BlockData
+        {
+            public string id;
+            public Vector3 position;
+        }
     }
 }

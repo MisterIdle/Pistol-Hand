@@ -71,8 +71,6 @@ public class MatchManager : BaseManager
         yield return new WaitForSeconds(1f);
         yield return CameraManager.MoveCameraTransition(true, 1f);
 
-        yield return StartCoroutine(LoadMapFromSave());
-
         yield return new WaitForSeconds(1f);
 
         GameManager.ResetAllPlayers();
@@ -81,33 +79,6 @@ public class MatchManager : BaseManager
 
         yield return CameraManager.MoveCameraTransition(false, 1f);
         IsLoading = false;
-    }
-
-    private IEnumerator LoadMapFromSave()
-    {
-        List<(string id, Vector3 pos)> blocks = SaveManager.LoadRandomMap();
-        if (blocks != null)
-        {
-            foreach (var block in blocks)
-            {
-                var blockData = blockDatabase.blocks.FirstOrDefault(b => b.id == block.id);
-                if (blockData != null)
-                {
-                    Instantiate(blockData.prefab, block.pos, Quaternion.identity);
-                }
-                else
-                {
-                    Debug.LogError($"Block ID {block.id} not found in the database!");
-                }
-            }
-        }
-        else
-        {
-            Debug.LogError("Failed to load map data or map is empty.");
-            IsLoading = false;
-            yield break;
-        }
-        yield return null;
     }
 
     private IEnumerator TeleportToTrophy()
