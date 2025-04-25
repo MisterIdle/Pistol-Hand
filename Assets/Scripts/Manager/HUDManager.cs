@@ -57,12 +57,12 @@ public class HUDManager : BaseManager
 
     public void OnEditorButtonClick()
     {
-        StartCoroutine(GoToEditorScene());
+        StartCoroutine(TransitionToEditorScene());
     }
 
-    public IEnumerator GoToEditorScene()
+    public IEnumerator TransitionToEditorScene()
     {
-        HUDManager.EnableHUD(false);
+        EnableHUD(false);
         yield return new WaitForSeconds(1f);
 
         StartCoroutine(SceneLoader.LoadScene(GameManager.EditorSceneName));

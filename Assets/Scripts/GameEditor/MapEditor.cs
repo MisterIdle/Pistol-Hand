@@ -1,31 +1,32 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Security.Cryptography;
-using System.Text;
+using System.Linq;
 
 public class MapEditor : BaseManager
 {
     public static MapEditor Instance { get; private set; }
 
     public BlockDatabase blockDatabase;
+    public GameObject map;
 
-    [SerializeField] private Vector2 buildAreaMin = new Vector2(-9, -5);
-    [SerializeField] private Vector2 buildAreaMax = new Vector2(9, 5);
+    [SerializeField] private Vector2 buildAreaMin = new(-9, -5);
+    [SerializeField] private Vector2 buildAreaMax = new(9, 5);
+
+    public bool mirrorEnabled = true;
 
     private List<PlacedBlock> placedBlocks = new();
     private GameObject ghostBlock;
-    private GameObject mirrorGhostBlock;
+    private GameObject ghostMirrorBlock;
     private int currentBlockIndex = 0;
 
     private Camera cam;
     private Vector3 lastPlacedPos = Vector3.positiveInfinity;
     private Vector3 lastRemovedPos = Vector3.positiveInfinity;
 
-    public void Awake()
+    void Awake()
     {
         InitializeSingleton();
+        GameManager.SetGameState(GameState.Editor);
     }
 
     private void InitializeSingleton()
@@ -33,6 +34,7 @@ public class MapEditor : BaseManager
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -40,28 +42,22 @@ public class MapEditor : BaseManager
         }
     }
 
-
-    private void Start()
+    void Start()
     {
         cam = Camera.main;
         CreateGhostBlock();
 
-        GameManager.SetGameState(GameState.Editor);
-
-        foreach (var player in GameManager.GetAllPlayers())
-        {
-            Destroy(player.gameObject);
-        }
-
         HUDManager.EnableHUD(true);
+
         StartCoroutine(CameraManager.ChangeCameraLens(6.5f, 0f));
-        StartCoroutine(CameraManager.SetCameraPosition(new Vector3(-1.5f, -1f, -10), 0f));
-        HUDManager.Instance.editorButton.gameObject.SetActive(false);
+        StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0f, -1f, -10), 0f));
+
+        HUDManager.editorButton.gameObject.SetActive(false);
     }
 
-    private void Update()
+    void Update()
     {
-        if (MapTester.Instance.InTestMode) return;
+        if (MapTester.InTestMode || HUDEditorManager.messageUI.activeSelf) return;
 
         Vector3 gridPos = GetMouseGridPosition();
         HandleScrollInput();
@@ -81,312 +77,141 @@ public class MapEditor : BaseManager
         UpdateGhostBlock(gridPos);
     }
 
-    private void HandleScrollInput()
+    void HandleScrollInput()
     {
         float scroll = Input.mouseScrollDelta.y;
-        if (scroll != 0)
-        {
-            currentBlockIndex = (currentBlockIndex + (int)Mathf.Sign(scroll)) % blockDatabase.blocks.Count;
-            if (currentBlockIndex < 0) currentBlockIndex += blockDatabase.blocks.Count;
+        if (scroll == 0) return;
 
-            Destroy(ghostBlock);
-            CreateGhostBlock();
-        }
-    }
+        currentBlockIndex = (currentBlockIndex + (int)Mathf.Sign(scroll)) % blockDatabase.blocks.Count;
+        if (currentBlockIndex < 0) currentBlockIndex += blockDatabase.blocks.Count;
 
-    public void SetBlockIndex(int index)
-    {
-        currentBlockIndex = index;
         Destroy(ghostBlock);
+        Destroy(ghostMirrorBlock);
         CreateGhostBlock();
     }
 
-    private void PlaceBlock(Vector3 pos)
+    void PlaceBlock(Vector3 pos)
     {
-        if (!IsInBuildArea(pos) || IsBlockAt(pos) || HUDEditorManager.Instance.errorImage.gameObject.activeSelf) return;
+        if (!IsInBuildArea(pos) || IsBlockAt(pos)) return;
 
         var blockData = blockDatabase.blocks[currentBlockIndex];
-        GameObject obj = Instantiate(blockData.prefab, pos, Quaternion.identity);
+        GameObject obj = Instantiate(blockData.prefab, pos, Quaternion.identity, map.transform);
         placedBlocks.Add(new PlacedBlock { id = blockData.id, instance = obj });
 
-        if (HUDEditorManager.Instance.mirrorModeToggle.isOn)
+        if (mirrorEnabled)
         {
-            Vector3 mirrorPos = new Vector3(-pos.x, pos.y, pos.z);
+            Vector3 mirrorPos = GetMirrorPosition(pos);
             if (IsInBuildArea(mirrorPos) && !IsBlockAt(mirrorPos))
             {
-                GameObject mirrorObj = Instantiate(blockData.prefab, mirrorPos, Quaternion.identity);
+                GameObject mirrorObj = Instantiate(blockData.prefab, mirrorPos, Quaternion.identity, map.transform);
                 placedBlocks.Add(new PlacedBlock { id = blockData.id, instance = mirrorObj });
             }
         }
-        
+
         RefreshAllTiles();
     }
 
-
-    private void RemoveBlock(Vector3 pos)
+    void RemoveBlock(Vector3 pos)
     {
-        if (!IsInBuildArea(pos)) return;
+        Vector3 mirrorPos = mirrorEnabled ? GetMirrorPosition(pos) : Vector3.positiveInfinity;
 
-        for (int i = placedBlocks.Count - 1; i >= 0; i--)
+        placedBlocks.RemoveAll(b =>
         {
-            if (placedBlocks[i].instance != null && placedBlocks[i].instance.transform.position == pos)
-            {
-                Destroy(placedBlocks[i].instance);
-                placedBlocks.RemoveAt(i);
-                break;
-            }
-        }
+            if (b.instance == null) return false;
 
-        if (HUDEditorManager.Instance.mirrorModeToggle.isOn)
-        {
-            Vector3 mirrorPos = new Vector3(-pos.x, pos.y, pos.z);
-            for (int i = placedBlocks.Count - 1; i >= 0; i--)
+            Vector3 bPos = b.instance.transform.position;
+            if (bPos == pos || (mirrorEnabled && bPos == mirrorPos))
             {
-                if (placedBlocks[i].instance != null && placedBlocks[i].instance.transform.position == mirrorPos)
-                {
-                    Destroy(placedBlocks[i].instance);
-                    placedBlocks.RemoveAt(i);
-                    break;
-                }
+                Destroy(b.instance);
+                return true;
             }
-        }
+            return false;
+        });
 
         RefreshAllTiles();
     }
 
-    private void CreateGhostBlock()
+    void CreateGhostBlock()
     {
         var prefab = blockDatabase.blocks[currentBlockIndex].prefab;
+
         ghostBlock = Instantiate(prefab);
+        ghostMirrorBlock = Instantiate(prefab);
+
         foreach (var r in ghostBlock.GetComponentsInChildren<SpriteRenderer>())
-        {
             r.color = new Color(r.color.r, r.color.g, r.color.b, 0.4f);
-        }
         foreach (var c in ghostBlock.GetComponentsInChildren<Collider2D>())
-        {
             c.enabled = false;
-        }
 
-        if (mirrorGhostBlock != null)
-        {
-            Destroy(mirrorGhostBlock);
-            mirrorGhostBlock = null;
-        }
+        foreach (var r in ghostMirrorBlock.GetComponentsInChildren<SpriteRenderer>())
+            r.color = new Color(r.color.r, r.color.g, r.color.b, 0.4f);
+        foreach (var c in ghostMirrorBlock.GetComponentsInChildren<Collider2D>())
+            c.enabled = false;
     }
 
-    private void UpdateGhostBlock(Vector3 pos)
+    void UpdateGhostBlock(Vector3 pos)
     {
-        if (ghostBlock != null)
-        {
-            ghostBlock.transform.position = pos;
-            ghostBlock.SetActive(IsInBuildArea(pos) && !HUDEditorManager.Instance.errorImage.gameObject.activeSelf);
-        }
+        if (ghostBlock == null || ghostMirrorBlock == null) return;
 
-        if (HUDEditorManager.Instance.mirrorModeToggle.isOn && ghostBlock != null)
-        {
-            if (mirrorGhostBlock == null)
-            {
-                mirrorGhostBlock = Instantiate(blockDatabase.blocks[currentBlockIndex].prefab);
-                foreach (var r in mirrorGhostBlock.GetComponentsInChildren<SpriteRenderer>())
-                    r.color = new Color(r.color.r, r.color.g, r.color.b, 0.4f);
-                foreach (var c in mirrorGhostBlock.GetComponentsInChildren<Collider2D>())
-                    c.enabled = false;
-            }
+        ghostBlock.transform.position = pos;
+        ghostBlock.SetActive(IsInBuildArea(pos));
 
-            Vector3 mirrorPos = new Vector3(-pos.x, pos.y, pos.z);
-            mirrorGhostBlock.transform.position = mirrorPos;
-            mirrorGhostBlock.SetActive(IsInBuildArea(mirrorPos));
-        }
-        else if (mirrorGhostBlock != null)
+        if (mirrorEnabled)
         {
-            Destroy(mirrorGhostBlock);
-            mirrorGhostBlock = null;
+            Vector3 mirrorPos = GetMirrorPosition(pos);
+            ghostMirrorBlock.transform.position = mirrorPos;
+            ghostMirrorBlock.SetActive(IsInBuildArea(mirrorPos));
+        }
+        else
+        {
+            ghostMirrorBlock.SetActive(false);
         }
     }
 
+    Vector3 GetMirrorPosition(Vector3 pos)
+    {
+        float centerX = (buildAreaMin.x + buildAreaMax.x) / 2f;
+        float distanceFromCenter = pos.x - centerX;
+        float mirroredX = centerX - distanceFromCenter;
+        return new Vector3(mirroredX, pos.y, 0f);
+    }
 
-    private Vector3 GetMouseGridPosition()
+    Vector3 GetMouseGridPosition()
     {
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = 10f;
-        Vector3 worldPos = cam.ScreenToWorldPoint(mousePos);
-        return SnapToGrid(worldPos);
+        return SnapToGrid(cam.ScreenToWorldPoint(mousePos));
     }
 
-    private Vector3 SnapToGrid(Vector3 pos)
+    Vector3 SnapToGrid(Vector3 pos)
     {
-        float x = Mathf.Round(pos.x / GameManager.GridSize) * GameManager.GridSize;
-        float y = Mathf.Round(pos.y / GameManager.GridSize) * GameManager.GridSize;
+        float size = GameManager.GridSize;
+        float x = Mathf.Round(pos.x / size) * size;
+        float y = Mathf.Round(pos.y / size) * size;
         return new Vector3(x, y, 0f);
     }
 
-    private bool IsBlockAt(Vector3 pos)
-    {
-        foreach (var block in placedBlocks)
-        {
-            if (block.instance != null && block.instance.transform.position == pos)
-                return true;
-        }
-        return false;
-    }
+    bool IsBlockAt(Vector3 pos) => placedBlocks.Any(b => b.instance != null && b.instance.transform.position == pos);
 
-    private bool IsInBuildArea(Vector3 pos)
+    bool IsInBuildArea(Vector3 pos)
     {
         return pos.x >= buildAreaMin.x && pos.x <= buildAreaMax.x &&
                pos.y >= buildAreaMin.y && pos.y <= buildAreaMax.y;
     }
 
-    public void SaveMap(string mapName)
+    void RefreshAllTiles()
     {
-        string requiredBlockID = "4";
-        int requiredCount = 4;
-        int actualCount = 0;
-    
-        var mapData = new MapData();
-    
-        foreach (var block in placedBlocks)
-        {
-            if (block.instance != null)
-            {
-                if (block.id == requiredBlockID)
-                    actualCount++;
-    
-                var spriteRenderer = block.instance.GetComponentInChildren<SpriteRenderer>();
-                string spriteName = spriteRenderer?.sprite?.name ?? "";
-    
-                mapData.blocks.Add(new BlockData
-                {
-                    blockID = block.id,
-                    position = block.instance.transform.position,
-                    spriteName = spriteName
-                });
-            }
-        }
-    
-        if (actualCount < requiredCount)
-        {
-            HUDEditorManager.Instance.ErrorMessage($"Il faut au moins {requiredCount} blocs de type 'Spawn' pour sauvegarder la carte.");
-            return;
-        }
-    
-        string folder = Application.dataPath + "/Save";
-        if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
-    
-        string path = folder + "/map_" + mapName + ".dat";
-    
-        string json = JsonUtility.ToJson(mapData, true);
-        byte[] compressed = Compress(json);
-        byte[] encrypted = Encrypt(compressed, "my_super_secret_key_123");
-    
-        File.WriteAllBytes(path, encrypted);
-    
-        HUDEditorManager.Instance.SuccessMessage($"Carte \"{mapName}\" sauvegardée.");
-    }
-    
-    private byte[] Compress(string data)
-    {
-        byte[] raw = Encoding.UTF8.GetBytes(data);
-        using var output = new MemoryStream();
-        using (var gzip = new GZipStream(output, CompressionMode.Compress)) 
-            gzip.Write(raw, 0, raw.Length);
-        return output.ToArray();
-    }
-    
-    private byte[] Encrypt(byte[] data, string key)
-    {
-        using Aes aes = Aes.Create();
-        aes.Key = Encoding.UTF8.GetBytes(key.PadRight(32).Substring(0, 32));
-        aes.IV = new byte[16];
-    
-        using var encryptor = aes.CreateEncryptor();
-        using var output = new MemoryStream();
-        using (var cryptoStream = new CryptoStream(output, encryptor, CryptoStreamMode.Write))
-            cryptoStream.Write(data, 0, data.Length);
-        return output.ToArray();
+        TileManager.RefreshAllTiles(placedBlocks);
     }
 
-    public void LoadMap(string mapName)
+    public bool CompletMap()
     {
-        string path = Application.dataPath + "/Save/" + mapName + ".json";
-        if (!File.Exists(path)) return;
-
-        string json = File.ReadAllText(path);
-        MapData mapData = JsonUtility.FromJson<MapData>(json);
-
-        foreach (var block in placedBlocks)
-        {
-            if (block.instance != null)
-                Destroy(block.instance);
-        }
-        placedBlocks.Clear();
-
-        foreach (var data in mapData.blocks)
-        {
-            var blockData = blockDatabase.blocks.Find(b => b.id == data.blockID);
-            if (blockData != null)
-            {
-                GameObject obj = Instantiate(blockData.prefab, data.position, Quaternion.identity);
-                placedBlocks.Add(new PlacedBlock { id = data.blockID, instance = obj });
-            }
-        }
-
-        Debug.Log("Map loaded: " + mapName);
+        return placedBlocks.Any(b => b.id == "4");
     }
 
-    public void RefreshAllTiles()
-    {
-        Dictionary<Vector2Int, RuleTiteApply> tileMap = new();  
-
-        foreach (var block in placedBlocks)
-        {
-            if (block.instance == null) continue;   
-
-            RuleTiteApply tile = block.instance.GetComponent<RuleTiteApply>();
-            if (tile == null) continue; 
-
-            Vector2Int gridPos = ToGridPosition(block.instance.transform.position);
-            tileMap[gridPos] = tile;
-        }   
-
-        foreach (var pair in tileMap)
-        {
-            Vector2Int pos = pair.Key;
-            RuleTiteApply tile = pair.Value;    
-
-            Dictionary<Vector3, bool> neighbors = new()
-            {
-                { Vector3.up, tileMap.ContainsKey(pos + Vector2Int.up) },
-                { Vector3.down, tileMap.ContainsKey(pos + Vector2Int.down) },
-                { Vector3.left, tileMap.ContainsKey(pos + Vector2Int.left) },
-                { Vector3.right, tileMap.ContainsKey(pos + Vector2Int.right) }
-            };  
-
-            tile.UpdateSprite(neighbors);
-        }
-    }   
-
-    private Vector2Int ToGridPosition(Vector3 pos)
-    {
-        float size = GameManager.GridSize;
-        int x = Mathf.RoundToInt(pos.x / size);
-        int y = Mathf.RoundToInt(pos.y / size);
-        return new Vector2Int(x, y);
-    }
-
-
-
-    private class PlacedBlock
+    public class PlacedBlock
     {
         public string id;
         public GameObject instance;
-    }
-
-    public void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(new Vector3(buildAreaMin.x, buildAreaMin.y), new Vector3(buildAreaMax.x, buildAreaMin.y));
-        Gizmos.DrawLine(new Vector3(buildAreaMax.x, buildAreaMin.y), new Vector3(buildAreaMax.x, buildAreaMax.y));
-        Gizmos.DrawLine(new Vector3(buildAreaMax.x, buildAreaMax.y), new Vector3(buildAreaMin.x, buildAreaMax.y));
-        Gizmos.DrawLine(new Vector3(buildAreaMin.x, buildAreaMax.y), new Vector3(buildAreaMin.x, buildAreaMin.y));
     }
 }

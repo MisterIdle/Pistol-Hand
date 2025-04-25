@@ -15,9 +15,11 @@ public class LobbyManager : BaseManager
         GameManager.SetGameState(GameState.WaitingForPlayers);
 
         HUDManager.EnableHUD(true);
+
         StartCoroutine(CameraManager.ChangeCameraLens(5f, 0f));
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0, 0, -10), 0f));
-        HUDManager.Instance.editorButton.gameObject.SetActive(true);
+
+        HUDManager.editorButton.gameObject.SetActive(true);
     }
 
     private void InitializeSingleton()

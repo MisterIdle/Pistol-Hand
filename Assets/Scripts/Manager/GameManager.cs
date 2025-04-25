@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using System.Linq;
 
 [DefaultExecutionOrder(-100)]
@@ -13,6 +14,7 @@ public class GameManager : BaseManager
     public int PlayerDeath;
     public int NeedToWin = 3;
     [SerializeField] public Transform[] _spawnPoints;
+
 
     [Header("Scene Settings")]
     public string LobbySceneName = "Lobby";
@@ -57,6 +59,7 @@ public class GameManager : BaseManager
                 break;
         }
     }
+
 
     private void FixedUpdate()
     {
