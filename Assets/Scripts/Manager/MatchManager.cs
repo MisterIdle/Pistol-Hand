@@ -1,7 +1,5 @@
 using UnityEngine;
-using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
 
 public class MatchManager : BaseManager
 {
@@ -73,6 +71,8 @@ public class MatchManager : BaseManager
 
         yield return new WaitForSeconds(1f);
 
+        LoadRandomMap();
+
         GameManager.ResetAllPlayers();
         GameManager.SetSpawnPoints();
         GameManager.PlaceAllPlayers();
@@ -80,6 +80,31 @@ public class MatchManager : BaseManager
         yield return CameraManager.MoveCameraTransition(false, 1f);
         IsLoading = false;
     }
+
+    public void LoadRandomMap()
+    {
+        var mapNames = SaveManager.GetAllMaps();
+        if (mapNames.Count == 0)
+        {
+            Debug.LogWarning("No maps available to load.");
+            return;
+        }      
+
+        string randomMapName = mapNames[Random.Range(0, mapNames.Count)];
+        var loadedData = SaveManager.LoadMap(randomMapName);
+        if (loadedData == null) return;    
+
+        foreach (Transform child in blocks.transform)
+        {
+            Destroy(child.gameObject);
+        }      
+
+        var placedBlocks = BlockLoader.LoadBlocks(loadedData, blockDatabase, blocks.transform);
+        TileManager.RefreshAllTiles(placedBlocks);
+
+        print($"Loaded map: {randomMapName}");
+    }
+
 
     private IEnumerator TeleportToTrophy()
     {

@@ -153,7 +153,12 @@ public class HUDEditorManager : BaseManager
 
     public void OnMirrorToggle()
     {
-        MapEditor.mirrorEnabled = !MapEditor.mirrorEnabled;
+        MapEditor.ToggleMirror();
+    }
+
+    public void OnGridToggle()
+    {
+        MapEditor.ToggleGrid();
     }
 
     public void OnSaveButtonClick()

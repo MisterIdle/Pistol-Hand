@@ -6,6 +6,7 @@ public class MapTester : BaseManager
 
     public int _playerID = 0;
     public bool InTestMode = false;
+    private bool wasGridEnabledBeforeTest = true; // Pour garder l'état de la grille avant de tester
 
     private void Awake()
     {
@@ -65,6 +66,15 @@ public class MapTester : BaseManager
 
     public void StartTestMatch()
     {
+        // Sauvegarder l'état de la grille avant d'entrer en mode test
+        wasGridEnabledBeforeTest = MapEditor.Instance.gridEnabled;
+
+        // Désactiver la grille si elle est activée avant de commencer le test
+        if (MapEditor.Instance.gridEnabled)
+        {
+            MapEditor.Instance.ToggleGrid(); // Désactiver la grille
+        }
+
         StartCoroutine(CameraManager.ChangeCameraLens(5f, 1f));
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0, 0, -10), 1f));
 
@@ -75,7 +85,6 @@ public class MapTester : BaseManager
         GameManager.SetSpawnPoints();
 
         InTestMode = true;
-
     }
 
     public void StopTestMatch()
@@ -94,12 +103,14 @@ public class MapTester : BaseManager
 
         GameManager.PlayerCount = 0;
         GameManager.PlayerDeath = 0;
-        
+
         HUDEditorManager.editorUI.SetActive(true);
         HUDEditorManager.testerUI.SetActive(false);
         HUDEditorManager.center.SetActive(true);
 
-        InTestMode = false;
+        if (wasGridEnabledBeforeTest)
+        {
+            MapEditor.Instance.ToggleGrid();
+        }
     }
-    
 }

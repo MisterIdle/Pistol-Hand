@@ -8,13 +8,17 @@ public class MapEditor : BaseManager
 
     public BlockDatabase blockDatabase;
     public GameObject map;
+    public GameObject grid;
+    public GameObject gridblock;
 
     [SerializeField] private Vector2 buildAreaMin = new(-9, -5);
     [SerializeField] private Vector2 buildAreaMax = new(9, 5);
 
     public bool mirrorEnabled = true;
+    public bool gridEnabled = true;
 
     private List<PlacedBlock> placedBlocks = new();
+    private List<GameObject> gridBlocks = new();
     private GameObject ghostBlock;
     private GameObject ghostMirrorBlock;
     private int currentBlockIndex = 0;
@@ -53,6 +57,8 @@ public class MapEditor : BaseManager
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0f, -1f, -10), 0f));
 
         HUDManager.editorButton.gameObject.SetActive(false);
+
+        GenerateGrid();
     }
 
     void Update()
@@ -66,13 +72,20 @@ public class MapEditor : BaseManager
         {
             PlaceBlock(gridPos);
             lastPlacedPos = gridPos;
+            lastRemovedPos = Vector3.positiveInfinity;
         }
 
         if (Input.GetMouseButton(1) && gridPos != lastRemovedPos)
         {
             RemoveBlock(gridPos);
             lastRemovedPos = gridPos;
+            lastPlacedPos = Vector3.positiveInfinity;
         }
+
+        if (gridEnabled)
+            GenerateGrid();
+        else
+            HideGrid();
 
         UpdateGhostBlock(gridPos);
     }
@@ -216,31 +229,11 @@ public class MapEditor : BaseManager
 
     public void LoadBlocksFromSaveData(List<SaveManager.MapSaveData.BlockData> loadedBlocks)
     {
-        foreach (var placedBlock in placedBlocks)
-        {
-            if (placedBlock.instance != null)
-            {
-                Destroy(placedBlock.instance);
-            }
-        }
-        placedBlocks.Clear();
-
-        foreach (var blockData in loadedBlocks)
-        {
-            var blockPrefab = blockDatabase.blocks.FirstOrDefault(b => b.id == blockData.id)?.prefab;
-            if (blockPrefab != null)
-            {
-                GameObject blockInstance = Instantiate(blockPrefab, blockData.position, Quaternion.identity, map.transform);
-                placedBlocks.Add(new PlacedBlock { id = blockData.id, instance = blockInstance });
-            }
-            else
-            {
-                Debug.LogWarning($"Prefab for block ID {blockData.id} not found!");
-            }
-        }
-
+        ClearMap();
+        placedBlocks = BlockLoader.LoadBlocks(loadedBlocks, blockDatabase, map.transform);
         RefreshAllTiles();
     }
+
 
     public void ClearMap()
     {
@@ -255,6 +248,59 @@ public class MapEditor : BaseManager
         RefreshAllTiles();
     }
 
+    public void ToggleMirror()
+    {
+        mirrorEnabled = !mirrorEnabled;
+
+        if (mirrorEnabled)
+            ghostMirrorBlock.SetActive(true);
+        else
+            ghostMirrorBlock.SetActive(false);
+    }
+    
+    public void ToggleGrid()
+    {
+        if (!MapTester.Instance.InTestMode)
+        {
+            gridEnabled = !gridEnabled;
+
+            if (gridEnabled)
+                ShowGrid();
+            else
+                HideGrid();
+        }
+    }
+
+
+    public void GenerateGrid()
+    {
+        if (gridBlocks.Count > 0) return;
+
+        for (float x = buildAreaMin.x; x <= buildAreaMax.x; x += GameManager.GridSize)
+        {
+            for (float y = buildAreaMin.y; y <= buildAreaMax.y; y += GameManager.GridSize)
+            {
+                GameObject gridBlock = Instantiate(gridblock, new Vector3(x, y, 0), Quaternion.identity, grid.transform);
+                gridBlocks.Add(gridBlock);
+            }
+        }
+    }
+
+    public void ShowGrid()
+    {
+        foreach (var block in gridBlocks)
+        {
+            block.SetActive(true);
+        }
+    }
+
+    public void HideGrid()
+    {
+        foreach (var block in gridBlocks)
+        {
+            block.SetActive(false);
+        }
+    }
 
     public class PlacedBlock
     {

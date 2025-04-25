@@ -60,6 +60,20 @@ public static class SaveManager
         return saveData.placedBlocks;
     }
 
+    public static List<string> GetAllMaps()
+    {
+        if (!Directory.Exists(saveDirectory))
+        {
+            Debug.LogWarning("Save directory does not exist: " + saveDirectory);
+            return new List<string>();
+        }
+
+        string[] files = Directory.GetFiles(saveDirectory, "*.map");
+        List<string> mapNames = files.Select(Path.GetFileNameWithoutExtension).ToList();
+
+        Debug.Log("Available maps: " + string.Join(", ", mapNames));
+        return mapNames;
+    }
 
     public static void DeleteMap(string mapName)
     {
