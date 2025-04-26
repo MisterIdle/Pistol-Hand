@@ -84,11 +84,13 @@ public class PlayerController : MonoBehaviour
     private bool _isShooting;
     private bool _isReloading;
 
+    private bool _loaded;
+
     private bool _wasGrounded;
 
     private bool _isInvulnerable;
 
-    public void Awake()
+    public void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
         _spriteRender = GetComponentInChildren<SpriteRenderer>();
@@ -99,6 +101,12 @@ public class PlayerController : MonoBehaviour
         Lifes = _baseHealth;
 
         DontDestroyOnLoad(gameObject);
+
+        SkinManager.Instance.AssignColor(PlayerID, PlayerID);
+        Color playerColor = SkinManager.Instance.GetPlayerColor(PlayerID);
+        _spriteRender.color = playerColor;
+
+        print($"Player {PlayerID} color: {playerColor}");
     }
 
     public void Update()
@@ -454,5 +462,13 @@ public class PlayerController : MonoBehaviour
         if (context.canceled) dpadInput = Vector2.zero;
 
         AudioManager.instance.OnAdjustVolumeFromPlayer(dpadInput);
+    }
+
+    public void OnChangeColor(InputAction.CallbackContext context)
+    {
+        Vector2 dpadInput = context.ReadValue<Vector2>();
+        if (context.canceled) dpadInput = Vector2.zero;
+
+        SkinManager.Instance.AssignColor(PlayerID, dpadInput.y > 0 ? 1 : -1);
     }
 }

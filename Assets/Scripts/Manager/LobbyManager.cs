@@ -44,13 +44,13 @@ public class LobbyManager : BaseManager
         {
             player.name = $"Player {id}";
             player.PlayerID = id;
+
             id++;
         }
+        
 
         _playerID = id;
         GameManager.PlayerCount = id;
-
-        StartCoroutine(CameraManager.SlowMotion());
     }
 
     public void InLobby()

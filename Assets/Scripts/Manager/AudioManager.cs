@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
-public class AudioManager : MonoBehaviour
+public class AudioManager : BaseManager
 {
     public static AudioManager instance;
 
