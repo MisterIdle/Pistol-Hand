@@ -6,7 +6,7 @@ public class LobbyManager : BaseManager
     public static LobbyManager Instance { get; private set; }
 
     [Header("Player Settings")]
-    public int _playerID = 0;
+    public int PlayerID = 0;
     public bool LoadNextMap = false;
 
     private void Awake()
@@ -18,8 +18,6 @@ public class LobbyManager : BaseManager
 
         StartCoroutine(CameraManager.ChangeCameraLens(5f, 0f));
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0, 0, -10), 0f));
-
-        HUDManager.editorButton.gameObject.SetActive(true);
     }
 
     private void InitializeSingleton()
@@ -36,21 +34,8 @@ public class LobbyManager : BaseManager
 
     public void OnPlayerJoin()
     {
-        var players = GameManager.GetAllPlayers();
-        if (players == null) return;
-
-        int id = 0;
-        foreach (var player in players)
-        {
-            player.name = $"Player {id}";
-            player.PlayerID = id;
-
-            id++;
-        }
-        
-
-        _playerID = id;
-        GameManager.PlayerCount = id;
+        PlayerID++;
+        GameManager.PlayerCount++;
     }
 
     public void InLobby()

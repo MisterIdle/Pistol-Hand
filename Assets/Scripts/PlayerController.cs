@@ -84,8 +84,6 @@ public class PlayerController : MonoBehaviour
     private bool _isShooting;
     private bool _isReloading;
 
-    private bool _loaded;
-
     private bool _wasGrounded;
 
     private bool _isInvulnerable;
@@ -100,14 +98,17 @@ public class PlayerController : MonoBehaviour
         _dashTrail.emitting = false;
         Lifes = _baseHealth;
 
+        PlayerID = LobbyManager.Instance.PlayerID;
+
+        SkinManager.Instance.AssignColor(PlayerID, PlayerID - 1);
+
+        _spriteRender.color = SkinManager.Instance.GetPlayerColor(PlayerID);
+        
+        print($"Player {PlayerID} joined with color {SkinManager.Instance.GetPlayerColorName(PlayerID)}");
+
         DontDestroyOnLoad(gameObject);
-
-        SkinManager.Instance.AssignColor(PlayerID, PlayerID);
-        Color playerColor = SkinManager.Instance.GetPlayerColor(PlayerID);
-        _spriteRender.color = playerColor;
-
-        print($"Player {PlayerID} color: {playerColor}");
     }
+
 
     public void Update()
     {
@@ -368,7 +369,7 @@ public class PlayerController : MonoBehaviour
         }
 
         transform.rotation = Quaternion.identity;
-        _spriteRender.color = Color.white;
+        _spriteRender.color = SkinManager.Instance.GetPlayerColor(PlayerID);
 
         _animator.SetBool("Hit", false);
 
@@ -418,7 +419,7 @@ public class PlayerController : MonoBehaviour
         _isDashing = false;
         _isInvulnerable = false;
 
-        _spriteRender.color = Color.white;
+        _spriteRender.color = SkinManager.Instance.GetPlayerColor(PlayerID);
         _spriteRender.enabled = true;
         _collider.enabled = true;
         _handSprite.enabled = true;
