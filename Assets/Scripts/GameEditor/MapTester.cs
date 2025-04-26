@@ -66,13 +66,11 @@ public class MapTester : BaseManager
 
     public void StartTestMatch()
     {
-        // Sauvegarder l'état de la grille avant d'entrer en mode test
         wasGridEnabledBeforeTest = MapEditor.Instance.gridEnabled;
 
-        // Désactiver la grille si elle est activée avant de commencer le test
         if (MapEditor.Instance.gridEnabled)
         {
-            MapEditor.Instance.ToggleGrid(); // Désactiver la grille
+            MapEditor.Instance.ToggleGrid();
         }
 
         StartCoroutine(CameraManager.ChangeCameraLens(5f, 1f));
@@ -91,7 +89,7 @@ public class MapTester : BaseManager
     {
         InTestMode = false;
         StartCoroutine(CameraManager.ChangeCameraLens(6.5f, 1f));
-        StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0f, -1f, -10), 1f));
+        StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0f, -0.5f, -10), 1f));
 
         var players = GameManager.GetAllPlayers();
         if (players == null) return;

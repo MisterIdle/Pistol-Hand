@@ -1,8 +1,9 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Collections;
 using System.IO;
-using System.Linq;
 
 public class HUDEditorManager : BaseManager
 {
@@ -17,10 +18,16 @@ public class HUDEditorManager : BaseManager
     public GameObject testerUI;
     public TMP_Dropdown allMapsDropdown;
     public TMP_InputField mapNameInputField;
+    public TMP_Text globalMapName;
     public bool confirmed = false;
 
     private string saveDirectory = "Assets/Save";
     private string actionToConfirm = "";
+    private string currentMapName = "";
+
+    public List<Button> blockButtons;
+    private Color selectedColor = Color.yellow;
+    private Color defaultColor = Color.white;
 
     private void Awake()
     {
@@ -42,6 +49,34 @@ public class HUDEditorManager : BaseManager
     private void Start()
     {
         PopulateMapDropdown();
+
+        for (int i = 0; i < blockButtons.Count; i++)
+        {
+            int index = i;
+            Button button = blockButtons[i];
+            button.onClick.AddListener(() => OnBlockButtonClick(index));
+        }
+    }
+
+    public void OnBlockButtonClick(int blockIndex)
+    {
+        MapEditor.SetCurrentBlockById(blockIndex);
+        HighlightSelectedButton(blockIndex);
+    }
+
+    public void HighlightSelectedButton(int selectedIndex)
+    {
+        foreach (Button btn in blockButtons)
+        {
+            Image buttonImage = btn.GetComponent<Image>();
+            if (buttonImage != null)
+                buttonImage.color = defaultColor;
+        }
+
+        Button selectedButton = blockButtons[selectedIndex];
+        Image selectedButtonImage = selectedButton.GetComponent<Image>();
+        if (selectedButtonImage != null)
+            selectedButtonImage.color = selectedColor;
     }
 
     private void PopulateMapDropdown()
@@ -126,7 +161,15 @@ public class HUDEditorManager : BaseManager
 
     public void OnLobbyButtonClick()
     {
-        HUDManager.gameObject.SetActive(true);
+        StartCoroutine(TransitionToEditorScene());
+    }
+
+    public IEnumerator TransitionToEditorScene()
+    {
+        HUDManager.EnableHUD(false);
+        yield return new WaitForSeconds(1f);
+
+        StartCoroutine(SceneLoader.LoadScene(GameManager.LobbySceneName));
     }
 
     public void OnPlayButtonClick()
@@ -216,9 +259,28 @@ public class HUDEditorManager : BaseManager
 
     public void OnRenameButtonClick()
     {
-        string mapName = allMapsDropdown.options[allMapsDropdown.value].text.Trim();
+        if (string.IsNullOrEmpty(currentMapName))
+        {
+            MessageUI("No map is currently loaded.", Color.red, false);
+            return;
+        }
+
+        string newMapName = mapNameInputField.text.Trim();
+
+        if (string.IsNullOrEmpty(newMapName))
+        {
+            MessageUI("New map name cannot be empty.", Color.red, false);
+            return;
+        }
+
+        if (newMapName == currentMapName)
+        {
+            MessageUI("New map name is the same as the current one.", Color.red, false);
+            return;
+        }
+
         actionToConfirm = "rename";
-        MessageUI($"Are you sure you want to rename the map '{mapName}'?", Color.green, true);
+        MessageUI($"Are you sure you want to rename the map '{currentMapName}' to '{newMapName}'?", Color.green, true);
     }
 
     private void OnConfirmSave()
@@ -240,8 +302,13 @@ public class HUDEditorManager : BaseManager
             return;
         }
 
+        currentMapName = mapName;
         MapEditor.Instance.LoadBlocksFromSaveData(loadedBlocks);
         MessageUI($"Map '{mapName}' loaded successfully.", Color.green, false);
+
+        globalMapName.text = "CURRENT MAP: " + mapName;
+        mapNameInputField.text = mapName;
+        
     }
 
     private void OnConfirmDelete()
@@ -269,7 +336,6 @@ public class HUDEditorManager : BaseManager
 
     private void OnConfirmRename()
     {
-        string mapName = allMapsDropdown.options[allMapsDropdown.value].text.Trim();
         string newMapName = mapNameInputField.text.Trim();
 
         if (string.IsNullOrEmpty(newMapName))
@@ -278,19 +344,28 @@ public class HUDEditorManager : BaseManager
             return;
         }
 
-        string oldFilePath = Path.Combine(saveDirectory, mapName + ".map");
+        string oldFilePath = Path.Combine(saveDirectory, currentMapName + ".map");
         string newFilePath = Path.Combine(saveDirectory, newMapName + ".map");
+
+        if (File.Exists(newFilePath))
+        {
+            MessageUI($"Map '{newMapName}' already exists.", Color.red, false);
+            return;
+        }
 
         if (File.Exists(oldFilePath))
         {
             File.Move(oldFilePath, newFilePath);
+            currentMapName = newMapName;
             RefreshMapDropdown();
-            MessageUI($"Map '{mapName}' renamed to '{newMapName}' successfully.", Color.green, false);
+            MessageUI($"Map renamed to '{newMapName}' successfully.", Color.green, false);
+
+            globalMapName.text = "CURRENT MAP: " + newMapName;
+            mapNameInputField.text = newMapName;
         }
         else
         {
-            MessageUI($"Map '{mapName}' not found.", Color.red, false);
+            MessageUI($"Map '{currentMapName}' not found.", Color.red, false);
         }
     }
 }
-

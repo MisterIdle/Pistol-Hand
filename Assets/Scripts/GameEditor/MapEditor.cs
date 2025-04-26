@@ -38,7 +38,6 @@ public class MapEditor : BaseManager
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -54,7 +53,7 @@ public class MapEditor : BaseManager
         HUDManager.EnableHUD(true);
 
         StartCoroutine(CameraManager.ChangeCameraLens(6.5f, 0f));
-        StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0f, -1f, -10), 0f));
+        StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0f, -0.5f, -10), 0f));
 
         HUDManager.editorButton.gameObject.SetActive(false);
 
@@ -92,12 +91,25 @@ public class MapEditor : BaseManager
 
     void HandleScrollInput()
     {
-        float scroll = Input.mouseScrollDelta.y;
-        if (scroll == 0) return;
+        if (Input.mouseScrollDelta.y < 0)
+        {
+            currentBlockIndex = (currentBlockIndex + 1) % blockDatabase.blocks.Count;
+        }
+        else if (Input.mouseScrollDelta.y > 0)
+        {
+            currentBlockIndex = (currentBlockIndex - 1 + blockDatabase.blocks.Count) % blockDatabase.blocks.Count;
+        }
 
-        currentBlockIndex = (currentBlockIndex + (int)Mathf.Sign(scroll)) % blockDatabase.blocks.Count;
-        if (currentBlockIndex < 0) currentBlockIndex += blockDatabase.blocks.Count;
+        HUDEditorManager.HighlightSelectedButton(currentBlockIndex);
 
+        Destroy(ghostBlock);
+        Destroy(ghostMirrorBlock);
+        CreateGhostBlock();
+    }
+
+    public void SetCurrentBlockById(int blockId)
+    {
+        currentBlockIndex = blockId;
         Destroy(ghostBlock);
         Destroy(ghostMirrorBlock);
         CreateGhostBlock();

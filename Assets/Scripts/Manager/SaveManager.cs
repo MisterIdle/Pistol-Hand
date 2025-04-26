@@ -78,6 +78,7 @@ public static class SaveManager
     public static void DeleteMap(string mapName)
     {
         string path = Path.Combine(saveDirectory, mapName + ".map");
+        string metaPath = path + ".meta";
 
         if (File.Exists(path))
         {
@@ -87,6 +88,16 @@ public static class SaveManager
         else
         {
             Debug.LogWarning("Map file not found: " + path);
+        }
+
+        if (File.Exists(metaPath))
+        {
+            File.Delete(metaPath);
+            Debug.Log("Meta file deleted: " + metaPath);
+        }
+        else
+        {
+            Debug.LogWarning("Meta file not found: " + metaPath);
         }
     }
 
