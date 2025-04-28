@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public bool IsDead;
 
     [Header("Movement")]
-    [SerializeField] private float _maxSpeed = 10f;
+    [SerializeField] public float _maxSpeed = 10f;
     [SerializeField] private float _acceleration = 60f;
     [SerializeField] private float _deceleration = 70f;
     [SerializeField] private float _airControl = 0.6f;
@@ -150,6 +150,10 @@ public class PlayerController : MonoBehaviour
         if (groundedNow) _isJumping = false;
     }
 
+    public float GetMaxSpeed() => _maxSpeed;
+    public void SetMaxSpeed(float speed) => _maxSpeed = speed;
+
+    public void CantDash(bool canDash) => _isDashing = canDash;
 
     private void HandleMovement()
     {

@@ -1,5 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using NUnit.Framework;
+using System.Threading.Tasks;
+using Unity.VisualScripting;
 
 public class MatchManager : BaseManager
 {
@@ -8,6 +11,8 @@ public class MatchManager : BaseManager
     [Header("Spawn System")]
     public bool IsLoading = false;
     public bool FirstMatch = true;
+    public int countdownStart = 3;
+    public int count;
 
     [Header("Map System")]
     public BlockDatabase blockDatabase;
@@ -58,7 +63,7 @@ public class MatchManager : BaseManager
 
                 if (p.Wins >= GameManager.NeedToWin)
                 {
-                    Debug.Log($"Player {p.PlayerID} wins the match!");
+                    Debug.Log($"Player {SkinManager.Instance.GetPlayerColorName(p.PlayerID)} wins the match!");
                     IsLoading = false;
                     StartCoroutine(TeleportToTrophy());
                     yield break;
@@ -79,6 +84,29 @@ public class MatchManager : BaseManager
 
         yield return CameraManager.MoveCameraTransition(false, 1f);
         IsLoading = false;
+        StartCoroutine(StartMatch());
+    }
+
+    public IEnumerator StartMatch()
+    {
+        PlayerController[] players = GameManager.GetAllPlayers();
+        float maxSpeed = players[0].GetMaxSpeed();
+        count = countdownStart; 
+        foreach (var p in players) {
+            p.SetMaxSpeed(0);
+            p.CantDash(true);
+        }
+        while (count > 0)
+        {
+            Debug.Log($"{count}");
+            count--;
+            yield return new WaitForSeconds(1f);
+        }
+        foreach (var p in players){
+            p.SetMaxSpeed(maxSpeed);
+            p.CantDash(false);
+        }
+        Debug.Log("Go");
     }
 
     public void LoadRandomMap()
