@@ -150,10 +150,10 @@ public class PlayerController : MonoBehaviour
         if (groundedNow) _isJumping = false;
     }
 
-    public float GetMaxSpeed() => _maxSpeed;
-    public void SetMaxSpeed(float speed) => _maxSpeed = speed;
-
-    public void CantDash(bool canDash) => _isDashing = canDash;
+    public void CanMove(bool canMove) {
+        _isDashing = !canMove;
+        _stunned = !canMove;
+    }
 
     private void HandleMovement()
     {

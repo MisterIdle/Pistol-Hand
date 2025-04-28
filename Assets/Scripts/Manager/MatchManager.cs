@@ -90,22 +90,15 @@ public class MatchManager : BaseManager
     public IEnumerator StartMatch()
     {
         PlayerController[] players = GameManager.GetAllPlayers();
-        float maxSpeed = players[0].GetMaxSpeed();
         count = countdownStart; 
-        foreach (var p in players) {
-            p.SetMaxSpeed(0);
-            p.CantDash(true);
-        }
+        foreach (var p in players) p.CanMove(false);
         while (count > 0)
         {
             Debug.Log($"{count}");
             count--;
             yield return new WaitForSeconds(1f);
         }
-        foreach (var p in players){
-            p.SetMaxSpeed(maxSpeed);
-            p.CantDash(false);
-        }
+        foreach (var p in players) p.CanMove(true);
         Debug.Log("Go");
     }
 
