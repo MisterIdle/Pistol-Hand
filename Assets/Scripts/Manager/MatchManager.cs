@@ -11,12 +11,17 @@ public class MatchManager : BaseManager
     [Header("Spawn System")]
     public bool IsLoading = false;
     public bool FirstMatch = true;
-    public int countdownStart = 3;
-    public int count;
 
     [Header("Map System")]
     public BlockDatabase blockDatabase;
     public GameObject blocks;
+    
+    [Header("Start System")]
+    public int countdownStart = 3;
+    public int count;
+
+    [Header("Draw System")]
+    public float drawTime = 0.5f;
 
     private void Awake()
     {
@@ -59,8 +64,7 @@ public class MatchManager : BaseManager
             foreach (var p in GameManager.GetAllPlayers())
             {
                 if (p.IsDead) continue;
-                p.Wins++;
-
+                StartCoroutine(DrawMatch());
                 if (p.Wins >= GameManager.NeedToWin)
                 {
                     Debug.Log($"Player {SkinManager.Instance.GetPlayerColorName(p.PlayerID)} wins the match!");
@@ -100,6 +104,38 @@ public class MatchManager : BaseManager
         }
         foreach (var p in players) p.CanMove(true);
         Debug.Log("Go");
+    }
+
+    public IEnumerator DrawMatch()
+    {
+        PlayerController[] players = GameManager.GetAllPlayers();
+        while (drawTime > 0)
+        {
+            drawTime -= Time.deltaTime;
+            yield return null;
+        }
+
+        int playersAlive = 0;
+        PlayerController lastAlivePlayer = null;
+
+        foreach (var p in players)
+        {
+            if (!p.IsDead)
+            {
+                playersAlive++;
+                lastAlivePlayer = p;
+            }
+        }
+
+        if (playersAlive == 1 && lastAlivePlayer != null)
+        {
+            lastAlivePlayer.Wins++;
+            Debug.Log($"Player {SkinManager.Instance.GetPlayerColorName(lastAlivePlayer.PlayerID)} wins this round!");
+        }
+        else
+        {
+            Debug.Log("Draw");
+        }
     }
 
     public void LoadRandomMap()
