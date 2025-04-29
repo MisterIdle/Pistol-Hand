@@ -86,6 +86,9 @@ public class MatchManager : BaseManager
         GameManager.SetSpawnPoints();
         GameManager.PlaceAllPlayers();
 
+        PlayerController[] players = GameManager.GetAllPlayers();
+        foreach (var p in players) p.CanMove(false);
+
         yield return CameraManager.MoveCameraTransition(false, 1f);
         IsLoading = false;
         StartCoroutine(StartMatch());
@@ -94,8 +97,7 @@ public class MatchManager : BaseManager
     public IEnumerator StartMatch()
     {
         PlayerController[] players = GameManager.GetAllPlayers();
-        count = countdownStart; 
-        foreach (var p in players) p.CanMove(false);
+        count = countdownStart;
         while (count > 0)
         {
             Debug.Log($"{count}");
