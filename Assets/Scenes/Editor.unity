@@ -1398,7 +1398,7 @@ GameObject:
   - component: {fileID: 477579479}
   - component: {fileID: 477579478}
   m_Layer: 5
-  m_Name: DashResetBlock
+  m_Name: CrateBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1421,7 +1421,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 44.99994, y: -36.999954}
+  m_AnchoredPosition: {x: 44.999878, y: -36.999954}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &477579478
@@ -3195,7 +3195,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: BASIC
+  m_text: PLATFORM
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9451ce448f66434419894266ee956beb, type: 2}
   m_sharedMaterial: {fileID: 3561129096346417744, guid: 9451ce448f66434419894266ee956beb, type: 2}
@@ -3222,8 +3222,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3260,7 +3260,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 29.198471, y: 0, z: -4.1750107, w: 0}
+  m_margin: {x: 29.198471, y: 0, z: -34.203445, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -4174,7 +4174,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: BOUNCE
+  m_text: SPRING
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9451ce448f66434419894266ee956beb, type: 2}
   m_sharedMaterial: {fileID: 3561129096346417744, guid: 9451ce448f66434419894266ee956beb, type: 2}
@@ -4201,8 +4201,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -4893,7 +4893,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: REDASH
+  m_text: CRATE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9451ce448f66434419894266ee956beb, type: 2}
   m_sharedMaterial: {fileID: 3561129096346417744, guid: 9451ce448f66434419894266ee956beb, type: 2}
@@ -4920,8 +4920,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5295,7 +5295,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 44.99994, y: -738.9999}
+  m_AnchoredPosition: {x: 44.999878, y: -738.9999}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1486215442
@@ -5342,9 +5342,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1529215156}
+      - m_Target: {fileID: 1529215151}
         m_TargetAssemblyTypeName: HUDEditorManager, Assembly-CSharp
-        m_MethodName: OnBlockButtonClick
+        m_MethodName: 
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5649,11 +5649,16 @@ MonoBehaviour:
   globalMapName: {fileID: 658699119}
   confirmed: 0
   blockButtons:
-  - {fileID: 1634713934}
-  - {fileID: 1741767473}
-  - {fileID: 1693888529}
-  - {fileID: 477579478}
-  - {fileID: 1486215442}
+  - button: {fileID: 1634713934}
+    blockType: 1
+  - button: {fileID: 1741767473}
+    blockType: 2
+  - button: {fileID: 1693888529}
+    blockType: 3
+  - button: {fileID: 477579478}
+    blockType: 4
+  - button: {fileID: 1486215442}
+    blockType: 0
 --- !u!1 &1537417301
 GameObject:
   m_ObjectHideFlags: 0
@@ -6055,7 +6060,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: KILL
+  m_text: SPIKE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9451ce448f66434419894266ee956beb, type: 2}
   m_sharedMaterial: {fileID: 3561129096346417744, guid: 9451ce448f66434419894266ee956beb, type: 2}
@@ -6082,8 +6087,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -6358,7 +6363,7 @@ GameObject:
   - component: {fileID: 1634713935}
   - component: {fileID: 1634713934}
   m_Layer: 5
-  m_Name: NormalBlock
+  m_Name: PlatformBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6381,7 +6386,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 44.99994, y: 248.00005}
+  m_AnchoredPosition: {x: 44.999878, y: 248.00005}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1634713934
@@ -6427,19 +6432,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1634713935}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1529215156}
-        m_TargetAssemblyTypeName: HUDEditorManager, Assembly-CSharp
-        m_MethodName: OnBlockButtonClick
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1634713935
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6763,7 +6756,7 @@ GameObject:
   - component: {fileID: 1693888530}
   - component: {fileID: 1693888529}
   m_Layer: 5
-  m_Name: BounceBlock
+  m_Name: SpringBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6786,7 +6779,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 44.99994, y: 23.000048}
+  m_AnchoredPosition: {x: 44.999878, y: 23.000048}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1693888529
@@ -7025,7 +7018,7 @@ GameObject:
   - component: {fileID: 1741767474}
   - component: {fileID: 1741767473}
   m_Layer: 5
-  m_Name: KillBlock
+  m_Name: SpikeBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7048,7 +7041,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 44.99994, y: 83.000046}
+  m_AnchoredPosition: {x: 44.999878, y: 83.000046}
   m_SizeDelta: {x: 40, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1741767473
@@ -7578,8 +7571,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 25
+  m_fontSizeBase: 25
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

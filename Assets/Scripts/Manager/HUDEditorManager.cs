@@ -25,7 +25,7 @@ public class HUDEditorManager : BaseManager
     private string actionToConfirm = "";
     private string currentMapName = "";
 
-    public List<Button> blockButtons;
+    public List<BlockButtonBinding> blockButtons = new List<BlockButtonBinding>();
     private Color selectedColor = Color.yellow;
     private Color defaultColor = Color.white;
 
@@ -52,31 +52,32 @@ public class HUDEditorManager : BaseManager
 
         for (int i = 0; i < blockButtons.Count; i++)
         {
-            int index = i;
-            Button button = blockButtons[i];
-            button.onClick.AddListener(() => OnBlockButtonClick(index));
-        }
-    }
-
-    public void OnBlockButtonClick(int blockIndex)
-    {
-        MapEditor.SetCurrentBlockById(blockIndex);
-        HighlightSelectedButton(blockIndex);
-    }
-
-    public void HighlightSelectedButton(int selectedIndex)
-    {
-        foreach (Button btn in blockButtons)
-        {
-            Image buttonImage = btn.GetComponent<Image>();
+            var blockButton = blockButtons[i];
+            blockButton.button.onClick.AddListener(() => OnBlockTypeButtonClick(blockButton.blockType));
+            var buttonImage = blockButton.button.GetComponent<Image>();
             if (buttonImage != null)
+            {
                 buttonImage.color = defaultColor;
+            }
         }
+    }
 
-        Button selectedButton = blockButtons[selectedIndex];
-        Image selectedButtonImage = selectedButton.GetComponent<Image>();
-        if (selectedButtonImage != null)
-            selectedButtonImage.color = selectedColor;
+    public void OnBlockTypeButtonClick(BlockType type)
+    {
+        MapEditor.SetCurrentBlockByType(type);
+        HighlightBlockTypeButton(type);
+    }
+
+    public void HighlightBlockTypeButton(BlockType type)
+    {
+        foreach (var blockButton in blockButtons)
+        {
+            var buttonImage = blockButton.button.GetComponent<Image>();
+            if (buttonImage != null)
+            {
+                buttonImage.color = blockButton.blockType == type ? selectedColor : defaultColor;
+            }
+        }
     }
 
     private void PopulateMapDropdown()
@@ -174,17 +175,19 @@ public class HUDEditorManager : BaseManager
 
     public void OnPlayButtonClick()
     {
-        if (!MapEditor.CompletMap())
+        var validation = MapEditor.Instance.ValidateMap();
+        if (!validation.isValid)
         {
-            MessageUI("Please complete the map before testing.", Color.red, false);
+            MessageUI(validation.errorMessage, Color.red, false);
             return;
         }
-
+    
         editorUI.SetActive(false);
         testerUI.SetActive(true);
         center.SetActive(false);
         MapTester.StartTestMatch();
     }
+
 
     public void OnBackButtonClick()
     {
@@ -206,7 +209,7 @@ public class HUDEditorManager : BaseManager
 
     public void OnSaveButtonClick()
     {
-        if (!MapEditor.CompletMap())
+        if (!MapEditor.HasBeenTestedAndValid)
         {
             MessageUI("Please complete the map before saving.", Color.red, false);
             return;
@@ -367,5 +370,12 @@ public class HUDEditorManager : BaseManager
         {
             MessageUI($"Map '{currentMapName}' not found.", Color.red, false);
         }
+    }
+
+    [System.Serializable]
+    public class BlockButtonBinding
+    {
+        public Button button;
+        public BlockType blockType;
     }
 }

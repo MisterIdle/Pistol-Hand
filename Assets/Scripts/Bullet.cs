@@ -17,6 +17,7 @@ public class Bullet : MonoBehaviour
             if (players != shooter)
             {
                 players.TakeHit(5, gameObject, true);
+                players.LastHitBy = shooter;
             }
         }
 

@@ -2,6 +2,7 @@ using UnityEngine.UI;
 using UnityEngine;
 using System.Collections;
 
+[DefaultExecutionOrder(-50)]
 public class HUDManager : BaseManager
 {
     public Image transition;

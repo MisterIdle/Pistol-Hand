@@ -49,6 +49,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Colors",
+                    "type": "Value",
+                    "id": "1e2ca10d-4138-470f-80b9-bbd1b991f103",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -280,6 +289,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4d6476f5-d79a-439e-a009-3f2e52e36fbf",
+                    "path": "<Gamepad>/dpad",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Colors",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -818,7 +838,7 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "609f8078-011c-45a6-ba6d-bc207053cdeb",
+                    "id": "7f726048-631c-4ebb-bbdf-fafc6fe3140a",
                     "path": "<Gamepad>/dpad",
                     "interactions": "",
                     "processors": "",

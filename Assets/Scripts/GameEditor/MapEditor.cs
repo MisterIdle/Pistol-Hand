@@ -27,6 +27,8 @@ public class MapEditor : BaseManager
     private Vector3 lastPlacedPos = Vector3.positiveInfinity;
     private Vector3 lastRemovedPos = Vector3.positiveInfinity;
 
+    public bool HasBeenTestedAndValid = false;
+
     void Awake()
     {
         InitializeSingleton();
@@ -56,6 +58,9 @@ public class MapEditor : BaseManager
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0f, -0.5f, -10), 0f));
 
         HUDManager.editorButton.gameObject.SetActive(false);
+
+        GameManager.PlayerCount = 0;
+        GameManager.PlayerDeath = 0;
 
         GenerateGrid();
     }
@@ -87,29 +92,33 @@ public class MapEditor : BaseManager
             HideGrid();
 
         UpdateGhostBlock(gridPos);
+
+        SetCratePhysics(false);
     }
 
     void HandleScrollInput()
     {
         if (Input.mouseScrollDelta.y < 0)
         {
-            currentBlockIndex = (currentBlockIndex + 1) % blockDatabase.blocks.Count;
+            currentBlockIndex = (currentBlockIndex + 1) % blockDatabase.blockList.Count;
         }
         else if (Input.mouseScrollDelta.y > 0)
         {
-            currentBlockIndex = (currentBlockIndex - 1 + blockDatabase.blocks.Count) % blockDatabase.blocks.Count;
+            currentBlockIndex = (currentBlockIndex - 1 + blockDatabase.blockList.Count) % blockDatabase.blockList.Count;
         }
 
-        HUDEditorManager.HighlightSelectedButton(currentBlockIndex);
+        HUDEditorManager.HighlightBlockTypeButton(blockDatabase.blockList[currentBlockIndex].type);
 
         Destroy(ghostBlock);
         Destroy(ghostMirrorBlock);
         CreateGhostBlock();
     }
 
-    public void SetCurrentBlockById(int blockId)
+    public void SetCurrentBlockByType(BlockType type)
     {
-        currentBlockIndex = blockId;
+        currentBlockIndex = blockDatabase.blockList.FindIndex(b => b.type == type);
+        if (currentBlockIndex == -1) return;
+
         Destroy(ghostBlock);
         Destroy(ghostMirrorBlock);
         CreateGhostBlock();
@@ -118,21 +127,41 @@ public class MapEditor : BaseManager
     void PlaceBlock(Vector3 pos)
     {
         if (!IsInBuildArea(pos) || IsBlockAt(pos)) return;
+    
+        var blockData = blockDatabase.blockList[currentBlockIndex];
 
-        var blockData = blockDatabase.blocks[currentBlockIndex];
+        var spawnPositions = placedBlocks
+            .Where(b => b.type == BlockType.Spawn)
+            .Select(b => SnapToGrid(b.position))
+            .ToList();
+        
+        if (blockData.type == BlockType.Crate)
+        {
+            foreach (var spawnPos in spawnPositions)
+            {
+                float distance = Vector2.Distance(pos, spawnPos);
+                bool isAboveSpawn = Mathf.Approximately(pos.x, spawnPos.x) && pos.y > spawnPos.y;
+    
+                if (distance <= GameManager.GridSize || isAboveSpawn)
+                    return;
+            }
+        }
+    
         GameObject obj = Instantiate(blockData.prefab, pos, Quaternion.identity, map.transform);
-        placedBlocks.Add(new PlacedBlock { id = blockData.id, instance = obj });
-
+        placedBlocks.Add(new PlacedBlock { type = blockData.type, instance = obj, position = pos });
+    
         if (mirrorEnabled)
         {
             Vector3 mirrorPos = GetMirrorPosition(pos);
             if (IsInBuildArea(mirrorPos) && !IsBlockAt(mirrorPos))
             {
                 GameObject mirrorObj = Instantiate(blockData.prefab, mirrorPos, Quaternion.identity, map.transform);
-                placedBlocks.Add(new PlacedBlock { id = blockData.id, instance = mirrorObj });
+                placedBlocks.Add(new PlacedBlock { type = blockData.type, instance = mirrorObj, position = mirrorPos });
             }
         }
 
+        HasBeenTestedAndValid = false;
+    
         RefreshAllTiles();
     }
 
@@ -153,12 +182,14 @@ public class MapEditor : BaseManager
             return false;
         });
 
+        HasBeenTestedAndValid = false;
+
         RefreshAllTiles();
     }
 
     void CreateGhostBlock()
     {
-        var prefab = blockDatabase.blocks[currentBlockIndex].prefab;
+        var prefab = blockDatabase.blockList[currentBlockIndex].prefab;
 
         ghostBlock = Instantiate(prefab);
         ghostMirrorBlock = Instantiate(prefab);
@@ -229,9 +260,57 @@ public class MapEditor : BaseManager
         TileManager.RefreshAllTiles(placedBlocks);
     }
 
-    public bool CompletMap()
+    public MapValidationResult ValidateMap()
     {
-        return placedBlocks.Any(b => b.id == "4");
+        var spawnBlocks = placedBlocks.Where(b => b.type == BlockType.Spawn).ToList();
+        if (spawnBlocks.Count < 4)
+        {
+            return new MapValidationResult
+            {
+                isValid = false,
+                errorMessage = "There must be at least 4 spawn points."
+            };
+        }
+
+        foreach (var spawn in spawnBlocks)
+        {
+            Vector3 currentPos = spawn.position + new Vector3(0, -GameManager.GridSize, 0);
+
+            while (IsInBuildArea(currentPos))
+            {
+                var blockBelow = placedBlocks.FirstOrDefault(b => b.position == currentPos);
+                if (blockBelow != null)
+                {
+                    if (blockBelow.type == BlockType.Platform)
+                        break;
+                    else
+                    {
+                        return new MapValidationResult
+                        {
+                            isValid = false,
+                            errorMessage = "Each spawn must be above a platform."
+                        };
+                    }
+                }
+
+                currentPos += new Vector3(0, -GameManager.GridSize, 0);
+            }
+
+            if (!IsInBuildArea(currentPos))
+            {
+                return new MapValidationResult
+                {
+                    isValid = false,
+                    errorMessage = "Each spawn must have a platform below within the build area."
+                };
+            }
+        }
+
+        return new MapValidationResult
+        {
+            isValid = true,
+            errorMessage = string.Empty
+        };
     }
 
     public List<PlacedBlock> GetPlacedBlocks()
@@ -241,11 +320,25 @@ public class MapEditor : BaseManager
 
     public void LoadBlocksFromSaveData(List<SaveManager.MapSaveData.BlockData> loadedBlocks)
     {
-        ClearMap();
-        placedBlocks = BlockLoader.LoadBlocks(loadedBlocks, blockDatabase, map.transform);
+        ClearMap(); 
+
+        foreach (var data in loadedBlocks)
+        {
+            var blockData = blockDatabase.blockList.FirstOrDefault(b => b.type == data.type);
+            if (blockData != null)
+            {
+                GameObject obj = Instantiate(blockData.prefab, data.position, Quaternion.identity, map.transform);
+                placedBlocks.Add(new PlacedBlock
+                {
+                    type = data.type,
+                    instance = obj,
+                    position = data.position
+                });
+            }
+        }   
+
         RefreshAllTiles();
     }
-
 
     public void ClearMap()
     {
@@ -314,9 +407,62 @@ public class MapEditor : BaseManager
         }
     }
 
+    public void SetCratePhysics(bool enabled)
+    {
+        foreach (var placedBlock in placedBlocks)
+        {
+            if (placedBlock.instance != null && placedBlock.type == BlockType.Crate)
+            {
+                var rb = placedBlock.instance.GetComponent<Rigidbody2D>();
+                if (rb != null)
+                {
+                    rb.simulated = enabled;
+                }
+            }
+        }
+    }
+
+    public void ReplaceCrateAfterTest()
+    {
+        var cratePositions = placedBlocks
+            .Where(b => b.type == BlockType.Crate && b.instance != null)
+            .Select(b => b.position)
+            .ToList();
+
+        placedBlocks.RemoveAll(b =>
+        {
+            if (b.type == BlockType.Crate && b.instance != null)
+            {
+                Destroy(b.instance);
+                return true;
+            }
+            return false;
+        });
+
+        var blockData = blockDatabase.blockList.FirstOrDefault(b => b.type == BlockType.Crate);
+        if (blockData == null) return;
+
+        foreach (var pos in cratePositions)
+        {
+            GameObject obj = Instantiate(blockData.prefab, pos, Quaternion.identity, map.transform);
+            placedBlocks.Add(new PlacedBlock { type = BlockType.Crate, instance = obj, position = pos });
+        }
+
+        RefreshAllTiles();
+    }
+
+
     public class PlacedBlock
     {
-        public string id;
+        public BlockType type;
         public GameObject instance;
+        public Vector3 position;
     }
+
+    public struct MapValidationResult
+    {
+        public bool isValid;
+        public string errorMessage;
+    }
+
 }

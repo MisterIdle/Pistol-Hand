@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public static class BlockLoader
@@ -14,15 +13,19 @@ public static class BlockLoader
 
         foreach (var blockData in loadedBlocks)
         {
-            var blockPrefab = database.blocks.FirstOrDefault(b => b.id == blockData.id)?.prefab;
-            if (blockPrefab != null)
+            var blockInfo = database.Get(blockData.type);
+            if (blockInfo != null && blockInfo.prefab != null)
             {
-                var blockInstance = Object.Instantiate(blockPrefab, blockData.position, Quaternion.identity, parent);
-                placedBlocks.Add(new MapEditor.PlacedBlock { id = blockData.id, instance = blockInstance });
+                var blockInstance = Object.Instantiate(blockInfo.prefab, blockData.position, Quaternion.identity, parent);
+                placedBlocks.Add(new MapEditor.PlacedBlock
+                {
+                    type = blockData.type,
+                    instance = blockInstance
+                });
             }
             else
             {
-                Debug.LogWarning($"Prefab for block ID {blockData.id} not found!");
+                Debug.LogWarning($"Prefab for block type {blockData.type} not found!");
             }
         }
 

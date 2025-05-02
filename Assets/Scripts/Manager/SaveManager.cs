@@ -21,7 +21,7 @@ public static class SaveManager
         {
             placedBlocks = placedBlocks.Select(b => new MapSaveData.BlockData
             {
-                id = b.id,
+                type = b.type,
                 position = b.instance.transform.position
             }).ToList()
         };
@@ -122,7 +122,7 @@ public static class SaveManager
         [System.Serializable]
         public class BlockData
         {
-            public string id;
+            public BlockType type;
             public Vector3 position;
         }
     }

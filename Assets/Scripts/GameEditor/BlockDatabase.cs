@@ -1,15 +1,30 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 
-[CreateAssetMenu(fileName = "BlockDatabase", menuName = "MapEditor/BlockDatabase")]
+[CreateAssetMenu(fileName = "BlockDatabase", menuName = "LevelEditor/BlockDatabase")]
 public class BlockDatabase : ScriptableObject
 {
-    public List<BlockInfo> blocks;
-}
+    public List<BlockData> blockList;
 
-[System.Serializable]
-public class BlockInfo
-{
-    public string id;
-    public GameObject prefab;
+    private Dictionary<BlockType, BlockData> lookup;
+
+    public void Init()
+    {
+        lookup = new();
+        foreach (var block in blockList)
+        {
+            lookup[block.type] = block;
+        }
+    }
+
+    public BlockData Get(BlockType type)
+    {
+        if (lookup == null) Init();
+        return lookup.TryGetValue(type, out var data) ? data : null;
+    }
+
+    public int GetIndex(BlockType type)
+    {
+        return blockList.FindIndex(b => b.type == type);
+    }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public int PlayerID;
     [SerializeField] public int Wins;
     [SerializeField] public bool IsDead;
+    [SerializeField] public PlayerController LastHitBy;
 
     [Header("Movement")]
     [SerializeField] public float _maxSpeed = 10f;
@@ -88,6 +90,8 @@ public class PlayerController : MonoBehaviour
 
     private bool _isInvulnerable;
 
+    private int _currentColorIndex;
+
     public void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -98,17 +102,38 @@ public class PlayerController : MonoBehaviour
         _dashTrail.emitting = false;
         Lifes = _baseHealth;
 
-        PlayerID = LobbyManager.Instance.PlayerID;
+        if (LobbyManager.Instance != null)
+            PlayerID = LobbyManager.Instance.PlayerID;
+        else if (MapTester.Instance != null)
+            PlayerID = MapTester.Instance.PlayerID;
+        else
+            Debug.LogError("No LobbyManager or MapTester found!");
 
-        SkinManager.Instance.AssignColor(PlayerID, PlayerID - 1);
+        _currentColorIndex = PlayerID - 1;
+
+        bool assigned = SkinManager.Instance.AssignColor(PlayerID, _currentColorIndex);
+        if (!assigned)
+        {
+            List<SkinManager.SkinColor> freeColors = SkinManager.Instance.GetAvailableColors();
+            if (freeColors.Count > 0)
+            {
+                _currentColorIndex = SkinManager.Instance.AvailableColors.IndexOf(freeColors[0]);
+                SkinManager.Instance.AssignColor(PlayerID, _currentColorIndex);
+            }
+            else
+            {
+                Debug.LogWarning("No available colors to assign");
+            }
+        }
 
         _spriteRender.color = SkinManager.Instance.GetPlayerColor(PlayerID);
-        
+
         print($"Player {PlayerID} joined with color {SkinManager.Instance.GetPlayerColorName(PlayerID)}");
+
+        name = $"Player {PlayerID}";
 
         DontDestroyOnLoad(gameObject);
     }
-
 
     public void Update()
     {
@@ -150,7 +175,7 @@ public class PlayerController : MonoBehaviour
         if (groundedNow) _isJumping = false;
     }
 
-    public void CanMove(bool canMove) {
+    public void SetMovementState(bool canMove) {
         _isDashing = !canMove;
         _stunned = !canMove;
     }
@@ -335,6 +360,11 @@ public class PlayerController : MonoBehaviour
 
         _rb.AddForce(knockback * (pistol ? _pistolHitForce : _punchHitForce) * force, ForceMode2D.Impulse);
 
+        if (source.TryGetComponent<PlayerController>(out var attacker))
+            LastHitBy = attacker;
+
+        print($"Player {PlayerID} hit by {source.name}");
+
         Lifes--;
         StartCoroutine(Stun());
         StartCoroutine(FlashRed());
@@ -463,17 +493,34 @@ public class PlayerController : MonoBehaviour
 
     public void OnAdjustVolume(InputAction.CallbackContext context)
     {
-        Vector2 dpadInput = context.ReadValue<Vector2>();
-        if (context.canceled) dpadInput = Vector2.zero;
-
-        AudioManager.instance.OnAdjustVolumeFromPlayer(dpadInput);
     }
 
     public void OnChangeColor(InputAction.CallbackContext context)
     {
+        if (!context.performed) return;
+    
         Vector2 dpadInput = context.ReadValue<Vector2>();
-        if (context.canceled) dpadInput = Vector2.zero;
+        int direction = dpadInput.y > 0.1f ? -1 : (dpadInput.y < -0.1f ? 1 : 0);
+    
+        if (direction == 0) return;
+    
+        int totalColors = SkinManager.Instance.AvailableColors.Count;
+        int startIndex = _currentColorIndex;
+    
+        for (int i = 1; i <= totalColors; i++)
+        {
+            int newIndex = (_currentColorIndex + i * direction + totalColors) % totalColors;
+    
+            if (SkinManager.Instance.ChangeColor(PlayerID, newIndex))
+            {
+                _currentColorIndex = newIndex;
+                _spriteRender.color = SkinManager.Instance.GetPlayerColor(PlayerID);
+                break;
+            }
+    
+            if (newIndex == startIndex) break;
+        }
 
-        SkinManager.Instance.AssignColor(PlayerID, dpadInput.y > 0 ? 1 : -1);
+        print($"Player {PlayerID} changed color to {SkinManager.Instance.GetPlayerColorName(PlayerID)}");
     }
 }

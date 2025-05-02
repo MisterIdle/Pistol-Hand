@@ -77,6 +77,20 @@ public class GameManager : BaseManager
         return PlayerDeath == PlayerCount - 1 && PlayerCount >= MinPlayers;
     }
 
+    public bool IsPlayerKilledByAnother()
+    {
+        PlayerController[] players = GetAllPlayers();
+        foreach (PlayerController player in players)
+        {
+            if (player.LastHitBy != null)
+            {
+            return true;
+            }
+        }
+        return false;
+
+    }
+
     public PlayerController[] GetAllPlayers()
     {
         PlayerController[] players = FindObjectsByType<PlayerController>(FindObjectsSortMode.None);
@@ -125,7 +139,27 @@ public class GameManager : BaseManager
             return;
         }
 
-        var randomSpawnPoint = _spawnPoints[Random.Range(0, _spawnPoints.Length)];
+        var availableSpawnPoints = _spawnPoints.Where(sp => !IsSpawnPointOccupied(sp)).ToArray();
+        if (availableSpawnPoints.Length == 0)
+        {
+            Debug.LogError("No available spawn points! Stopping the game.");
+            return;
+        }
+
+        var randomSpawnPoint = availableSpawnPoints[Random.Range(0, availableSpawnPoints.Length)];
         player.transform.position = randomSpawnPoint.position;
+    }
+
+    private bool IsSpawnPointOccupied(Transform spawnPoint)
+    {
+        PlayerController[] players = GetAllPlayers();
+        foreach (var p in players)
+        {
+            if (Vector3.Distance(p.transform.position, spawnPoint.position) < 0.1f)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

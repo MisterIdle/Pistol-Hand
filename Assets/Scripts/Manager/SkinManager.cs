@@ -12,7 +12,7 @@ public class SkinManager : MonoBehaviour
 
     public static SkinManager Instance;
 
-    [SerializeField] private List<SkinColor> _availableColors;
+    [SerializeField] public List<SkinColor> AvailableColors;
 
     private Dictionary<int, SkinColor> _assignedColors = new();
 
@@ -26,10 +26,10 @@ public class SkinManager : MonoBehaviour
 
     public bool AssignColor(int playerID, int colorIndex)
     {
-        if (colorIndex < 0 || colorIndex >= _availableColors.Count)
+        if (colorIndex < 0 || colorIndex >= AvailableColors.Count)
             return false;
 
-        SkinColor selected = _availableColors[colorIndex];
+        SkinColor selected = AvailableColors[colorIndex];
 
         foreach (var color in _assignedColors.Values)
         {
@@ -57,16 +57,10 @@ public class SkinManager : MonoBehaviour
         return "None";
     }
 
-    public void UnassignColor(int playerID)
-    {
-        if (_assignedColors.ContainsKey(playerID))
-            _assignedColors.Remove(playerID);
-    }
-
     public List<SkinColor> GetAvailableColors()
     {
         List<SkinColor> free = new();
-        foreach (var skin in _availableColors)
+        foreach (var skin in AvailableColors)
         {
             if (!_assignedColors.ContainsValue(skin))
                 free.Add(skin);
@@ -76,10 +70,10 @@ public class SkinManager : MonoBehaviour
 
     public bool ChangeColor(int playerID, int newColorIndex)
     {
-        if (newColorIndex < 0 || newColorIndex >= _availableColors.Count)
+        if (newColorIndex < 0 || newColorIndex >= AvailableColors.Count)
             return false;
 
-        SkinColor newColor = _availableColors[newColorIndex];
+        SkinColor newColor = AvailableColors[newColorIndex];
 
         foreach (var entry in _assignedColors)
         {
@@ -90,4 +84,5 @@ public class SkinManager : MonoBehaviour
         _assignedColors[playerID] = newColor;
         return true;
     }
+
 }

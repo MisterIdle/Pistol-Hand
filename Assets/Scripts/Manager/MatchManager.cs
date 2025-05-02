@@ -1,8 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using NUnit.Framework;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
 
 public class MatchManager : BaseManager
 {
@@ -87,7 +84,7 @@ public class MatchManager : BaseManager
         GameManager.PlaceAllPlayers();
 
         PlayerController[] players = GameManager.GetAllPlayers();
-        foreach (var p in players) p.CanMove(false);
+        foreach (var p in players) p.SetMovementState(false);
 
         yield return CameraManager.MoveCameraTransition(false, 1f);
         IsLoading = false;
@@ -104,7 +101,7 @@ public class MatchManager : BaseManager
             count--;
             yield return new WaitForSeconds(1f);
         }
-        foreach (var p in players) p.CanMove(true);
+        foreach (var p in players) p.SetMovementState(true);
         Debug.Log("Go");
     }
 
@@ -156,10 +153,22 @@ public class MatchManager : BaseManager
         foreach (Transform child in blocks.transform)
         {
             Destroy(child.gameObject);
-        }      
+        }
 
         var placedBlocks = BlockLoader.LoadBlocks(loadedData, blockDatabase, blocks.transform);
         TileManager.RefreshAllTiles(placedBlocks);
+
+        foreach (var block in placedBlocks)
+        {
+            if (block.type == BlockType.Spawn)
+            {
+                var spriteRenderer = block.instance.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.enabled = true;
+                }
+            }
+        }
 
         print($"Loaded map: {randomMapName}");
     }

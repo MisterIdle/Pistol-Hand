@@ -4,9 +4,9 @@ public class MapTester : BaseManager
 {
     public static MapTester Instance { get; private set; }
 
-    public int _playerID = 0;
+    public int PlayerID = 0;
     public bool InTestMode = false;
-    private bool wasGridEnabledBeforeTest = true; // Pour garder l'état de la grille avant de tester
+    private bool wasGridEnabledBeforeTest = true;
 
     private void Awake()
     {
@@ -40,28 +40,32 @@ public class MapTester : BaseManager
             }
             return;
         }
-
+        
         var activePlayers = GameManager.GetAllPlayers();
         if (activePlayers == null) return;
 
-        int id = 0;
         foreach (var player in activePlayers)
         {
-            player.name = $"Player {id}";
-            player.PlayerID = id;
-            id++;
-
             GameManager.PlacePlayer(player);
         }
 
-        _playerID = id;
-        GameManager.PlayerCount = id;
+        PlayerID++;
+        GameManager.PlayerCount++;
     }
 
     public void InTestMatch()
     {
-        if (GameManager.CheckPlayer())
+        if (InTestMode && GameManager.CheckPlayer())
+        {
             StopTestMatch();
+            print("Test Match Ended");
+            
+            if (GameManager.IsPlayerKilledByAnother())
+            {
+                MapEditor.HasBeenTestedAndValid = true;
+                print("Test Match Validated");
+            }
+        }
     }
 
     public void StartTestMatch()
@@ -76,8 +80,10 @@ public class MapTester : BaseManager
         StartCoroutine(CameraManager.ChangeCameraLens(5f, 1f));
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0, 0, -10), 1f));
 
-        HUDEditorManager.Instance.editorUI.SetActive(false);
-        HUDEditorManager.Instance.testerUI.SetActive(true);
+        HUDEditorManager.editorUI.SetActive(false);
+        HUDEditorManager.testerUI.SetActive(true);
+
+        MapEditor.SetCratePhysics(true);
 
         GameManager.ResetAllPlayers();
         GameManager.SetSpawnPoints();
@@ -102,9 +108,14 @@ public class MapTester : BaseManager
         GameManager.PlayerCount = 0;
         GameManager.PlayerDeath = 0;
 
+        PlayerID = 0;
+
         HUDEditorManager.editorUI.SetActive(true);
         HUDEditorManager.testerUI.SetActive(false);
         HUDEditorManager.center.SetActive(true);
+
+        MapEditor.ReplaceCrateAfterTest();
+    
 
         if (wasGridEnabledBeforeTest)
         {
