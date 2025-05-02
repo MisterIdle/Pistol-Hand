@@ -10,12 +10,13 @@ public class MatchManager : BaseManager
     public bool FirstMatch = true;
 
     [Header("Map System")]
-    public BlockDatabase blockDatabase;
+    public BlockDatabase blockDatabase => GameManager.blockDatabase;
     public GameObject blocks;
     
     [Header("Start System")]
     public int countdownStart = 3;
     public int count;
+    public float countSec = 0.2f;
 
     [Header("Draw System")]
     public float drawTime = 0.5f;
@@ -95,14 +96,20 @@ public class MatchManager : BaseManager
     {
         PlayerController[] players = GameManager.GetAllPlayers();
         count = countdownStart;
+
         while (count > 0)
         {
-            Debug.Log($"{count}");
+            Debug.Log($"Starting in {count}...");
+            yield return new WaitForSeconds(countSec);
             count--;
-            yield return new WaitForSeconds(1f);
         }
-        foreach (var p in players) p.SetMovementState(true);
-        Debug.Log("Go");
+
+        foreach (var player in players)
+        {
+            player.SetMovementState(true);
+        }
+
+        Debug.Log("Match Started!");
     }
 
     public IEnumerator DrawMatch()
@@ -165,7 +172,7 @@ public class MatchManager : BaseManager
                 var spriteRenderer = block.instance.GetComponent<SpriteRenderer>();
                 if (spriteRenderer != null)
                 {
-                    spriteRenderer.enabled = true;
+                    spriteRenderer.enabled = false;
                 }
             }
         }

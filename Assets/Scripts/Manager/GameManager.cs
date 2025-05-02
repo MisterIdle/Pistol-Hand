@@ -6,6 +6,7 @@ using System.Linq;
 public class GameManager : BaseManager
 {
     public static GameManager Instance { get; private set; }
+    public BlockDatabase blockDatabase;
     public GameState CurrentState { get; private set; } = GameState.WaitingForPlayers;
 
     [Header("Game Settings")]

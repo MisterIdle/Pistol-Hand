@@ -5,8 +5,7 @@ using System.Linq;
 public class MapEditor : BaseManager
 {
     public static MapEditor Instance { get; private set; }
-
-    public BlockDatabase blockDatabase;
+    public BlockDatabase blockDatabase => GameManager.Instance.blockDatabase;
     public GameObject map;
     public GameObject grid;
     public GameObject gridblock;

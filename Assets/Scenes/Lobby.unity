@@ -1689,6 +1689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11a076eb237dd5d4c888db47d468ff5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blockDatabase: {fileID: 11400000, guid: 773d8fcab5af4c14abca5defdba5efb8, type: 2}
   MinPlayers: 2
   PlayerCount: 0
   PlayerDeath: 0
@@ -1873,7 +1874,6 @@ PrefabInstance:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1798133683}
   - {fileID: 2053068934}
   - {fileID: 1185218007}
   - {fileID: 519420032}
@@ -1884,6 +1884,7 @@ SceneRoots:
   - {fileID: 1751620505}
   - {fileID: 961096165}
   - {fileID: 1435522322}
+  - {fileID: 1798133683}
   - {fileID: 1706215310}
   - {fileID: 148626583}
   - {fileID: 1169012659}
