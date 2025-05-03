@@ -12,11 +12,11 @@ public class MatchManager : BaseManager
     [Header("Map System")]
     public BlockDatabase blockDatabase => GameManager.blockDatabase;
     public GameObject blocks;
-    
+
     [Header("Start System")]
     public int countdownStart = 3;
     public int count;
-    public float countSec = 0.2f;
+    public float countSec = 0.5f;
 
     [Header("Draw System")]
     public float drawTime = 0.5f;
@@ -63,9 +63,11 @@ public class MatchManager : BaseManager
             {
                 if (p.IsDead) continue;
                 StartCoroutine(DrawMatch());
+
                 if (p.Wins >= GameManager.NeedToWin)
                 {
-                    Debug.Log($"Player {SkinManager.Instance.GetPlayerColorName(p.PlayerID)} wins the match!");
+                    string winnerName = "Player: " + p.PlayerID;
+                    HUDManager.ShowTitle(winnerName, "Congratulations!", SkinManager.Instance.GetPlayerColor(p.PlayerID), Color.white);
                     IsLoading = false;
                     StartCoroutine(TeleportToTrophy());
                     yield break;
@@ -75,7 +77,6 @@ public class MatchManager : BaseManager
 
         yield return new WaitForSeconds(1f);
         yield return CameraManager.MoveCameraTransition(true, 1f);
-
         yield return new WaitForSeconds(1f);
 
         LoadRandomMap();
@@ -83,6 +84,8 @@ public class MatchManager : BaseManager
         GameManager.ResetAllPlayers();
         GameManager.SetSpawnPoints();
         GameManager.PlaceAllPlayers();
+
+        UpdateCrown();
 
         PlayerController[] players = GameManager.GetAllPlayers();
         foreach (var p in players) p.SetMovementState(false);
@@ -99,7 +102,7 @@ public class MatchManager : BaseManager
 
         while (count > 0)
         {
-            Debug.Log($"Starting in {count}...");
+            HUDManager.ShowTitle(count.ToString() + "...", "", Color.white, Color.clear);
             yield return new WaitForSeconds(countSec);
             count--;
         }
@@ -109,6 +112,9 @@ public class MatchManager : BaseManager
             player.SetMovementState(true);
         }
 
+        HUDManager.ShowTitle("GO!", "", Color.green, Color.clear);
+        yield return new WaitForSeconds(0.5f);
+        HUDManager.ClearTitle();
         Debug.Log("Match Started!");
     }
 
@@ -136,12 +142,28 @@ public class MatchManager : BaseManager
         if (playersAlive == 1 && lastAlivePlayer != null)
         {
             lastAlivePlayer.Wins++;
-            Debug.Log($"Player {SkinManager.Instance.GetPlayerColorName(lastAlivePlayer.PlayerID)} wins this round!");
+            string winnerName = "Player: " + lastAlivePlayer.PlayerID;
+            HUDManager.ShowTitle(winnerName, $"wins the match! \n {lastAlivePlayer.Wins} / {GameManager.NeedToWin} for the trophy!", SkinManager.Instance.GetPlayerColor(lastAlivePlayer.PlayerID), Color.white);
         }
         else
         {
-            Debug.Log("Draw");
+            HUDManager.ShowTitle("Draw!", "", Color.white, Color.clear);
         }
+
+        UpdateCrown();
+    }
+
+    private void UpdateCrown()
+    {
+        PlayerController[] players = GameManager.GetAllPlayers();
+        int maxWins = -1;
+
+        foreach (var p in players)
+            if (!p.IsDead && p.Wins > maxWins)
+                maxWins = p.Wins;
+
+        foreach (var p in players)
+            p.CrownSprite.enabled = !p.IsDead && p.Wins == maxWins && maxWins > 0;
     }
 
     public void LoadRandomMap()
@@ -151,11 +173,11 @@ public class MatchManager : BaseManager
         {
             Debug.LogWarning("No maps available to load.");
             return;
-        }      
+        }
 
         string randomMapName = mapNames[Random.Range(0, mapNames.Count)];
         var loadedData = SaveManager.LoadMap(randomMapName);
-        if (loadedData == null) return;    
+        if (loadedData == null) return;
 
         foreach (Transform child in blocks.transform)
         {
@@ -179,7 +201,6 @@ public class MatchManager : BaseManager
 
         print($"Loaded map: {randomMapName}");
     }
-
 
     private IEnumerator TeleportToTrophy()
     {

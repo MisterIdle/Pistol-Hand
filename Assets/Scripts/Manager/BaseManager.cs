@@ -11,4 +11,5 @@ public abstract class BaseManager : MonoBehaviour
     protected TrophyManager TrophyManager => TrophyManager.Instance;
     protected MapEditor MapEditor => MapEditor.Instance;
     protected MapTester MapTester => MapTester.Instance;
+    protected SkinManager SkinManager => SkinManager.Instance;
 }

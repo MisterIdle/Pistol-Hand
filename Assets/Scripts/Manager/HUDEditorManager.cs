@@ -160,11 +160,6 @@ public class HUDEditorManager : BaseManager
         messageUIText.text = string.Empty;
     }
 
-    public void OnLobbyButtonClick()
-    {
-        StartCoroutine(TransitionToEditorScene());
-    }
-
     public IEnumerator TransitionToEditorScene()
     {
         HUDManager.EnableHUD(false);

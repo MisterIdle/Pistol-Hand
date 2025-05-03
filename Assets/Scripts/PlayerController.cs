@@ -61,6 +61,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private TrailRenderer _dashTrail;
     [SerializeField] private GameObject _blastPrefab;
 
+    [Header("Crown")]
+    [SerializeField] public SpriteRenderer CrownSprite;
+
     [Header("Animation")]
     [SerializeField] private Animator _animator;
     [SerializeField] private Animator _handAnimator;
@@ -132,6 +135,8 @@ public class PlayerController : MonoBehaviour
 
         name = $"Player {PlayerID}";
 
+        HUDManager.Instance.DisplayPlayerCards(PlayerID);
+
         DontDestroyOnLoad(gameObject);
     }
 
@@ -153,6 +158,9 @@ public class PlayerController : MonoBehaviour
         Death();
         Shooting();
         CheckBounds();
+
+        float healthPercentage = (float)Lifes / _baseHealth * 100;
+        HUDManager.Instance.UpdatePlayerHealth(PlayerID, healthPercentage);
     }
 
     public void FixedUpdate()
@@ -178,6 +186,8 @@ public class PlayerController : MonoBehaviour
     public void SetMovementState(bool canMove) {
         _isDashing = !canMove;
         _stunned = !canMove;
+
+        _rb.constraints = canMove ? RigidbodyConstraints2D.FreezeRotation : RigidbodyConstraints2D.FreezeAll;
     }
 
     private void HandleMovement()
@@ -367,15 +377,6 @@ public class PlayerController : MonoBehaviour
 
         Lifes--;
         StartCoroutine(Stun());
-        StartCoroutine(FlashRed());
-    }
-
-    private IEnumerator FlashRed()
-    {
-        Color original = _spriteRender.color;
-        _spriteRender.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        _spriteRender.color = original;
     }
 
     private IEnumerator Stun()
@@ -389,21 +390,37 @@ public class PlayerController : MonoBehaviour
         _isInvulnerable = true;
         _canJump = false;
         _canMoveHand = false;
-        _spriteRender.color = Color.red;
         _handSprite.enabled = false;
 
         float elapsedTime = 0f;
+        float blinkTimer = 0f;
+        float blinkInterval = 0.1f;
+        bool useRed = true;
+
+        _spriteRender.color = Color.red;
+
+        Color normalColor = SkinManager.Instance.GetPlayerColor(PlayerID);
+        Color stunColor = Color.white;
 
         while (elapsedTime < _stunDuration)
         {
             float rotationAmount = _stunRotationSpeed * Time.deltaTime;
             transform.Rotate(0, 0, rotationAmount);
+
+            blinkTimer += Time.deltaTime;
+            if (blinkTimer >= blinkInterval)
+            {
+                blinkTimer = 0f;
+                _spriteRender.color = useRed ? stunColor : normalColor;
+                useRed = !useRed;
+            }
+
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
         transform.rotation = Quaternion.identity;
-        _spriteRender.color = SkinManager.Instance.GetPlayerColor(PlayerID);
+        _spriteRender.color = normalColor;
 
         _animator.SetBool("Hit", false);
 
@@ -415,8 +432,9 @@ public class PlayerController : MonoBehaviour
         _canMoveHand = true;
         _handSprite.enabled = true;
         _rb.linearVelocity = Vector2.zero;
-        _canJump = true;
     }
+
+
 
     public void KillPlayer() => Lifes = 0;
     
@@ -424,7 +442,8 @@ public class PlayerController : MonoBehaviour
     {
         if (Lifes > 0 || IsDead) return;
 
-        Instantiate(_blastPrefab, transform.position, Quaternion.identity);
+        GameObject blast = Instantiate(_blastPrefab, transform.position, Quaternion.identity);
+        blast.GetComponent<Blast>().SetRedColor(SkinManager.Instance.GetPlayerColor(PlayerID));
 
         _rb.simulated = false;
         _canJump = false;
@@ -434,6 +453,7 @@ public class PlayerController : MonoBehaviour
         _spriteRender.enabled = false;
         _collider.enabled = false;
         _handSprite.enabled = false;
+        CrownSprite.enabled = false;
 
         GameManager.Instance.PlayerDeath++;
     }
@@ -491,13 +511,11 @@ public class PlayerController : MonoBehaviour
         if (_canMoveHand) _lookInput = ctx.ReadValue<Vector2>();
     }
 
-    public void OnAdjustVolume(InputAction.CallbackContext context)
-    {
-    }
-
     public void OnChangeColor(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
+
+        if (GameManager.Instance.CurrentState != GameState.WaitingForPlayers) return;
     
         Vector2 dpadInput = context.ReadValue<Vector2>();
         int direction = dpadInput.y > 0.1f ? -1 : (dpadInput.y < -0.1f ? 1 : 0);
@@ -520,6 +538,8 @@ public class PlayerController : MonoBehaviour
     
             if (newIndex == startIndex) break;
         }
+
+        HUDManager.Instance.UpdateColorPlayerCard(PlayerID, SkinManager.Instance.GetPlayerColor(PlayerID));
 
         print($"Player {PlayerID} changed color to {SkinManager.Instance.GetPlayerColorName(PlayerID)}");
     }

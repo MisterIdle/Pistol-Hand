@@ -56,8 +56,6 @@ public class MapEditor : BaseManager
         StartCoroutine(CameraManager.ChangeCameraLens(6.5f, 0f));
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0f, -0.5f, -10), 0f));
 
-        HUDManager.editorButton.gameObject.SetActive(false);
-
         GameManager.PlayerCount = 0;
         GameManager.PlayerDeath = 0;
 

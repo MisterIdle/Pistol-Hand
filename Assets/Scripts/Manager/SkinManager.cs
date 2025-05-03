@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkinManager : MonoBehaviour
+public class SkinManager : BaseManager
 {
     [System.Serializable]
     public class SkinColor
