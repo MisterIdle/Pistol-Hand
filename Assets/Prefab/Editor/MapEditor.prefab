@@ -44,10 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff8d8b58aaa559e409dbaa3fc8e6c515, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blockDatabase: {fileID: 11400000, guid: 773d8fcab5af4c14abca5defdba5efb8, type: 2}
-  map: {fileID: 0}
-  grid: {fileID: 0}
-  gridblock: {fileID: 7117357842414572950, guid: d324dd38053b74646b4f9da2428d5147, type: 3}
-  buildAreaMin: {x: -9, y: -5}
-  buildAreaMax: {x: 9, y: 5}
-  mirrorEnabled: 1
+  Map: {fileID: 0}
+  Grid: {fileID: 0}
+  Gridblock: {fileID: 7117357842414572950, guid: d324dd38053b74646b4f9da2428d5147, type: 3}
+  MirrorEnabled: 1
+  GridEnabled: 1
+  HasBeenTestedAndValid: 0

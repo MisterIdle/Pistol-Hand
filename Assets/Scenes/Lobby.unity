@@ -820,9 +820,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2c70fa68851bdb47967c9b7462edbb3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slowfactor: 0.05
-  slowDuration: 0.02
-  shakeTime: 0
+  Slowfactor: 0.05
+  SlowDuration: 0.02
+  ShakeTime: 0
 --- !u!1 &1435522321
 GameObject:
   m_ObjectHideFlags: 0
@@ -964,7 +964,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerID: 0
-  LoadNextMap: 0
 --- !u!1 &1751620504
 GameObject:
   m_ObjectHideFlags: 0
@@ -1168,6 +1167,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 751770358378694924, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1365188571222312537, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2544303015888805175, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5066571879060031177, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}

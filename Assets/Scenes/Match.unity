@@ -181,8 +181,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsLoading: 0
   FirstMatch: 1
-  blockDatabase: {fileID: 11400000, guid: 773d8fcab5af4c14abca5defdba5efb8, type: 2}
-  blocks: {fileID: 23723485}
+  _blocks: {fileID: 23723485}
+  _countdownStart: 3
+  seconds: 0.5
+  _drawTime: 0.2
 --- !u!4 &631226120
 Transform:
   m_ObjectHideFlags: 0
