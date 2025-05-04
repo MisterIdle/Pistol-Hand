@@ -11,7 +11,7 @@ public class Spring : MonoBehaviour
     {
         if (_isOnCooldown) return;
 
-        if (collision.gameObject.CompareTag("Player") && collision.rigidbody != null)
+        if (collision.rigidbody != null)
         {
             if (collision.rigidbody.linearVelocity.y <= 0)
             {

@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: BlockDatabase
   m_EditorClassIdentifier: 
   BlockList:
-  - type: 0
-    prefab: {fileID: 786116597816017877, guid: 57b94d1cdac86404e91946d524ef8ab4, type: 3}
   - type: 1
     prefab: {fileID: 977820078711118862, guid: 70fd5f68a011ecd41b49e7624861f41b, type: 3}
   - type: 2
@@ -23,3 +21,5 @@ MonoBehaviour:
     prefab: {fileID: 8931709261868049439, guid: 111310f34592b914899e2adcd9126da6, type: 3}
   - type: 4
     prefab: {fileID: 4010994177761666274, guid: 66eb37e21f51e9a4fbd4debf88b1336d, type: 3}
+  - type: 0
+    prefab: {fileID: 786116597816017877, guid: 57b94d1cdac86404e91946d524ef8ab4, type: 3}
