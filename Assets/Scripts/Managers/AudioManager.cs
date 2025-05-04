@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.UI;
 
 public class AudioManager : BaseManager
 {
@@ -7,10 +8,9 @@ public class AudioManager : BaseManager
 
     [Header("Audio")]
     public AudioMixer AudioMixer;
-    [Range(0f, 1f)] private float _volume = 1.0f;
-    public float VolumeStep = 0.05f;
-    public float MinVolume = -40f;
-    public float MaxVolume = 10f;
+    public Slider MasterVolumeSlider;
+    public Slider MusicVolumeSlider;
+    public Slider SFXVolumeSlider;
 
     [Header("Music")]
     public AudioSource MusicSource;
@@ -55,20 +55,18 @@ public class AudioManager : BaseManager
         }
     }
 
-    public void SetVolume(float volume)
+    public void OnSetSFXVolume(float volume)
     {
-        AudioMixer.SetFloat("MasterVolume", Mathf.Lerp(MinVolume, MaxVolume, volume));
+        AudioMixer.SetFloat("SFXVolume", volume);
     }
 
-    public void IncreaseVolume()
+    public void OnSetMusicVolume(float volume)
     {
-        _volume = Mathf.Min(_volume + VolumeStep, 1f);
-        SetVolume(_volume);
+        AudioMixer.SetFloat("MusicVolume", volume);
     }
 
-    public void DecreaseVolume()
+    public void OnSetMasterVolume(float volume)
     {
-        _volume = Mathf.Max(_volume - VolumeStep, 0f);
-        SetVolume(_volume);
+        AudioMixer.SetFloat("MasterVolume", volume);
     }
 }
