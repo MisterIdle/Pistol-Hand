@@ -33,7 +33,13 @@ public class TrophyManager : BaseManager
         
         GameManager.ResetAllPlayers();
         GameManager.SetSpawnPoints();
-        GameManager.PlaceAllPlayers();
+
+        var players = GameManager.GetAllPlayers();
+
+        foreach (var player in players)
+        {
+            GameManager.PlacePlayer(player);
+        }
 
         yield return new WaitForSeconds(3f);
 

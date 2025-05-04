@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 19e639fe8bef30f4bb51ed71097c1649
+guid: 1344b1c542821244f8016f5329f4ef46
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7998113151036179668
-    second: HorizontalOpen_0
+      213: -881356965719094987
+    second: spring-Sheet_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: HorizontalOpen_0
+      name: Spring_0
       rect:
         serializedVersion: 2
         x: 0
@@ -113,10 +113,76 @@ TextureImporter:
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c2bbb17077ef00190800000000000000
-      internalID: -7998113151036179668
+      spriteID: eb06430c58fb85d4aba52c7bbb675005
+      internalID: -838851614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spring_1
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b13cc39feccaeed4091bae57a93191b9
+      internalID: -425493645
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spring_2
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29896a6eaae553a40b040265f93ee164
+      internalID: -278264529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spring_3
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 22b11e0f15d401c4682c140c1300c075
+      internalID: 1431607652
       vertices: []
       indices: 
       edges: []
@@ -125,7 +191,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 2c013f227e710d54482056e154f23a17
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +201,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      HorizontalOpen_0: -7998113151036179668
+      Spring_0: -838851614
+      Spring_1: -425493645
+      Spring_2: -278264529
+      Spring_3: 1431607652
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

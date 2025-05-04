@@ -75,7 +75,7 @@ public class MatchManager : BaseManager
             }
         }
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.5f);
         yield return CameraManager.MoveCameraTransition(true, 1f);
         yield return new WaitForSeconds(1f);
 
@@ -85,11 +85,16 @@ public class MatchManager : BaseManager
 
         GameManager.ResetAllPlayers();
         GameManager.SetSpawnPoints();
-        GameManager.PlaceAllPlayers();
+
+        var players = GameManager.GetAllPlayers();
+
+        foreach (var player in players)
+        {
+            GameManager.PlacePlayer(player);
+        }
 
         UpdateCrown();
 
-        PlayersController[] players = GameManager.GetAllPlayers();
         foreach (var p in players) p.SetMovementState(false);
 
         yield return CameraManager.MoveCameraTransition(false, 1f);

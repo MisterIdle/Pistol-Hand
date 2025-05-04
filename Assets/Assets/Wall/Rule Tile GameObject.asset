@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Rule Tile GameObject
   m_EditorClassIdentifier: 
   CenterSprite: {fileID: 21300000, guid: 0799f6efbef361741b203c5f5a1f8d22, type: 3}
-  SingleSprite: {fileID: 21300000, guid: a83955f184a8004418df1d36fd96f634, type: 3}
-  DefaultSprite: {fileID: 21300000, guid: a83955f184a8004418df1d36fd96f634, type: 3}
+  SingleSprite: {fileID: 21300000, guid: 7052a4ff37b54c8408fec576457653ef, type: 3}
+  DefaultSprite: {fileID: 21300000, guid: 7052a4ff37b54c8408fec576457653ef, type: 3}
   Top: {fileID: 21300000, guid: e2819cfc66579a1458f2d2de6b9c3ebb, type: 3}
   Bottom: {fileID: 21300000, guid: 184e42fa18891544eb63fc0224cfbc15, type: 3}
   Left: {fileID: 21300000, guid: c1345993d24305e45a017ef4592afe7b, type: 3}
@@ -27,5 +27,5 @@ MonoBehaviour:
   TopRightCorner: {fileID: 21300000, guid: 454f04d0e42447141b2e0054450b504c, type: 3}
   BottomLeftCorner: {fileID: 21300000, guid: 840745824dfbb50498ed25f29a7f5fb2, type: 3}
   BottomRightCorner: {fileID: 21300000, guid: fd94b818dc1aa2742a7e19735b169eb0, type: 3}
-  VerticalOpen: {fileID: 21300000, guid: 01d0074e7af672c439b519095d81ecab, type: 3}
-  HorizontalOpen: {fileID: 21300000, guid: 19e639fe8bef30f4bb51ed71097c1649, type: 3}
+  VerticalOpen: {fileID: 21300000, guid: 05963c4dbc1b7c344bf900f5e9fc4863, type: 3}
+  HorizontalOpen: {fileID: 21300000, guid: 5f91d4062a28deb44873bcb4aec000c2, type: 3}

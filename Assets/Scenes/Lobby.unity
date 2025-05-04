@@ -165,13 +165,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AvailableColors:
   - Name: Red
-    Color: {r: 1, g: 0, b: 0, a: 1}
+    Color: {r: 1, g: 0.36320752, b: 0.36320752, a: 1}
   - Name: Blue
-    Color: {r: 0, g: 0.060156107, b: 1, a: 1}
+    Color: {r: 0.3443396, g: 0.3829079, b: 1, a: 1}
   - Name: Yellow
-    Color: {r: 1, g: 0.8002132, b: 0, a: 1}
+    Color: {r: 1, g: 0.87641513, b: 0.3820755, a: 1}
   - Name: Green
-    Color: {r: 0.29170775, g: 1, b: 0, a: 1}
+    Color: {r: 0.6350536, g: 1, b: 0.48584908, a: 1}
 --- !u!1 &182720654
 GameObject:
   m_ObjectHideFlags: 0
@@ -334,7 +334,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BackGroundColor: {r: 0.028301895, g: 0.028301895, b: 0.028301895, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -683,37 +683,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1 &1169012658
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1169012659}
-  m_Layer: 0
-  m_Name: ==============
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1169012659
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1169012658}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1185218005
 GameObject:
   m_ObjectHideFlags: 0
@@ -1181,6 +1150,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GlobalHUD
       objectReference: {fileID: 0}
+    - target: {fileID: 5066571879060031177, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1203,4 +1176,3 @@ SceneRoots:
   - {fileID: 1798133683}
   - {fileID: 1706215310}
   - {fileID: 148626583}
-  - {fileID: 1169012659}

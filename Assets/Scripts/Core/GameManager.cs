@@ -113,23 +113,6 @@ public class GameManager : BaseManager
             .ToArray();
     }
 
-    public void PlaceAllPlayers()
-    {
-        var players = GameManager.GetAllPlayers();
-        var shuffledSpawnPoints = _spawnPoints.OrderBy(x => Random.value).ToArray();
-        for (int i = 0; i < players.Length; i++)
-        {
-            if (_spawnPoints == null || _spawnPoints.Length == 0)
-            {
-                Debug.LogError("No spawn points found! Stopping the game.");
-                break;
-            }
-
-            var spawnPoint = shuffledSpawnPoints[i % shuffledSpawnPoints.Length];
-            players[i].SetPosition(spawnPoint.position);
-        }
-    }
-
     public void PlacePlayer(PlayersController player)
     {
         if (_spawnPoints == null || _spawnPoints.Length == 0)
