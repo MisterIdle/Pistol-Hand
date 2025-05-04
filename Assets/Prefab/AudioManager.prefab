@@ -45,10 +45,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fce4eac06e03fa647a79a3165fc4db32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioMixer: {fileID: 24100000, guid: 7dda34f1361900f44b8ca1e6bd6ee234, type: 2}
-  musicSource: {fileID: 5307867750531353003}
-  audioClips:
-  - {fileID: 8300000, guid: 2a94fa683b5eb7a4e94e29d44aec7dea, type: 3}
+  AudioMixer: {fileID: 24100000, guid: 7dda34f1361900f44b8ca1e6bd6ee234, type: 2}
+  VolumeStep: 0.05
+  MinVolume: -40
+  MaxVolume: 10
+  MusicSource: {fileID: 0}
+  AudioClips: []
+  SFXSource: {fileID: 0}
+  SFXClips: []
 --- !u!82 &5307867750531353003
 AudioSource:
   m_ObjectHideFlags: 0

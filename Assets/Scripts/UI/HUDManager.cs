@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Collections;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.UIElements.Experimental;
+using UnityEngine.Events;
 
 [DefaultExecutionOrder(-50)]
 
@@ -13,6 +15,8 @@ public class HUDManager : BaseManager
     [Header("HUD Elements")]
     [SerializeField] private Image _transition;
     [SerializeField] private GameObject _mainMenu;
+    [SerializeField] private GameObject _configMenu;
+    [SerializeField] private GameObject _audioMenu;
     [SerializeField] private GameObject _gameButton;
     [SerializeField] private GameObject _editorButton;
 
@@ -21,6 +25,7 @@ public class HUDManager : BaseManager
     
     [SerializeField] private List<PlayerCardData> _playerCardsData = new List<PlayerCardData>();
 
+    [SerializeField] private List<IntReference> _values;
 
     private bool _isPaused = false;
 
@@ -104,6 +109,26 @@ public class HUDManager : BaseManager
         _transition.CrossFadeAlpha(0, time, false);
         yield return new WaitForSeconds(time);
         _transition.gameObject.SetActive(false);
+    }
+
+    public void OnConfigButtonClick()
+    {
+        _configMenu.SetActive(!_configMenu.activeSelf);
+    }
+
+    public void OnConfigQuitButtonClick()
+    {
+        _configMenu.SetActive(false);
+    }
+
+    public void OnAudioButtonClick()
+    {
+        _audioMenu.SetActive(!_audioMenu.activeSelf);
+    }
+
+    public void OnAudioQuitButtonClick()
+    {
+        _audioMenu.SetActive(false);
     }
 
     public void OnResumeButtonClick()
@@ -235,4 +260,38 @@ public class HUDManager : BaseManager
         healthText.transform.localScale = originalScale;
         healthText.color = originalColor;
     }
+
+
+    public void OnClickUpValue(int index)
+    {
+        if (index >= 0 && index < _values.Count)
+        {
+            _values[index].Increment();
+            print($"Value at index {index} incremented to: {_values[index].GetValue()}");
+        }
+        else
+        {
+            Debug.LogWarning($"Index {index} est invalide dans la liste _values (taille = {_values.Count})");
+        }
+    }
+
+
+    public void OnClickDownValue(int index)
+    {
+        if (index >= 0 && index < _values.Count)
+        {
+            _values[index].Decrement();
+            print($"Value at index {index} decremented to: {_values[index].GetValue()}");
+        }
+        else
+        {
+            Debug.LogWarning($"Index {index} est invalide dans la liste _values (taille = {_values.Count})");
+        }
+    }
+
+    public int GetValue(int index)
+    {
+        return (index >= 0 && index < _values.Count) ? _values[index].GetValue() : 0;
+    }
+
 }
