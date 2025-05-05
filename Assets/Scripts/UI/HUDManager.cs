@@ -289,9 +289,12 @@ public class HUDManager : BaseManager
         }
     }
 
-    public int GetValue(int index)
+    public void InitializeValues()
     {
-        return (index >= 0 && index < _values.Count) ? _values[index].GetValue() : 0;
+        foreach (var value in _values)
+        {
+            value.textObject.text = value.defaultValue.ToString();
+            value.Initialize();
+        }
     }
-
 }
