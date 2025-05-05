@@ -344,12 +344,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 149dfe32f2e0b33468edc4f97b793cb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Health: 0
+  Health: 3
   PlayerID: 0
   Wins: 0
   IsDead: 0
   LastHitBy: {fileID: 0}
-  _maxSpeed: 7
+  _maxSpeed: 10
   _acceleration: 60
   _deceleration: 70
   _airControl: 0.6
