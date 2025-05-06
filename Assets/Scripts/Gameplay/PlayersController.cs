@@ -135,15 +135,13 @@ public class PlayersController : MonoBehaviour
 
         HUDManager.Instance.DisplayPlayerCards(PlayerID);
 
-        SetParams();
-
         DontDestroyOnLoad(gameObject);
     }
 
     public void Update()
     {
         UpdateJumpTimers();
-
+        
         if (_canMoveHand) UpdateHand();
         if (_isDashing) Punch();
 
@@ -434,13 +432,18 @@ public class PlayersController : MonoBehaviour
         _rb.linearVelocity = Vector2.zero;
     }
 
-
-
+    public void SetPlayerHealth(int lhealth) {
+        _baseHealth = lhealth;
+        Health = lhealth;
+    }
+    
     public void KillPlayer() => Health = 0;
     
     private void Death()
     {
-        if (Health > 0 || IsDead) return;
+        if (Health >= 0 || IsDead) return;
+
+        print($"Player {PlayerID} died!");
 
         GameObject blast = Instantiate(_blastPrefab, transform.position, Quaternion.identity);
         blast.GetComponent<Blast>().SetRedColor(SkinManager.Instance.GetPlayerColor(PlayerID));
@@ -485,8 +488,11 @@ public class PlayersController : MonoBehaviour
         if (IsDead || GameManager.Instance.CheckPlayer()) return;
 
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
-        if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0)
+        if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0) 
+        {
             KillPlayer();
+            print($"Player {PlayerID} out of bounds!");
+        }
     }
 
     public void SetPosition(Vector3 position) => _rb.position = position;
@@ -558,35 +564,4 @@ public class PlayersController : MonoBehaviour
 
         print($"Player {PlayerID} changed hand speed to {_handSpeed}");
     }
-
-    public void SetParams()
-{
-    foreach (var param in HUDManager.Instance._values)
-    {
-        if (param.target.name == "Player")
-        {
-            var field = GetType().GetField(param.fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            if (field == null) continue;
-
-            string valueText = param.textObject.text;
-            float value;
-
-            if (valueText == "∞")
-            {
-                value = 10000f;
-            }
-            else if (!float.TryParse(valueText, out value))
-            {
-                Debug.LogWarning($"Invalid value for {param.fieldName}: '{valueText}'");
-                continue;
-            }
-
-            if (field.FieldType == typeof(int))
-                field.SetValue(this, (int)value);
-            else if (field.FieldType == typeof(float))
-                field.SetValue(this, value);
-        }
-    }
-}
-
 }

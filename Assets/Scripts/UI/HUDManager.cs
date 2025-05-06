@@ -3,11 +3,8 @@ using UnityEngine;
 using System.Collections;
 using TMPro;
 using System.Collections.Generic;
-using UnityEngine.UIElements.Experimental;
-using UnityEngine.Events;
 
 [DefaultExecutionOrder(-50)]
-
 public class HUDManager : BaseManager
 {
     public static HUDManager Instance { get; private set; }
@@ -37,6 +34,11 @@ public class HUDManager : BaseManager
     private void Start()
     {
         UpdateEditorGameButton();
+    
+        foreach (var value in _values)
+        {
+            value.Initialize();
+        }
     }
 
     private void InitializeSingleton()
@@ -259,42 +261,5 @@ public class HUDManager : BaseManager
 
         healthText.transform.localScale = originalScale;
         healthText.color = originalColor;
-    }
-
-
-    public void OnClickUpValue(int index)
-    {
-        if (index >= 0 && index < _values.Count)
-        {
-            _values[index].Increment();
-            print($"Value at index {index} incremented to: {_values[index].GetValue()}");
-        }
-        else
-        {
-            Debug.LogWarning($"Index {index} est invalide dans la liste _values (taille = {_values.Count})");
-        }
-    }
-
-
-    public void OnClickDownValue(int index)
-    {
-        if (index >= 0 && index < _values.Count)
-        {
-            _values[index].Decrement();
-            print($"Value at index {index} decremented to: {_values[index].GetValue()}");
-        }
-        else
-        {
-            Debug.LogWarning($"Index {index} est invalide dans la liste _values (taille = {_values.Count})");
-        }
-    }
-
-    public void InitializeValues()
-    {
-        foreach (var value in _values)
-        {
-            value.textObject.text = value.defaultValue.ToString();
-            value.Initialize();
-        }
     }
 }

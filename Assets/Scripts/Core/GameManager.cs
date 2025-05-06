@@ -12,7 +12,7 @@ public class GameManager : BaseManager
     public int MinPlayers = 2;
     public int PlayerCount;
     public int PlayerDeath;
-    public int NeedToWin = 3;
+    public int NeedToWin;
     public Transform[] _spawnPoints;
 
 

@@ -15,7 +15,6 @@ public class LobbyManager : BaseManager
         GameManager.SetGameState(GameState.WaitingForPlayers);
 
         HUDManager.SetTransition(true);
-        HUDManager.InitializeValues();
 
         SkinManager.ClearAssignedColors();
 
