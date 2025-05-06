@@ -18,29 +18,15 @@ public class IntReference
 
     private int CurrentValue
     {
-        get
-        {
-            return valueType switch
-            {
-                Values.NeedToWin => GameParameter.Instance.GetNeedToWin(),
-                Values.PlayerHealth => GameParameter.Instance.GetPlayerHealth(),
-                _ => 0
-            };
-        }
+        get => GameParameter.Instance.GetValue(valueType);
         set
         {
-            switch (valueType)
-            {
-                case Values.NeedToWin:
-                    GameParameter.Instance.SetNeedToWin(value);
-                    break;
-                case Values.PlayerHealth:
-                    GameParameter.Instance.SetPlayerHeal(value);
-                    break;
-            }
+            GameParameter.Instance.SetValue(valueType, value);
+            GameParameter.Instance.ApplySettings();
             UpdateText();
         }
     }
+
 
     public void Initialize()
     {

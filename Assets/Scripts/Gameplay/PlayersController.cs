@@ -11,7 +11,7 @@ public class PlayersController : MonoBehaviour
     public int Health;
     public int PlayerID;
     public int Wins;
-    public bool IsDead;
+    public bool IsDead = false;
     public PlayersController LastHitBy;
 
     [Header("Movement")]
@@ -134,6 +134,7 @@ public class PlayersController : MonoBehaviour
         name = $"Player {PlayerID}";
 
         HUDManager.Instance.DisplayPlayerCards(PlayerID);
+        GameParameter.Instance.ApplySettings();
 
         DontDestroyOnLoad(gameObject);
     }
@@ -154,6 +155,9 @@ public class PlayersController : MonoBehaviour
 
 
         Death();
+
+        print($"Player {PlayerID} Health: {Health}");
+
         Shooting();
         CheckBounds();
 
@@ -432,18 +436,16 @@ public class PlayersController : MonoBehaviour
         _rb.linearVelocity = Vector2.zero;
     }
 
-    public void SetPlayerHealth(int lhealth) {
-        _baseHealth = lhealth;
-        Health = lhealth;
+    public void SetPlayerHealth(int hp) {
+        _baseHealth = hp;
+        Health = hp;
     }
     
     public void KillPlayer() => Health = 0;
     
     private void Death()
     {
-        if (Health >= 0 || IsDead) return;
-
-        print($"Player {PlayerID} died!");
+        if (Health > 0 || IsDead) return;
 
         GameObject blast = Instantiate(_blastPrefab, transform.position, Quaternion.identity);
         blast.GetComponent<Blast>().SetRedColor(SkinManager.Instance.GetPlayerColor(PlayerID));

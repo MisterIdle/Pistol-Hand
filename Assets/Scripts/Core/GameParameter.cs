@@ -1,19 +1,17 @@
-using UnityEngine;
+using System.Collections.Generic;
 
-[DefaultExecutionOrder(-110)]
 public class GameParameter : BaseManager
 {
     public static GameParameter Instance { get; private set; }
 
-    [Header("Game Settings")]
-    public int NeedToWin = 3;
-    public int PlayerHealth = 3;
+    private Dictionary<Values, int> parameters = new Dictionary<Values, int>();
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
+            InitializeDefaults();
         }
         else
         {
@@ -21,27 +19,26 @@ public class GameParameter : BaseManager
         }
     }
 
-    public void Update()
+    private void InitializeDefaults()
     {
+        parameters[Values.NeedToWin] = 3;
+        parameters[Values.PlayerHealth] = 3;
+    }
 
-        if (GameManager.Instance.CurrentState != GameState.WaitingForPlayers) return;
+    public int GetValue(Values key) => parameters.TryGetValue(key, out var value) ? value : 0;
+    public void SetValue(Values key, int value) => parameters[key] = value;
 
-        GameManager.NeedToWin = NeedToWin;
+    public void ApplySettings()
+    {
+        GameManager.NeedToWin = GetValue(Values.NeedToWin);
 
         var players = GameManager.GetAllPlayers();
         if (players != null)
         {
-            for (int i = 0; i < players.Length; i++)
+            foreach (var player in players)
             {
-                if (players[i].IsDead) continue;
-                players[i].SetPlayerHealth(PlayerHealth);
+                player.SetPlayerHealth(GetValue(Values.PlayerHealth));
             }
         }
     }
-
-    public int GetNeedToWin() => NeedToWin;
-    public void SetNeedToWin(int value) => NeedToWin = value;
-
-    public int GetPlayerHealth() => PlayerHealth;
-    public void SetPlayerHeal(int value) => PlayerHealth = value;
 }
