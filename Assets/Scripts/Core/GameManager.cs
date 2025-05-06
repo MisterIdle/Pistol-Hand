@@ -12,7 +12,7 @@ public class GameManager : BaseManager
     public int MinPlayers = 2;
     public int PlayerCount;
     public int PlayerDeath;
-    public int NeedToWin;
+    public float NeedToWin;
     public Transform[] _spawnPoints;
 
 
@@ -29,6 +29,8 @@ public class GameManager : BaseManager
 
         Time.fixedDeltaTime = Time.timeScale * 0.02f;
         Time.timeScale = 1f;
+
+        GameParameter.Instance.ApplySettings();
     }
 
     private void InitializeSingleton()

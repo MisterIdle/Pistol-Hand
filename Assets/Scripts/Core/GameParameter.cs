@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using UnityEngine;
 
+[DefaultExecutionOrder(-110)]
 public class GameParameter : BaseManager
 {
     public static GameParameter Instance { get; private set; }
 
-    private Dictionary<Values, int> parameters = new Dictionary<Values, int>();
+    private Dictionary<Values, float> parameters = new Dictionary<Values, float>();
 
     private void Awake()
     {
@@ -21,23 +23,27 @@ public class GameParameter : BaseManager
 
     private void InitializeDefaults()
     {
-        parameters[Values.NeedToWin] = 3;
-        parameters[Values.PlayerHealth] = 3;
+        parameters[Values.NeedToWin] = 3f;
+        parameters[Values.PlayerHealth] = 3f;
     }
 
-    public int GetValue(Values key) => parameters.TryGetValue(key, out var value) ? value : 0;
-    public void SetValue(Values key, int value) => parameters[key] = value;
+    public float GetFloat(Values key) => parameters.TryGetValue(key, out var value) ? value : 0f;
+    public void SetFloat(Values key, float value) => parameters[key] = value;
+
+    public int GetInt(Values key) => Mathf.FloorToInt(GetFloat(key));
+    public void SetInt(Values key, int value) => SetFloat(key, value);
+
 
     public void ApplySettings()
     {
-        GameManager.NeedToWin = GetValue(Values.NeedToWin);
+        GameManager.NeedToWin = GetFloat(Values.NeedToWin);
 
         var players = GameManager.GetAllPlayers();
         if (players != null)
         {
             foreach (var player in players)
             {
-                player.SetPlayerHealth(GetValue(Values.PlayerHealth));
+                player.SetPlayerHealth(GetInt(Values.PlayerHealth));
             }
         }
     }

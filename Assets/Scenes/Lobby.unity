@@ -1131,8 +1131,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0dc2207101bccea46af8898e8cc5dc9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NeedToWin: 3
-  PlayerHealth: 3
 --- !u!1001 &1846763943
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1658,16 +1656,24 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1798133684}
     - target: {fileID: 8389790336599802754, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
+      propertyPath: _values.Array.data[1].valueKey
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8389790336599802754, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
       propertyPath: _values.Array.data[0].textField
       value: 
       objectReference: {fileID: 1497403104}
+    - target: {fileID: 8389790336599802754, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
+      propertyPath: _values.Array.data[0].valueType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8389790336599802754, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
       propertyPath: _values.Array.data[1].textField
       value: 
       objectReference: {fileID: 1673355700}
     - target: {fileID: 8389790336599802754, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
       propertyPath: _values.Array.data[1].valueType
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8389790336599802754, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
       propertyPath: _values.Array.data[0].addValueButton
