@@ -32,7 +32,7 @@ public class IntReference
         if (target.name == "Player")
         {
             var players = gameManager.GetAllPlayers();
-            if (players.Length == 0) return 0;
+            if (players.Length == 0) return int.Parse(textObject.text);
             var playerField = players[0].GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (playerField.FieldType == typeof(int))
             {
@@ -69,7 +69,7 @@ public class IntReference
             if (target.name == "Player")
             {
                 var players = gameManager.GetAllPlayers();
-                if (players.Length == 0) return;
+                if (players.Length == 0) textObject.text = value.ToString();
                 foreach (var player in players)
                 {
                     var playerField = player.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
