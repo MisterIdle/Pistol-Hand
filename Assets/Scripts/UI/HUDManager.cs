@@ -25,7 +25,7 @@ public class HUDManager : BaseManager
     
     [SerializeField] private List<PlayerCardData> _playerCardsData = new List<PlayerCardData>();
 
-    [SerializeField] private List<IntReference> _values;
+    [SerializeField] public List<IntReference> _values;
 
     private bool _isPaused = false;
 

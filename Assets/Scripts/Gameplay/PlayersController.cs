@@ -2,8 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine.UIElements.Experimental;
+using System.Reflection;
 
 public class PlayersController : MonoBehaviour
 {
@@ -135,6 +134,8 @@ public class PlayersController : MonoBehaviour
         name = $"Player {PlayerID}";
 
         HUDManager.Instance.DisplayPlayerCards(PlayerID);
+
+        SetParams();
 
         DontDestroyOnLoad(gameObject);
     }
@@ -557,4 +558,35 @@ public class PlayersController : MonoBehaviour
 
         print($"Player {PlayerID} changed hand speed to {_handSpeed}");
     }
+
+    public void SetParams()
+{
+    foreach (var param in HUDManager.Instance._values)
+    {
+        if (param.target.name == "Player")
+        {
+            var field = GetType().GetField(param.fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (field == null) continue;
+
+            string valueText = param.textObject.text;
+            float value;
+
+            if (valueText == "∞")
+            {
+                value = 10000f;
+            }
+            else if (!float.TryParse(valueText, out value))
+            {
+                Debug.LogWarning($"Invalid value for {param.fieldName}: '{valueText}'");
+                continue;
+            }
+
+            if (field.FieldType == typeof(int))
+                field.SetValue(this, (int)value);
+            else if (field.FieldType == typeof(float))
+                field.SetValue(this, value);
+        }
+    }
+}
+
 }
