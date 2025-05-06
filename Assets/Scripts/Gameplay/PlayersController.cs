@@ -435,7 +435,7 @@ public class PlayersController : MonoBehaviour
         _rb.linearVelocity = Vector2.zero;
     }
 
-    public void SetPlayerHealth(int hp) {
+    public void SetHealth(int hp) {
         _baseHealth = hp;
         Health = hp;
     }
@@ -497,6 +497,17 @@ public class PlayersController : MonoBehaviour
     }
 
     public void SetPosition(Vector3 position) => _rb.position = position;
+
+    public void SetMaxSpeed(float speed) => _maxSpeed = speed;
+    public void SetJumpForce(float force) => _jumpForce = force;
+    public void SetHitForce(float force) => _punchHitForce = force;
+    public void SetCrossbowForce(float force) => _pistolHitForce = force;
+    public void SetReloadBullet(float time) => _reloadTime = time;
+    public void SetBulletSpeed(float speed) => _shootForce = speed;
+    public void SetDashSpeed(float speed) => _dashSpeed = speed;
+    public void SetDashCooldown(float time) => _dashCooldown = time;
+    public void SetDashDuration(float time) => _dashDuration = time;
+    public void SetStunDuration(float time) => _stunDuration = time;
 
     public void OnMove(InputAction.CallbackContext ctx) => _movementInput = ctx.ReadValue<Vector2>();
 

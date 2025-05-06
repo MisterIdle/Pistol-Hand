@@ -24,7 +24,17 @@ public class GameParameter : BaseManager
     private void InitializeDefaults()
     {
         parameters[Values.NeedToWin] = 3f;
-        parameters[Values.PlayerHealth] = 3f;
+        parameters[Values.Health] = 3f;
+        parameters[Values.MaxSpeed] = 8f;
+        parameters[Values.JumpForce] = 10f;
+        parameters[Values.HitForce] = 1f;
+        parameters[Values.CrossbowForce] = 1f;
+        parameters[Values.ReloadBullet] = 0.5f;
+        parameters[Values.BulletSpeed] = 20f;
+        parameters[Values.DashSpeed] = 50f;
+        parameters[Values.DashCooldown] = 1f;
+        parameters[Values.DashDuration] = 0.1f;
+        parameters[Values.StunDuration] = 0.1f;
     }
 
     public float GetFloat(Values key) => parameters.TryGetValue(key, out var value) ? value : 0f;
@@ -43,7 +53,17 @@ public class GameParameter : BaseManager
         {
             foreach (var player in players)
             {
-                player.SetPlayerHealth(GetInt(Values.PlayerHealth));
+                player.SetHealth(GetInt(Values.Health));
+                player.SetMaxSpeed(GetFloat(Values.MaxSpeed));
+                player.SetJumpForce(GetFloat(Values.JumpForce));
+                player.SetHitForce(GetFloat(Values.HitForce));
+                player.SetCrossbowForce(GetFloat(Values.CrossbowForce));
+                player.SetReloadBullet(GetFloat(Values.ReloadBullet));
+                player.SetBulletSpeed(GetFloat(Values.BulletSpeed));
+                player.SetDashSpeed(GetFloat(Values.DashSpeed));
+                player.SetDashCooldown(GetFloat(Values.DashCooldown));
+                player.SetDashDuration(GetFloat(Values.DashDuration));
+                player.SetStunDuration(GetFloat(Values.StunDuration));
             }
         }
     }
