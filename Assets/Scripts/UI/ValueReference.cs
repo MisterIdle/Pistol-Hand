@@ -5,7 +5,17 @@ using TMPro;
 public enum Values
 {
     NeedToWin,
-    PlayerHealth
+    Health,
+    MaxSpeed,
+    JumpForce,
+    HitForce,
+    CrossbowForce,
+    ReloadBullet,
+    BulletSpeed,
+    DashSpeed,
+    DashCooldown,
+    DashDuration,
+    StunDuration
 }
 
 public enum ValueType
@@ -24,6 +34,8 @@ public class ValueReference
     public Values valueKey;
     public ValueType valueType;
     public float floatStep = 0.5f;
+    public float min;
+    public float max;
 
     private float CurrentValue
     {
@@ -46,17 +58,17 @@ public class ValueReference
     private void AddValue()
     {
         if (valueType == ValueType.Int)
-            CurrentValue = Mathf.FloorToInt(CurrentValue) + 1;
+            CurrentValue = Mathf.Clamp(Mathf.FloorToInt(CurrentValue) + 1, min, max);
         else
-            CurrentValue += floatStep;
+            CurrentValue = Mathf.Clamp(CurrentValue + floatStep, min, max);
     }
 
     private void RemoveValue()
     {
         if (valueType == ValueType.Int)
-            CurrentValue = Mathf.Max(0, Mathf.FloorToInt(CurrentValue) - 1);
+            CurrentValue = Mathf.Clamp(Mathf.FloorToInt(CurrentValue) - 1, min, max);
         else
-            CurrentValue = Mathf.Max(0, CurrentValue - floatStep);
+            CurrentValue = Mathf.Clamp(CurrentValue - floatStep, min, max);
     }
 
     private void UpdateText()
