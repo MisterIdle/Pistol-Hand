@@ -209,11 +209,11 @@ public class HUDEditorManager : BaseManager
 
     public void OnSaveButtonClick()
     {
-        if (!MapEditor.HasBeenTestedAndValid)
-        {
-            MessageUI("Please complete the map before saving.", Color.red, false);
-            return;
-        }
+        //if (!MapEditor.HasBeenTestedAndValid)
+        //{
+        //    MessageUI("Please complete the map before saving.", Color.red, false);
+        //    return;
+        //}
 
         string mapName = MapNameInputField.text.Trim();
 

@@ -64,7 +64,7 @@ public class MapTester : BaseManager
 
             if (GameManager.IsPlayerKilledByAnother())
             {
-                MapEditor.HasBeenTestedAndValid = true;
+                //MapEditor.HasBeenTestedAndValid = true;
                 Debug.Log("Test Match Validated");
             }
         }

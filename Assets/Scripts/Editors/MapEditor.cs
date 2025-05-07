@@ -18,7 +18,7 @@ public class MapEditor : BaseManager
     public bool MirrorEnabled = true;
     public bool GridEnabled = true;
 
-    public bool HasBeenTestedAndValid = false;
+    //public bool HasBeenTestedAndValid = false;
 
     private List<PlacedBlock> _placedBlocks = new();
     private List<GameObject> _gridBlocks = new();
@@ -136,7 +136,7 @@ public class MapEditor : BaseManager
             }
         }
 
-        HasBeenTestedAndValid = false;
+        //HasBeenTestedAndValid = false;
         RefreshAllTiles();
     }
 
@@ -157,7 +157,7 @@ public class MapEditor : BaseManager
             return false;
         });
 
-        HasBeenTestedAndValid = false;
+        //HasBeenTestedAndValid = false;
         RefreshAllTiles();
     }
 
