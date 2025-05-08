@@ -79,21 +79,32 @@ public class MatchManager : BaseManager
         yield return CameraManager.MoveCameraTransition(true, 1f);
         yield return new WaitForSeconds(1f);
 
-        LoadRandomMap();
+        StarGenerator.Instance.ClearStars();
+
+        // Wait for the map to be fully loaded before continuing
+        yield return StartCoroutine(LoadRandomMapAndPlacePlayers());
 
         HUDManager.ClearTitle();
+
+        var players = GameManager.GetAllPlayers();
+
+        foreach (var player in players)
+        {
+            player.KillPlayer();
+        }
 
         GameManager.ResetAllPlayers();
         GameManager.SetSpawnPoints();
 
-        var players = GameManager.GetAllPlayers();
-
+        // Place players after the map is loaded
         foreach (var player in players)
         {
             GameManager.PlacePlayer(player);
         }
 
         UpdateCrown();
+
+        StarGenerator.Instance.GenerateStars();
 
         foreach (var p in players) p.SetMovementState(false);
 
@@ -122,7 +133,6 @@ public class MatchManager : BaseManager
         HUDManager.ShowTitle("GO!", "", Color.green, Color.clear);
         yield return new WaitForSeconds(0.5f);
         HUDManager.ClearTitle();
-        Debug.Log("Match Started!");
     }
 
     public IEnumerator DrawMatch()
@@ -149,12 +159,12 @@ public class MatchManager : BaseManager
         if (playersAlive == 1 && lastAlivePlayer != null)
         {
             lastAlivePlayer.Wins++;
-            string winnerName = "Player: " + lastAlivePlayer.PlayerID;
-            HUDManager.ShowTitle(winnerName, $"wins the match! \n {lastAlivePlayer.Wins} / {GameManager.NeedToWin} for the trophy!", SkinManager.Instance.GetPlayerColor(lastAlivePlayer.PlayerID), Color.white);
+            string winnerName = "PLAYER: " + lastAlivePlayer.PlayerID;
+            HUDManager.ShowTitle(winnerName.ToUpper(), $"{lastAlivePlayer.Wins} / {GameManager.NeedToWin} FOR THE TROPHY!", SkinManager.Instance.GetPlayerColor(lastAlivePlayer.PlayerID), Color.white);
         }
         else
         {
-            HUDManager.ShowTitle("Draw!", "", Color.white, Color.clear);
+            HUDManager.ShowTitle("DRAW!", "", Color.white, Color.clear);
         }
 
         UpdateCrown();
@@ -173,18 +183,18 @@ public class MatchManager : BaseManager
             p.CrownSprite.enabled = !p.IsDead && p.Wins == maxWins && maxWins > 0;
     }
 
-    public void LoadRandomMap()
+    public IEnumerator LoadRandomMapAndPlacePlayers()
     {
         var mapNames = SaveManager.GetAllMaps();
         if (mapNames.Count == 0)
         {
             Debug.LogWarning("No maps available to load.");
-            return;
+            yield break;
         }
 
         string randomMapName = mapNames[Random.Range(0, mapNames.Count)];
         var loadedData = SaveManager.LoadMap(randomMapName);
-        if (loadedData == null) return;
+        if (loadedData == null) yield break;
 
         foreach (Transform child in _blocks.transform)
         {
@@ -207,6 +217,8 @@ public class MatchManager : BaseManager
         }
 
         print($"Loaded map: {randomMapName}");
+
+        yield return null;
     }
 
     private IEnumerator TeleportToTrophy()

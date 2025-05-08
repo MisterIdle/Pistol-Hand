@@ -124,7 +124,7 @@ public class GameManager : BaseManager
         }
 
         var availableSpawnPoints = _spawnPoints.Where(sp => !IsSpawnPointOccupied(sp)).ToArray();
-        if (availableSpawnPoints.Length == 0)
+        if (availableSpawnPoints.Length == 0 && GameManager.CurrentState != GameState.Trophy)
         {
             Debug.LogError("No available spawn points! Stopping the game.");
             return;

@@ -65,6 +65,8 @@ public class HUDEditorManager : BaseManager
                 buttonImage.color = DefaultColor;
             }
         }
+
+        HUDManager.MessageUIObject.SetActive(false);
     }
 
     public void OnBlockTypeButtonClick(BlockType type)

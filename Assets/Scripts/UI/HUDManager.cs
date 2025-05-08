@@ -17,6 +17,8 @@ public class HUDManager : BaseManager
     [SerializeField] private GameObject _gameButton;
     [SerializeField] private GameObject _editorButton;
 
+    [SerializeField] public GameObject MessageUIObject;
+    [SerializeField] public Image _backgroundImage;
     [SerializeField] private TMP_Text _titleText;
     [SerializeField] private TMP_Text _subtitleText;
     
@@ -39,6 +41,8 @@ public class HUDManager : BaseManager
         {
             value.Initialize();
         }
+
+        MessageUIObject.SetActive(true);
     }
 
     private void InitializeSingleton()
@@ -113,31 +117,6 @@ public class HUDManager : BaseManager
         _transition.gameObject.SetActive(false);
     }
 
-    public void OnConfigButtonClick()
-    {
-        _configMenu.SetActive(!_configMenu.activeSelf);
-    }
-
-    public void OnConfigQuitButtonClick()
-    {
-        _configMenu.SetActive(false);
-    }
-
-    public void OnAudioButtonClick()
-    {
-        _audioMenu.SetActive(!_audioMenu.activeSelf);
-    }
-
-    public void OnAudioQuitButtonClick()
-    {
-        _audioMenu.SetActive(false);
-    }
-
-    public void OnResumeButtonClick()
-    {
-        TogglePause();
-    }
-
     public void OnGameButtonClick()
     {
         StartCoroutine(TransitionToGameScene());
@@ -166,6 +145,7 @@ public class HUDManager : BaseManager
 
     public void ShowTitle(string title, string subtitle, Color titleColor, Color subtitleColor)
     {
+        _backgroundImage.gameObject.SetActive(true);
         _titleText.text = title;
         _subtitleText.text = subtitle;
         _titleText.color = titleColor;
@@ -174,6 +154,7 @@ public class HUDManager : BaseManager
 
     public void ClearTitle()
     {
+        _backgroundImage.gameObject.SetActive(false);
         _titleText.text = string.Empty;
         _subtitleText.text = string.Empty;
     }
@@ -237,7 +218,6 @@ public class HUDManager : BaseManager
             }
         }
     }
-
 
     private IEnumerator AnimateHealthChange(TMP_Text healthText)
     {

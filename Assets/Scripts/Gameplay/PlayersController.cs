@@ -228,22 +228,9 @@ public class PlayersController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        Vector2 position = _groundCheck.position;
-        Vector2 size = _spriteRender.bounds.size;
-        float rayLength = 0.2f;
-        float spacing = size.x * 0.4f;
-
-        Vector2 left = position + Vector2.left * spacing;
-        Vector2 center = position;
-        Vector2 right = position + Vector2.right * spacing;
-
-        return RaycastGround(left, rayLength) || RaycastGround(center, rayLength) || RaycastGround(right, rayLength);
-    }
-
-    private bool RaycastGround(Vector2 origin, float length)
-    {
-        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, length, _groundLayer);
-        Debug.DrawRay(origin, Vector2.down * length, hit ? Color.green : Color.red);
+        Vector2 origin = _groundCheck.position;
+        float rayLength = 0.1f;
+        RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, rayLength, _groundLayer);
         return hit.collider != null;
     }
 

@@ -36,6 +36,8 @@ public class MapEditor : BaseManager
     {
         InitializeSingleton();
         GameManager.SetGameState(GameState.Editor);
+
+        StarGenerator.Instance.ClearStars();
     }
 
     private void InitializeSingleton()
@@ -324,6 +326,8 @@ public class MapEditor : BaseManager
                 _placedBlocks.Add(new PlacedBlock { type = data.type, instance = obj, position = data.position });
             }
         }
+
+        SetCratePhysics(false);
 
         RefreshAllTiles();
     }

@@ -2,29 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public enum Values
-{
-    NeedToWin,
-    Health,
-    MaxSpeed,
-    JumpForce,
-    HitForce,
-    CrossbowForce,
-    ReloadBullet,
-    BulletSpeed,
-    DashSpeed,
-    DashCooldown,
-    DashDuration,
-    StunDuration
-}
-
-public enum ValueType
-{
-    Int,
-    Float
-}
-
-
 [System.Serializable]
 public class ValueReference
 {
