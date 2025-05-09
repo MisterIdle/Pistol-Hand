@@ -12,7 +12,7 @@ public class GameManager : BaseManager
     public int MinPlayers = 2;
     public int PlayerCount;
     public int PlayerDeath;
-    public float NeedToWin;
+    public int NeedToWin;
     public Transform[] _spawnPoints;
 
 
@@ -30,7 +30,9 @@ public class GameManager : BaseManager
         Time.fixedDeltaTime = Time.timeScale * 0.02f;
         Time.timeScale = 1f;
 
-        GameParameter.Instance.ApplySettings();
+        Screen.SetResolution(1920, 1080, true);
+
+        LoadGameSettings();
     }
 
     private void InitializeSingleton()
@@ -43,6 +45,19 @@ public class GameManager : BaseManager
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    public void LoadGameSettings()
+    {
+        var param = SettingsManager.Instance.GetParameterByKey(GameParameterType.NeedToWin);
+        if (param != null)
+        {
+            NeedToWin = (int)param.value;
+        }
+        else
+        {
+            Debug.LogError("NeedToWin parameter not found!");
         }
     }
 
@@ -60,12 +75,6 @@ public class GameManager : BaseManager
                 MapTester.InTestMatch();
                 break;
         }
-    }
-
-    private void FixedUpdate()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-            Application.Quit();
     }
 
     public void SetGameState(GameState newState)

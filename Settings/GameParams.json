@@ -1,0 +1,88 @@
+{
+    "parameters": [
+        {
+            "key": 7,
+            "value": 20.0,
+            "minValue": 1.0,
+            "maxValue": 100.0,
+            "stepValue": 1.0
+        },
+        {
+            "key": 5,
+            "value": 1.0,
+            "minValue": 1.0,
+            "maxValue": 20.0,
+            "stepValue": 1.0
+        },
+        {
+            "key": 8,
+            "value": 1.0,
+            "minValue": 0.5,
+            "maxValue": 20.0,
+            "stepValue": 0.5
+        },
+        {
+            "key": 10,
+            "value": 0.10000000149011612,
+            "minValue": 0.10000000149011612,
+            "maxValue": 20.0,
+            "stepValue": 0.10000000149011612
+        },
+        {
+            "key": 9,
+            "value": 30.0,
+            "minValue": 0.5,
+            "maxValue": 100.0,
+            "stepValue": 0.5
+        },
+        {
+            "key": 1,
+            "value": 3.0,
+            "minValue": 1.0,
+            "maxValue": 20.0,
+            "stepValue": 1.0
+        },
+        {
+            "key": 3,
+            "value": 8.0,
+            "minValue": 1.0,
+            "maxValue": 20.0,
+            "stepValue": 1.0
+        },
+        {
+            "key": 0,
+            "value": 3.0,
+            "minValue": 1.0,
+            "maxValue": 20.0,
+            "stepValue": 1.0
+        },
+        {
+            "key": 4,
+            "value": 3.0,
+            "minValue": 1.0,
+            "maxValue": 20.0,
+            "stepValue": 1.0
+        },
+        {
+            "key": 6,
+            "value": 0.5,
+            "minValue": 0.5,
+            "maxValue": 20.0,
+            "stepValue": 0.5
+        },
+        {
+            "key": 2,
+            "value": 8.0,
+            "minValue": 1.0,
+            "maxValue": 20.0,
+            "stepValue": 1.0
+        },
+        {
+            "key": 11,
+            "value": 0.5,
+            "minValue": 0.10000000149011612,
+            "maxValue": 20.0,
+            "stepValue": 0.10000000149011612
+        }
+    ]
+}

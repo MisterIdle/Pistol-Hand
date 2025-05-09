@@ -26,7 +26,7 @@ public class HUDEditorManager : BaseManager
     public TMP_Text GlobalMapName;
     public bool _confirmed = false;
 
-    private string _saveDirectory = "Assets/Save";
+    private string _UserSaveDirectory = "Save";
     private string _actionToConfirm = "";
     private string _currentMapName = "";
 
@@ -65,8 +65,6 @@ public class HUDEditorManager : BaseManager
                 buttonImage.color = DefaultColor;
             }
         }
-
-        HUDManager.MessageUIObject.SetActive(false);
     }
 
     public void OnBlockTypeButtonClick(BlockType type)
@@ -89,9 +87,9 @@ public class HUDEditorManager : BaseManager
 
     private void PopulateMapDropdown()
     {
-        if (!Directory.Exists(_saveDirectory)) return;
+        if (!Directory.Exists(_UserSaveDirectory)) return;
 
-        string[] mapFiles = Directory.GetFiles(_saveDirectory, "*.map");
+        string[] mapFiles = Directory.GetFiles(_UserSaveDirectory, "*.map");
         List<string> mapNames = new List<string>();
 
         foreach (var mapFile in mapFiles)
@@ -319,7 +317,7 @@ public class HUDEditorManager : BaseManager
     private void OnConfirmDelete()
     {
         string mapName = AllMapsDropdown.options[AllMapsDropdown.value].text.Trim();
-        string filePath = Path.Combine(_saveDirectory, mapName + ".map");
+        string filePath = Path.Combine(_UserSaveDirectory, mapName + ".map");
 
         if (File.Exists(filePath))
         {
@@ -349,8 +347,8 @@ public class HUDEditorManager : BaseManager
             return;
         }
 
-        string oldFilePath = Path.Combine(_saveDirectory, _currentMapName + ".map");
-        string newFilePath = Path.Combine(_saveDirectory, newMapName + ".map");
+        string oldFilePath = Path.Combine(_UserSaveDirectory, _currentMapName + ".map");
+        string newFilePath = Path.Combine(_UserSaveDirectory, newMapName + ".map");
 
         if (File.Exists(newFilePath))
         {

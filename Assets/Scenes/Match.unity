@@ -182,8 +182,6 @@ MonoBehaviour:
   IsLoading: 0
   FirstMatch: 1
   _blocks: {fileID: 23723485}
-  _countdownStart: 3
-  seconds: 0.5
   _drawTime: 0.2
 --- !u!4 &631226120
 Transform:

@@ -56,7 +56,6 @@ public class DashResetBlock : MonoBehaviour
             if (!_isOnCooldown)
             {
                 playerController.ResetDash();
-                Debug.Log("Dash reset");
                 _isOnCooldown = true;
             }
         }

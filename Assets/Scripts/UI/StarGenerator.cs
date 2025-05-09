@@ -54,7 +54,7 @@ public class StarGenerator : MonoBehaviour
 
             if (attempts >= maxAttempts) continue;
 
-            GameObject star = Instantiate(starPrefab, position, Quaternion.Euler(0f, 0f, Random.Range(0f, 360f)), transform);
+            GameObject star = Instantiate(starPrefab, position, Quaternion.Euler(0f, 0f, Random.Range(-360f, 360f)), transform);
 
             float scale = Random.Range(minSize, maxSize);
             star.transform.localScale = Vector3.one * scale;

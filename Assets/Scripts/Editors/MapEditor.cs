@@ -75,6 +75,8 @@ public class MapEditor : BaseManager
     {
         if (MapTester.InTestMode || HUDEditorManager.MessageUIObject.activeSelf) return;
 
+        if (HUDManager.IsPaused) return;
+
         Vector3 gridPos = GetMouseGridPosition();
 
         HandleScrollInput();
@@ -91,6 +93,11 @@ public class MapEditor : BaseManager
             RemoveBlock(gridPos);
             _lastRemovedPos = gridPos;
             _lastPlacedPos = Vector3.positiveInfinity;
+        }
+
+        if(Input.GetMouseButton(2))
+        {
+            GetBlockAt(gridPos);
         }
 
         if (GridEnabled)
@@ -161,6 +168,17 @@ public class MapEditor : BaseManager
 
         //HasBeenTestedAndValid = false;
         RefreshAllTiles();
+    }
+
+    PlacedBlock GetBlockAt(Vector2 pos)
+    {
+        var block = _placedBlocks.FirstOrDefault(b => b.instance != null && (Vector2)b.instance.transform.position == pos);
+        if (block != null)
+        {
+            SetCurrentBlockByType(block.type);
+        }
+
+        return block;
     }
 
     void CreateGhostBlock()

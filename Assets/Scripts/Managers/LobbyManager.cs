@@ -21,7 +21,8 @@ public class LobbyManager : BaseManager
         StartCoroutine(CameraManager.ChangeCameraLens(5f, 0f));
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0, 0, -10), 0f));
 
-        HUDManager.ShowTitle("PRESS ANY KEY", "KILL TO BEGIN", Color.white, Color.red);
+        HUDManager.ShowTitle("PRESS ANY KEY TO JOIN", "KILL TO BEGIN", Color.white, Color.red);
+        HUDManager.BackgroundImage.enabled = false;
 
         StarGenerator.Instance.GenerateStars();
     }

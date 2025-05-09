@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MatchManager : BaseManager
 {
@@ -8,15 +9,10 @@ public class MatchManager : BaseManager
     [Header("Spawn System")]
     public bool IsLoading = false;
     public bool FirstMatch = true;
+    private string _lastMapName = null;
 
     [Header("Map System")]
-    [SerializeField] private BlockDatabase _blockDatabase => GameManager.blockDatabase;
     [SerializeField] private GameObject _blocks;
-
-    [Header("Start System")]
-    [SerializeField] private int _countdownStart = 3;
-    private int _count;
-    [SerializeField] private float seconds = 0.5f;
 
     [Header("Draw System")]
     [SerializeField] private float _drawTime = 0.5f;
@@ -25,6 +21,9 @@ public class MatchManager : BaseManager
     {
         InitializeSingleton();
         GameManager.SetGameState(GameState.Playing);
+
+        HUDManager.BackgroundImage.enabled = true;
+        HUDManager.ShowTitle("LOADING...", "", Color.white, Color.clear);
     }
 
     private void InitializeSingleton()
@@ -81,7 +80,6 @@ public class MatchManager : BaseManager
 
         StarGenerator.Instance.ClearStars();
 
-        // Wait for the map to be fully loaded before continuing
         yield return StartCoroutine(LoadRandomMapAndPlacePlayers());
 
         HUDManager.ClearTitle();
@@ -96,7 +94,6 @@ public class MatchManager : BaseManager
         GameManager.ResetAllPlayers();
         GameManager.SetSpawnPoints();
 
-        // Place players after the map is loaded
         foreach (var player in players)
         {
             GameManager.PlacePlayer(player);
@@ -116,14 +113,10 @@ public class MatchManager : BaseManager
     public IEnumerator StartMatch()
     {
         PlayersController[] players = GameManager.GetAllPlayers();
-        _count = _countdownStart;
 
-        while (_count > 0)
-        {
-            HUDManager.ShowTitle(_count.ToString() + "...", "", Color.white, Color.clear);
-            yield return new WaitForSeconds(seconds);
-            _count--;
-        }
+        HUDManager.ShowTitle("READY?", "", Color.white, Color.clear);
+
+        yield return new WaitForSeconds(0.5f);
 
         foreach (var player in players)
         {
@@ -185,14 +178,24 @@ public class MatchManager : BaseManager
 
     public IEnumerator LoadRandomMapAndPlacePlayers()
     {
-        var mapNames = SaveManager.GetAllMaps();
-        if (mapNames.Count == 0)
+        var allMaps = new List<string>();
+        allMaps.AddRange(SaveManager.GetAllDefaultMaps());
+        allMaps.AddRange(SaveManager.GetAllUsersMaps());
+
+        if (allMaps.Count == 0)
         {
             Debug.LogWarning("No maps available to load.");
             yield break;
         }
 
-        string randomMapName = mapNames[Random.Range(0, mapNames.Count)];
+        if (allMaps.Count > 1 && _lastMapName != null)
+        {
+            allMaps.Remove(_lastMapName);
+        }
+
+        string randomMapName = allMaps[Random.Range(0, allMaps.Count)];
+        _lastMapName = randomMapName;
+
         var loadedData = SaveManager.LoadMap(randomMapName);
         if (loadedData == null) yield break;
 
@@ -201,7 +204,7 @@ public class MatchManager : BaseManager
             Destroy(child.gameObject);
         }
 
-        var placedBlocks = BlockLoader.LoadBlocks(loadedData, _blockDatabase, _blocks.transform);
+        var placedBlocks = BlockLoader.LoadBlocks(loadedData, GameManager.blockDatabase, _blocks.transform);
         TileManager.RefreshAllTiles(placedBlocks);
 
         foreach (var block in placedBlocks)
@@ -216,7 +219,9 @@ public class MatchManager : BaseManager
             }
         }
 
-        print($"Loaded map: {randomMapName}");
+        HUDManager.ShowTitle("LOADING...", randomMapName, Color.white, Color.white);
+
+        yield return new WaitForSeconds(1f);
 
         yield return null;
     }

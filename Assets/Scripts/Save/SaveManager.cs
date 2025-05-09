@@ -6,16 +6,18 @@ using System.Text;
 
 public static class SaveManager
 {
-    private static string _saveDirectory = "Assets/Save";
+    private static string _UserSaveDirectory = "Save";
+    private static string _DefaultSaveDirectory = Application.streamingAssetsPath + "/Save";
+    private static string _NeededDirectory = Application.streamingAssetsPath + "/Save/Needed";
 
     public static void SaveMap(string mapName, List<PlacedBlock> placedBlocks)
     {
-        if (!Directory.Exists(_saveDirectory))
+        if (!Directory.Exists(_UserSaveDirectory))
         {
-            Directory.CreateDirectory(_saveDirectory);
+            Directory.CreateDirectory(_UserSaveDirectory);
         }
 
-        string path = Path.Combine(_saveDirectory, mapName + ".map");
+        string path = Path.Combine(_UserSaveDirectory, mapName + ".map");
 
         MapSaveData saveData = new MapSaveData
         {
@@ -36,11 +38,15 @@ public static class SaveManager
 
     public static List<MapSaveData.BlockData> LoadMap(string mapName)
     {
-        string path = Path.Combine(_saveDirectory, mapName + ".map");
+        string userPath = Path.Combine(_UserSaveDirectory, mapName + ".map");
+        string defaultPath = Path.Combine(_DefaultSaveDirectory, mapName + ".map");
+        string neededPath = Path.Combine(_NeededDirectory, mapName + ".map");
 
-        if (!File.Exists(path))
+        string path = File.Exists(userPath) ? userPath : File.Exists(defaultPath) ? defaultPath : neededPath;
+
+        if (string.IsNullOrEmpty(path) || !File.Exists(path))
         {
-            Debug.LogWarning("Map file not found: " + path);
+            Debug.LogWarning("Map not found in user or default directories: " + mapName);
             return null;
         }
 
@@ -51,33 +57,62 @@ public static class SaveManager
             Debug.LogWarning("The map file is empty: " + path);
             return null;
         }
-        
-        string decryptedData = EncryptDecrypt(encryptedData);
 
+        string decryptedData = EncryptDecrypt(encryptedData);
         MapSaveData saveData = JsonUtility.FromJson<MapSaveData>(decryptedData);
 
         Debug.Log("Map loaded from " + path);
         return saveData.placedBlocks;
     }
 
-    public static List<string> GetAllMaps()
+    public static List<string> GetAllUsersMaps()
     {
-        if (!Directory.Exists(_saveDirectory))
+        if (!Directory.Exists(_UserSaveDirectory))
         {
-            Debug.LogWarning("Save directory does not exist: " + _saveDirectory);
+            Debug.LogWarning("Save directory does not exist: " + _UserSaveDirectory);
             return new List<string>();
         }
 
-        string[] files = Directory.GetFiles(_saveDirectory, "*.map");
+        string[] files = Directory.GetFiles(_UserSaveDirectory, "*.map");
         List<string> mapNames = files.Select(Path.GetFileNameWithoutExtension).ToList();
 
-        Debug.Log("Available maps: " + string.Join(", ", mapNames));
+        Debug.Log("Available maps (User): " + string.Join(", ", mapNames));
+        return mapNames;
+    }
+
+    public static List<string> GetAllDefaultMaps()
+    {
+        if (!Directory.Exists(_DefaultSaveDirectory))
+        {
+            Debug.LogWarning("Default save directory does not exist: " + _DefaultSaveDirectory);
+            return new List<string>();
+        }
+
+        string[] files = Directory.GetFiles(_DefaultSaveDirectory, "*.map");
+        List<string> mapNames = files.Select(Path.GetFileNameWithoutExtension).ToList();
+
+        Debug.Log("Available maps (Default):" + string.Join(", ", mapNames));
+        return mapNames;
+    }
+
+    public static List<string> GetAllNeededMaps()
+    {
+        if (!Directory.Exists(_NeededDirectory))
+        {
+            Debug.LogWarning("Needed save directory does not exist: " + _NeededDirectory);
+            return new List<string>();
+        }
+
+        string[] files = Directory.GetFiles(_NeededDirectory, "*.map");
+        List<string> mapNames = files.Select(Path.GetFileNameWithoutExtension).ToList();
+
+        Debug.Log("Available maps (Needed):" + string.Join(", ", mapNames));
         return mapNames;
     }
 
     public static void DeleteMap(string mapName)
     {
-        string path = Path.Combine(_saveDirectory, mapName + ".map");
+        string path = Path.Combine(_UserSaveDirectory, mapName + ".map");
         string metaPath = path + ".meta";
 
         if (File.Exists(path))

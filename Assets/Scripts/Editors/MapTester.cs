@@ -28,8 +28,6 @@ public class MapTester : BaseManager
 
     public void OnPlayerJoin()
     {
-        Debug.Log("InTestMode: " + InTestMode);
-
         var players = GameManager.GetAllPlayers();
 
         if (!InTestMode)
@@ -60,12 +58,10 @@ public class MapTester : BaseManager
         if (InTestMode && GameManager.CheckPlayer())
         {
             StopTestMatch();
-            Debug.Log("Test Match Ended");
 
             if (GameManager.IsPlayerKilledByAnother())
             {
                 //MapEditor.HasBeenTestedAndValid = true;
-                Debug.Log("Test Match Validated");
             }
         }
     }

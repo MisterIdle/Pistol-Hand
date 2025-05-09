@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 [DefaultExecutionOrder(-50)]
 public class HUDManager : BaseManager
@@ -18,15 +19,16 @@ public class HUDManager : BaseManager
     [SerializeField] private GameObject _editorButton;
 
     [SerializeField] public GameObject MessageUIObject;
-    [SerializeField] public Image _backgroundImage;
+    [SerializeField] public Image BackgroundImage;
     [SerializeField] private TMP_Text _titleText;
     [SerializeField] private TMP_Text _subtitleText;
     
     [SerializeField] private List<PlayerCardData> _playerCardsData = new List<PlayerCardData>();
+    
+    [Header("Value Modifiers")]
+    [SerializeField] private List<ValueModifier> _valueModifiers = new List<ValueModifier>();
 
-    [SerializeField] public List<ValueReference> _values;
-
-    private bool _isPaused = false;
+    public bool IsPaused = false;
 
     private void Awake()
     {
@@ -36,13 +38,11 @@ public class HUDManager : BaseManager
     private void Start()
     {
         UpdateEditorGameButton();
-    
-        foreach (var value in _values)
+        
+        foreach (var valueModifier in _valueModifiers)
         {
-            value.Initialize();
+            valueModifier.Initialize();
         }
-
-        MessageUIObject.SetActive(true);
     }
 
     private void InitializeSingleton()
@@ -68,15 +68,15 @@ public class HUDManager : BaseManager
 
     public void TogglePause()
     {
-        _isPaused = !_isPaused;
-        _mainMenu.SetActive(_isPaused);
+        IsPaused = !IsPaused;
+        _mainMenu.SetActive(IsPaused);
         UpdateEditorGameButton();
-        Time.timeScale = _isPaused ? 0 : 1;
+        Time.timeScale = IsPaused ? 0 : 1;
     }
 
     private void UpdateEditorGameButton()
     {
-        if (_isPaused)
+        if (IsPaused)
         {
             bool inEditor = GameManager.CurrentState == GameState.Editor;
             _gameButton.SetActive(inEditor);
@@ -131,6 +131,7 @@ public class HUDManager : BaseManager
     {
         TogglePause();
         SetTransition(false);
+        MessageUIObject.SetActive(false);
         yield return new WaitForSeconds(1f);
         StartCoroutine(SceneLoader.LoadScene(GameManager.EditorSceneName));
     }
@@ -141,11 +142,12 @@ public class HUDManager : BaseManager
         SetTransition(false);
         yield return new WaitForSeconds(1f);
         StartCoroutine(SceneLoader.LoadScene(GameManager.LobbySceneName));
+        MessageUIObject.SetActive(true);
     }
 
     public void ShowTitle(string title, string subtitle, Color titleColor, Color subtitleColor)
     {
-        _backgroundImage.gameObject.SetActive(true);
+        BackgroundImage.gameObject.SetActive(true);
         _titleText.text = title;
         _subtitleText.text = subtitle;
         _titleText.color = titleColor;
@@ -154,7 +156,7 @@ public class HUDManager : BaseManager
 
     public void ClearTitle()
     {
-        _backgroundImage.gameObject.SetActive(false);
+        BackgroundImage.gameObject.SetActive(false);
         _titleText.text = string.Empty;
         _subtitleText.text = string.Empty;
     }
@@ -241,5 +243,15 @@ public class HUDManager : BaseManager
 
         healthText.transform.localScale = originalScale;
         healthText.color = originalColor;
+    }
+
+    public void OnClickReset()
+    {
+        SettingsManager.Instance.DefaultParameters();
+
+        foreach (var valueModifier in _valueModifiers)
+        {
+            valueModifier.UpdateValueText();
+        }
     }
 }

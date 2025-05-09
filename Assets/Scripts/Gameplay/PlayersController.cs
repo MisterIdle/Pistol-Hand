@@ -2,11 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using System;
 
 public class PlayersController : MonoBehaviour
 {
     [Header("Stats")]
-    private int _baseHealth = 3;
+    private int _baseHealth;
     public int Health;
     public int PlayerID;
     public int Wins;
@@ -14,13 +15,13 @@ public class PlayersController : MonoBehaviour
     public PlayersController LastHitBy;
 
     [Header("Movement")]
-    [SerializeField] private float _maxSpeed = 10f;
+    [SerializeField] private float _speed;
     [SerializeField] private float _acceleration = 60f;
     [SerializeField] private float _deceleration = 70f;
     [SerializeField] private float _airControl = 0.6f;
 
     [Header("Jump")]
-    [SerializeField] private float _jumpForce = 14f;
+    [SerializeField] private float _jump;
     [SerializeField] private float _gravityMultiplier = 2f;
     [SerializeField] private float _maxFallSpeed = 10f;
     [SerializeField] private float _coyoteTime = 0.15f;
@@ -33,23 +34,23 @@ public class PlayersController : MonoBehaviour
     [SerializeField] private float _handMaxDistance = 1f;
 
     [Header("Dash")]
-    [SerializeField] private float _dashSpeed = 20f;
-    [SerializeField] private float _dashDuration = 0.2f;
-    [SerializeField] private float _dashCooldown = 1f;
+    [SerializeField] private float _dashSpeed;
+    [SerializeField] private float _dashDuration;
+    [SerializeField] private float _dashCooldown;
 
     [Header("Shoot")]
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform _shootPoint;
-    [SerializeField] private float _shootForce = 20f;
-    [SerializeField] private float _reloadTime = 0.5f;
+    [SerializeField] private float _shootForce;
+    [SerializeField] private float _reloadTime;
 
     [Header("Hit")]
     [SerializeField] private float _hitDistance = 0.5f;
-    [SerializeField] private float _pistolHitForce = 5f;
-    [SerializeField] private float _punchHitForce = 10f;
+    [SerializeField] private float _pistolHitForce;
+    [SerializeField] private float _punchHitForce;
 
     [Header("Stun")]
-    [SerializeField] private float _stunDuration = 0.5f;
+    [SerializeField] private float _stun;
     [SerializeField] private float _stunRotationSpeed = 720f;
 
 
@@ -106,8 +107,6 @@ public class PlayersController : MonoBehaviour
             PlayerID = LobbyManager.Instance.PlayerID;
         else if (MapTester.Instance != null)
             PlayerID = MapTester.Instance.PlayerID;
-        else
-            Debug.LogError("No LobbyManager or MapTester found!");
 
         _currentColorIndex = PlayerID - 1;
 
@@ -120,22 +119,48 @@ public class PlayersController : MonoBehaviour
                 _currentColorIndex = SkinManager.Instance.AvailableColors.IndexOf(freeColors[0]);
                 SkinManager.Instance.AssignColor(PlayerID, _currentColorIndex);
             }
-            else
-            {
-                Debug.LogWarning("No available colors to assign");
-            }
         }
 
         _spriteRender.color = SkinManager.Instance.GetPlayerColor(PlayerID);
 
-        print($"Player {PlayerID} joined with color {SkinManager.Instance.GetPlayerColorName(PlayerID)}");
-
         name = $"Player {PlayerID}";
 
         HUDManager.Instance.DisplayPlayerCards(PlayerID);
-        GameParameter.Instance.ApplySettings();
+
+        LoadPlayerSettings();
 
         DontDestroyOnLoad(gameObject);
+    }
+
+    public void LoadPlayerSettings()
+    {
+        var parameters = new Dictionary<GameParameterType, Action<float>>
+        {
+            { GameParameterType.Health, value => { _baseHealth = (int)value; Health = _baseHealth; } },
+            { GameParameterType.Speed, value => _speed = value },
+            { GameParameterType.Jump, value => _jump = value },
+            { GameParameterType.PunchForce, value => _punchHitForce = value },
+            { GameParameterType.CrossbowForce, value => _shootForce = value },
+            { GameParameterType.BulletSpeed, value => _shootForce = value },
+            { GameParameterType.Reload, value => _reloadTime = value },
+            { GameParameterType.DashCooldown, value => _dashCooldown = value },
+            { GameParameterType.DashSpeed, value => _dashSpeed = value },
+            { GameParameterType.DashDuration, value => _dashDuration = value },
+            { GameParameterType.Stun, value => _stun = value }
+        };
+
+        foreach (var param in parameters)
+        {
+            var setting = SettingsManager.Instance.GetParameterByKey(param.Key);
+            if (setting != null)
+            {
+                param.Value(setting.value);
+            }
+            else
+            {
+                Debug.LogError($"{param.Key} parameter not found!");
+            }
+        }
     }
 
     public void Update()
@@ -154,8 +179,6 @@ public class PlayersController : MonoBehaviour
 
 
         Death();
-
-        print($"Player {PlayerID} Health: {Health}");
 
         Shooting();
         CheckBounds();
@@ -193,7 +216,7 @@ public class PlayersController : MonoBehaviour
 
     private void HandleMovement()
     {
-        float targetSpeed = _movementInput.x * _maxSpeed;
+        float targetSpeed = _movementInput.x * _speed;
         float speedDiff = targetSpeed - _rb.linearVelocity.x;
         float accelRate = Mathf.Abs(targetSpeed) > 0.01f ? _acceleration : _deceleration;
 
@@ -209,7 +232,7 @@ public class PlayersController : MonoBehaviour
     {
         if (_jumpBufferCounter > 0 && _coyoteCounter > 0 && !_isJumping)
         {
-            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, _jumpForce);
+            _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, _jump);
             _isJumping = true;
             _jumpBufferCounter = 0;
         }
@@ -361,8 +384,6 @@ public class PlayersController : MonoBehaviour
         if (source.TryGetComponent<PlayersController>(out var attacker))
             LastHitBy = attacker;
 
-        print($"Player {PlayerID} hit by {source.name}");
-
         Health--;
         StartCoroutine(Stun());
     }
@@ -390,7 +411,7 @@ public class PlayersController : MonoBehaviour
         Color normalColor = SkinManager.Instance.GetPlayerColor(PlayerID);
         Color stunColor = Color.white;
 
-        while (elapsedTime < _stunDuration)
+        while (elapsedTime < _stun)
         {
             float rotationAmount = _stunRotationSpeed * Time.deltaTime;
             transform.Rotate(0, 0, rotationAmount);
@@ -420,6 +441,8 @@ public class PlayersController : MonoBehaviour
         _canMoveHand = true;
         _handSprite.enabled = true;
         _rb.linearVelocity = Vector2.zero;
+
+        transform.rotation = Quaternion.identity;
     }
 
     public void SetHealth(int hp) {
@@ -468,6 +491,8 @@ public class PlayersController : MonoBehaviour
         _spriteRender.enabled = true;
         _collider.enabled = true;
         _handSprite.enabled = true;
+
+        transform.rotation = Quaternion.identity;
     }
 
     private void CheckBounds()
@@ -477,24 +502,10 @@ public class PlayersController : MonoBehaviour
 
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
         if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0) 
-        {
             KillPlayer();
-            print($"Player {PlayerID} out of bounds!");
-        }
     }
 
     public void SetPosition(Vector3 position) => _rb.position = position;
-
-    public void SetMaxSpeed(float speed) => _maxSpeed = speed;
-    public void SetJumpForce(float force) => _jumpForce = force;
-    public void SetHitForce(float force) => _punchHitForce = force;
-    public void SetCrossbowForce(float force) => _pistolHitForce = force;
-    public void SetReloadBullet(float time) => _reloadTime = time;
-    public void SetBulletSpeed(float speed) => _shootForce = speed;
-    public void SetDashSpeed(float speed) => _dashSpeed = speed;
-    public void SetDashCooldown(float time) => _dashCooldown = time;
-    public void SetDashDuration(float time) => _dashDuration = time;
-    public void SetStunDuration(float time) => _stunDuration = time;
 
     public void OnMove(InputAction.CallbackContext ctx) => _movementInput = ctx.ReadValue<Vector2>();
 
@@ -545,8 +556,6 @@ public class PlayersController : MonoBehaviour
         }
 
         HUDManager.Instance.UpdateColorPlayerCard(PlayerID, SkinManager.Instance.GetPlayerColor(PlayerID));
-
-        print($"Player {PlayerID} changed color to {SkinManager.Instance.GetPlayerColorName(PlayerID)}");
     }
 
     public void OnChangeSensitivity(InputAction.CallbackContext context)
@@ -560,7 +569,5 @@ public class PlayersController : MonoBehaviour
 
         _handSpeed -= direction * 0.5f;
         _handSpeed = Mathf.Clamp(_handSpeed, 3f, 15f);
-
-        print($"Player {PlayerID} changed hand speed to {_handSpeed}");
     }
 }
