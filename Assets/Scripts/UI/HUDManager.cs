@@ -18,10 +18,17 @@ public class HUDManager : BaseManager
     [SerializeField] private GameObject _gameButton;
     [SerializeField] private GameObject _editorButton;
 
+    [Header("Audio Settings")]
+    [SerializeField] private Slider masterVolumeSlider;
+    [SerializeField] private Slider musicVolumeSlider;
+    [SerializeField] private Slider sfxVolumeSlider;
+
     [SerializeField] public GameObject MessageUIObject;
     [SerializeField] public Image BackgroundImage;
     [SerializeField] private TMP_Text _titleText;
     [SerializeField] private TMP_Text _subtitleText;
+
+    private Dictionary<TMP_Text, bool> _healthAnimationStates = new Dictionary<TMP_Text, bool>();
     
     [SerializeField] private List<PlayerCardData> _playerCardsData = new List<PlayerCardData>();
     
@@ -181,19 +188,19 @@ public class HUDManager : BaseManager
         }
     }
 
-    public void UpdatePlayerHealth(int playerID, float healthPercentage)
+    public void UpdatePlayerHealth(int playerID, float health)
     {
         int index = playerID - 1;
         if (index >= 0 && index < _playerCardsData.Count)
         {
             PlayerCardData playerCard = _playerCardsData[index];
     
-            if (Mathf.Approximately(playerCard.LastHealthPercentage, healthPercentage))
+            if (Mathf.Approximately(playerCard.LastHealth, health))
                 return;
     
-            playerCard.LastHealthPercentage = healthPercentage;
-            playerCard.HealthPourcent.text = $"{Mathf.FloorToInt(healthPercentage)}%";
-            StartCoroutine(AnimateHealthChange(playerCard.HealthPourcent));
+            playerCard.LastHealth = health;
+            playerCard.Health.text = $"{health:F0} HP";
+            StartCoroutine(AnimateHealthChange(playerCard.Health));
         }
     }
 
@@ -223,6 +230,11 @@ public class HUDManager : BaseManager
 
     private IEnumerator AnimateHealthChange(TMP_Text healthText)
     {
+        if (_healthAnimationStates.TryGetValue(healthText, out bool isAnimating) && isAnimating)
+            yield break;
+
+        _healthAnimationStates[healthText] = true;
+
         Vector3 originalScale = healthText.transform.localScale;
         Color originalColor = healthText.color;
 
@@ -243,6 +255,8 @@ public class HUDManager : BaseManager
 
         healthText.transform.localScale = originalScale;
         healthText.color = originalColor;
+
+        _healthAnimationStates[healthText] = false;
     }
 
     public void OnClickReset()
@@ -253,5 +267,17 @@ public class HUDManager : BaseManager
         {
             valueModifier.UpdateValueText();
         }
+    }
+
+    public void SetMusicVolume()
+    {
+        AudioManager.MusicVolume(musicVolumeSlider.value);
+        print($"Music Volume: {musicVolumeSlider.value}");
+    }
+
+    public void SetSFXVolume()
+    {
+        AudioManager.SFXVolume(sfxVolumeSlider.value);
+        print($"SFX Volume: {sfxVolumeSlider.value}");
     }
 }

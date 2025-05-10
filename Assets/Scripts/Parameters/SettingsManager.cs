@@ -9,7 +9,7 @@ public class SettingsManager : BaseManager
     public static SettingsManager Instance { get; private set; }
     public GameParametersDatabase gameParametersDatabase;
     private string savePath = "Settings/GameParams.json";
-    public List<SerializableParameter> parametersList = new List<SerializableParameter>();
+    private List<SerializableParameter> parametersList = new List<SerializableParameter>();
 
     private void Awake()
     {

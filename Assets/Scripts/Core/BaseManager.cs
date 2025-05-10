@@ -12,4 +12,7 @@ public abstract class BaseManager : MonoBehaviour
     protected MapEditor MapEditor => MapEditor.Instance;
     protected MapTester MapTester => MapTester.Instance;
     protected SkinManager SkinManager => SkinManager.Instance;
+    protected SettingsManager SettingsManager => SettingsManager.Instance;
+    protected MapManager MapManager => MapManager.Instance;
+    protected AudioManager AudioManager => AudioManager.Instance;
 }

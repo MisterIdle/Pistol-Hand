@@ -12,6 +12,7 @@ public class Saw : MonoBehaviour
             if (playerController != null)
             {
                 playerController.TakeHit(_hitForce, gameObject, false);
+                AudioManager.Instance.PlaySFX(SFXType.Saw);
             }
         }
     }

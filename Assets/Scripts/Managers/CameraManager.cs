@@ -2,6 +2,7 @@ using UnityEngine;
 using Unity.Cinemachine;
 using System.Collections;
 
+[DefaultExecutionOrder(-50)]
 public class CameraManager : BaseManager
 {
     [Header("Camera Settings")]
@@ -10,13 +11,14 @@ public class CameraManager : BaseManager
     public float SlowDuration = 0.02f;
     public float ShakeTime;
     private bool _isCameraUp;
-    private CinemachineCamera _cinemachineCam;
+    public CinemachineCamera _cinemachineCam;
 
     private void Awake()
     {
         InitializeSingleton();
         _cinemachineCam = GetComponent<CinemachineCamera>();
     }
+
 
     private void InitializeSingleton()
     {

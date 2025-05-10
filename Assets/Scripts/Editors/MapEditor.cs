@@ -7,7 +7,7 @@ public class MapEditor : BaseManager
     public static MapEditor Instance { get; private set; }
 
     [Header("References")]
-    public BlockDatabase BlockDatabase => GameManager.Instance.blockDatabase;
+    public BlockDatabase BlockDatabase => MapManager.Instance.blockDatabase;
     public GameObject Map;
     public GameObject Grid;
     public GameObject Gridblock;
@@ -127,7 +127,7 @@ public class MapEditor : BaseManager
                 float distance = Vector2.Distance(pos, spawnPos);
                 bool isAboveSpawn = Mathf.Approximately(pos.x, spawnPos.x) && pos.y > spawnPos.y;
 
-                if (distance <= GameManager.GridSize || isAboveSpawn)
+                if (distance <= MapManager.GridSize || isAboveSpawn)
                     return;
             }
         }
@@ -258,7 +258,7 @@ public class MapEditor : BaseManager
 
     Vector3 SnapToGrid(Vector3 pos)
     {
-        float size = GameManager.GridSize;
+        float size = MapManager.GridSize;
         float x = Mathf.Round(pos.x / size) * size;
         float y = Mathf.Round(pos.y / size) * size;
         return new Vector3(x, y, 0f);
@@ -268,9 +268,9 @@ public class MapEditor : BaseManager
     {
         if (_gridBlocks.Count > 0) return;
 
-        for (float x = _buildAreaMin.x; x <= _buildAreaMax.x; x += GameManager.GridSize)
+        for (float x = _buildAreaMin.x; x <= _buildAreaMax.x; x += MapManager.GridSize)
         {
-            for (float y = _buildAreaMin.y; y <= _buildAreaMax.y; y += GameManager.GridSize)
+            for (float y = _buildAreaMin.y; y <= _buildAreaMax.y; y += MapManager.GridSize)
             {
                 GameObject gridBlock = Instantiate(Gridblock, new Vector3(x, y, 0), Quaternion.identity, Grid.transform);
                 _gridBlocks.Add(gridBlock);
@@ -296,7 +296,7 @@ public class MapEditor : BaseManager
 
         foreach (var spawn in spawnBlocks)
         {
-            Vector3 currentPos = spawn.position + Vector3.down * GameManager.GridSize;
+            Vector3 currentPos = spawn.position + Vector3.down * MapManager.GridSize;
 
             while (IsInBuildArea(currentPos))
             {
@@ -315,7 +315,7 @@ public class MapEditor : BaseManager
                     }
                 }
 
-                currentPos += Vector3.down * GameManager.GridSize;
+                currentPos += Vector3.down * MapManager.GridSize;
             }
 
             if (!IsInBuildArea(currentPos))

@@ -56,7 +56,7 @@ public static class TileManager
 
     private static Vector2Int ToGridPosition(Vector3 pos)
     {
-        float size = GameManager.Instance.GridSize;
+        float size = MapManager.Instance.GridSize;
         int x = Mathf.RoundToInt(pos.x / size);
         int y = Mathf.RoundToInt(pos.y / size);
         return new Vector2Int(x, y);

@@ -5,33 +5,25 @@ using System.Linq;
 public class GameManager : BaseManager
 {
     public static GameManager Instance { get; private set; }
-    public BlockDatabase blockDatabase;
     public GameState CurrentState { get; private set; } = GameState.WaitingForPlayers;
 
-    [Header("Game Settings")]
     public int MinPlayers = 2;
     public int PlayerCount;
     public int PlayerDeath;
     public int NeedToWin;
-    public Transform[] _spawnPoints;
-
 
     [Header("Scene Settings")]
     public string LobbySceneName = "Lobby";
     public string GameSceneName = "Match";
     public string TrophySceneName = "Trophy";
     public string EditorSceneName = "Editor";
-    public float GridSize = 0.5f;
 
     private void Awake()
     {
         InitializeSingleton();
-
         Time.fixedDeltaTime = Time.timeScale * 0.02f;
         Time.timeScale = 1f;
-
         Screen.SetResolution(1920, 1080, true);
-
         LoadGameSettings();
     }
 
@@ -51,29 +43,17 @@ public class GameManager : BaseManager
     public void LoadGameSettings()
     {
         var param = SettingsManager.Instance.GetParameterByKey(GameParameterType.NeedToWin);
-        if (param != null)
-        {
-            NeedToWin = (int)param.value;
-        }
-        else
-        {
-            Debug.LogError("NeedToWin parameter not found!");
-        }
+        if (param != null) NeedToWin = (int)param.value;
+        else Debug.LogError("NeedToWin parameter not found!");
     }
 
     private void Update()
     {
         switch (CurrentState)
         {
-            case GameState.WaitingForPlayers:
-                LobbyManager.InLobby();
-                break;
-            case GameState.Playing:
-                MatchManager.InMatch();
-                break;
-            case GameState.Editor:
-                MapTester.InTestMatch();
-                break;
+            case GameState.WaitingForPlayers: LobbyManager.InLobby(); break;
+            case GameState.Playing: MatchManager.InMatch(); break;
+            case GameState.Editor: MapTester.InTestMatch(); break;
         }
     }
 
@@ -82,77 +62,27 @@ public class GameManager : BaseManager
         CurrentState = newState;
     }
 
-    public bool CheckPlayer() 
+    public bool CheckPlayer()
     {
         return PlayerDeath == PlayerCount - 1 && PlayerCount >= MinPlayers;
     }
 
     public bool IsPlayerKilledByAnother()
     {
-        PlayersController[] players = GetAllPlayers();
-        foreach (PlayersController player in players)
-        {
-            if (player.LastHitBy != null)
-            {
-            return true;
-            }
-        }
-        return false;
-
+        return GetAllPlayers().Any(p => p.LastHitBy != null);
     }
 
     public PlayersController[] GetAllPlayers()
     {
-        PlayersController[] players = FindObjectsByType<PlayersController>(FindObjectsSortMode.None);
-        return players;
+        return FindObjectsByType<PlayersController>(FindObjectsSortMode.None);
     }
 
     public void ResetAllPlayers()
     {
-        PlayersController[] players = GetAllPlayers();
-        foreach (PlayersController player in players)
+        foreach (var player in GetAllPlayers())
         {
             player.Respawn();
-            PlayerDeath = 0;
         }
-    }
-
-    public void SetSpawnPoints()
-    {
-        _spawnPoints = GameObject.FindGameObjectsWithTag("PlayerSpawn")
-            .Select(go => go.transform)
-            .ToArray();
-    }
-
-    public void PlacePlayer(PlayersController player)
-    {
-        if (_spawnPoints == null || _spawnPoints.Length == 0)
-        {
-            Debug.LogError("No spawn points found! Stopping the game.");
-            return;
-        }
-
-        var availableSpawnPoints = _spawnPoints.Where(sp => !IsSpawnPointOccupied(sp)).ToArray();
-        if (availableSpawnPoints.Length == 0 && GameManager.CurrentState != GameState.Trophy)
-        {
-            Debug.LogError("No available spawn points! Stopping the game.");
-            return;
-        }
-
-        var randomSpawnPoint = availableSpawnPoints[Random.Range(0, availableSpawnPoints.Length)];
-        player.transform.position = randomSpawnPoint.position;
-    }
-
-    private bool IsSpawnPointOccupied(Transform spawnPoint)
-    {
-        PlayersController[] players = GetAllPlayers();
-        foreach (var p in players)
-        {
-            if (Vector3.Distance(p.transform.position, spawnPoint.position) < 0.1f)
-            {
-                return true;
-            }
-        }
-        return false;
+        PlayerDeath = 0;
     }
 }

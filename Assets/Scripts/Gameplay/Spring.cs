@@ -32,6 +32,8 @@ public class Spring : MonoBehaviour
 
         rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
         rb.AddForce(Vector2.up * _bounceForce, ForceMode2D.Impulse);
+
+        AudioManager.Instance.PlaySFX(SFXType.Bounce);
         StartCoroutine(Cooldown());
     }
 

@@ -46,7 +46,7 @@ public class MapTester : BaseManager
 
         foreach (var player in players)
         {
-            GameManager.PlacePlayer(player);
+            MapManager.PlacePlayer(player);
         }
 
         PlayerID++;
@@ -83,7 +83,7 @@ public class MapTester : BaseManager
 
         MapEditor.SetCratePhysics(true);
         GameManager.ResetAllPlayers();
-        GameManager.SetSpawnPoints();
+        MapManager.SetSpawnPoints();
 
         InTestMode = true;
     }

@@ -127,6 +127,8 @@ public class PlayersController : MonoBehaviour
 
         HUDManager.Instance.DisplayPlayerCards(PlayerID);
 
+        AudioManager.Instance.PlaySFX(SFXType.Join);
+
         LoadPlayerSettings();
 
         DontDestroyOnLoad(gameObject);
@@ -179,12 +181,9 @@ public class PlayersController : MonoBehaviour
 
 
         Death();
-
-        Shooting();
         CheckBounds();
 
-        float healthPercentage = (float)Health / _baseHealth * 100;
-        HUDManager.Instance.UpdatePlayerHealth(PlayerID, healthPercentage);
+        HUDManager.Instance.UpdatePlayerHealth(PlayerID, Health);
     }
 
     public void FixedUpdate()
@@ -194,12 +193,14 @@ public class PlayersController : MonoBehaviour
         HandleMovement();
         HandleJump();
         ApplyGravity();
+        Shooting();
 
         bool groundedNow = IsGrounded();
 
         if (!_wasGrounded && groundedNow)
         {
             _animator.SetTrigger("Land");
+            ResetDash();
         }
 
         _wasGrounded = groundedNow;
@@ -292,6 +293,8 @@ public class PlayersController : MonoBehaviour
 
         _spriteRender.flipX = dir.x < 0;
 
+        AudioManager.Instance.PlaySFX(SFXType.Dash);
+
         StartCoroutine(StopDash());
     }
 
@@ -348,6 +351,8 @@ public class PlayersController : MonoBehaviour
         if (bulletComponent != null)
             bulletComponent.Shooter = this; 
 
+        AudioManager.Instance.PlaySFX(SFXType.Shoot);
+
         StartCoroutine(ShootingCooldown());
     }   
 
@@ -385,6 +390,8 @@ public class PlayersController : MonoBehaviour
             LastHitBy = attacker;
 
         Health--;
+
+        AudioManager.Instance.PlaySFX(SFXType.Hit);
         StartCoroutine(Stun());
     }
 
@@ -428,7 +435,7 @@ public class PlayersController : MonoBehaviour
             yield return null;
         }
 
-        transform.rotation = Quaternion.identity;
+        _spriteRender.transform.rotation = Quaternion.identity;
         _spriteRender.color = normalColor;
 
         _animator.SetBool("Hit", false);
@@ -441,8 +448,6 @@ public class PlayersController : MonoBehaviour
         _canMoveHand = true;
         _handSprite.enabled = true;
         _rb.linearVelocity = Vector2.zero;
-
-        transform.rotation = Quaternion.identity;
     }
 
     public void SetHealth(int hp) {
@@ -458,6 +463,8 @@ public class PlayersController : MonoBehaviour
 
         GameObject blast = Instantiate(_blastPrefab, transform.position, Quaternion.identity);
         blast.GetComponent<Blast>().SetRedColor(SkinManager.Instance.GetPlayerColor(PlayerID));
+
+        AudioManager.Instance.PlaySFX(SFXType.Death);
 
         _rb.simulated = false;
         _canJump = false;

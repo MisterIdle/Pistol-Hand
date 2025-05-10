@@ -18,9 +18,13 @@ public class Bullet : MonoBehaviour
             {
                 players.TakeHit(5, gameObject, true);
                 players.LastHitBy = Shooter;
+                Destroy(gameObject);
             }
         }
 
-        Destroy(gameObject);
+        if (collision.gameObject.layer == 3)
+        {
+            Destroy(gameObject);
+        }
     }
 }

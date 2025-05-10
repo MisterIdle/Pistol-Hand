@@ -24,6 +24,10 @@ public class LobbyManager : BaseManager
         HUDManager.ShowTitle("PRESS ANY KEY TO JOIN", "KILL TO BEGIN", Color.white, Color.red);
         HUDManager.BackgroundImage.enabled = false;
 
+        LoadLobbyMap();
+
+        AudioManager.Instance.PlayMusic(MusicType.MainMenu);
+
         StarGenerator.Instance.GenerateStars();
     }
 
@@ -37,6 +41,22 @@ public class LobbyManager : BaseManager
         {
             Destroy(gameObject);
         }
+    }
+
+    public void LoadLobbyMap() {
+        var data = SaveManager.LoadMap("Lobby");
+        if (data == null)
+        {
+            Debug.LogWarning("Lobby map not found.");
+        }
+
+        foreach (Transform child in MapManager.MapTile.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        var blocks = BlockLoader.LoadBlocks(data, MapManager.blockDatabase, MapManager.MapTile.transform);
+        TileManager.RefreshAllTiles(blocks);
     }
 
     public void OnPlayerJoin()

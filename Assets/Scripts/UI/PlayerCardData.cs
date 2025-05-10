@@ -7,6 +7,6 @@ public class PlayerCardData
 {
     public GameObject PlayerCard;
     public Image PlayerImage;
-    public TMP_Text HealthPourcent;
-    public float LastHealthPercentage = -1f;
+    public TMP_Text Health;
+    public float LastHealth = -1;
 }

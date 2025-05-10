@@ -1,30 +1,73 @@
 using UnityEngine;
-using UnityEngine.Audio;
-using UnityEngine.UI;
+using System.Collections.Generic;
+
+public enum MusicType 
+{ 
+    MainMenu, 
+    InGame, 
+}
+
+public enum SFXType 
+{
+    Join,
+
+    Dash,
+    Hit,
+    Shoot,
+    Death,
+
+    Bounce,
+    Saw,
+    Crate,
+
+    One,
+    Two,
+    Three,
+
+
+    Firework,
+}
+
+[System.Serializable]
+public struct MusicClip
+{
+    public MusicType type;
+    public AudioClip clip;
+}
+
+[System.Serializable]
+public struct SFXClipGroup
+{
+    public SFXType type;
+    public AudioClip[] clips;
+}
 
 public class AudioManager : BaseManager
 {
-    public static AudioManager instance;
-
-    [Header("Audio")]
-    public AudioMixer AudioMixer;
-    public Slider MasterVolumeSlider;
-    public Slider MusicVolumeSlider;
-    public Slider SFXVolumeSlider;
+    public static AudioManager Instance { get; private set; }
 
     [Header("Music")]
-    public AudioSource MusicSource;
-    public AudioClip[] AudioClips;
+    public AudioSource musicSource;
+    public MusicClip[] musicClips;
 
     [Header("SFX")]
-    public AudioSource SFXSource;
-    public AudioClip[] SFXClips;
+    public AudioSource sfxSource;
+    public SFXClipGroup[] sfxClips;
+
+    private Dictionary<MusicType, AudioClip> musicDict;
+    private Dictionary<SFXType, AudioClip[]> sfxDict;
 
     private void Awake()
     {
-        if (instance == null)
+        InitializeSingleton();
+        InitDictionaries();
+    }
+
+    private void InitializeSingleton()
+    {
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -33,40 +76,58 @@ public class AudioManager : BaseManager
         }
     }
 
-    public void PlayMusic(int trackIndex)
+    private void InitDictionaries()
     {
-        if (trackIndex >= 0 && trackIndex < AudioClips.Length)
+        musicDict = new Dictionary<MusicType, AudioClip>();
+        foreach (var music in musicClips)
         {
-            MusicSource.clip = AudioClips[trackIndex];
-            MusicSource.Play();
+            musicDict[music.type] = music.clip;
+        }
+
+        sfxDict = new Dictionary<SFXType, AudioClip[]>();
+        foreach (var sfx in sfxClips)
+        {
+            sfxDict[sfx.type] = sfx.clips;
+        }
+    }
+
+    public void PlayMusic(MusicType type)
+    {
+        if (musicSource != null && musicDict.ContainsKey(type))
+        {
+            musicSource.clip = musicDict[type];
+            musicSource.Play();
         }
     }
 
     public void StopMusic()
     {
-        MusicSource.Stop();
-    }
-
-    public void PlaySFX(int clipIndex)
-    {
-        if (clipIndex >= 0 && clipIndex < SFXClips.Length)
+        if (musicSource != null)
         {
-            SFXSource.PlayOneShot(SFXClips[clipIndex]);
+            musicSource.Stop();
         }
     }
 
-    public void OnSetSFXVolume(float volume)
+    public void PlaySFX(SFXType type)
     {
-        AudioMixer.SetFloat("SFXVolume", volume);
+        if (sfxSource != null && sfxDict.ContainsKey(type))
+        {
+            var clips = sfxDict[type];
+            if (clips.Length > 0)
+            {
+                var clip = clips[Random.Range(0, clips.Length)];
+                sfxSource.PlayOneShot(clip);
+            }
+        }
     }
 
-    public void OnSetMusicVolume(float volume)
+    public void MusicVolume(float volume)
     {
-        AudioMixer.SetFloat("MusicVolume", volume);
+        musicSource.volume = volume;
     }
 
-    public void OnSetMasterVolume(float volume)
+    public void SFXVolume(float volume)
     {
-        AudioMixer.SetFloat("MasterVolume", volume);
+        sfxSource.volume = volume;
     }
 }

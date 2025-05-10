@@ -6,8 +6,6 @@ public class TrophyManager : BaseManager
 {
     public static TrophyManager Instance { get; private set; }
 
-    [SerializeField] private GameObject _blocks;
-
     private bool _animationStarted = false;
 
     private void Awake()
@@ -33,14 +31,19 @@ public class TrophyManager : BaseManager
 
     public IEnumerator LoadTrophyMapAndPlacePlayers()
     {
-        var data = SaveManager.LoadMap("trophy");
+        var data = SaveManager.LoadMap("Trophy");
         if (data == null)
         {
             Debug.LogWarning("Trophy map not found.");
             yield break;
         }
 
-        var blocks = BlockLoader.LoadBlocks(data, GameManager.blockDatabase, _blocks.transform);
+        foreach (Transform child in MapManager.MapTile.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        var blocks = BlockLoader.LoadBlocks(data, MapManager.blockDatabase, MapManager.MapTile.transform);
         TileManager.RefreshAllTiles(blocks);
 
         foreach (var b in blocks)
@@ -55,11 +58,10 @@ public class TrophyManager : BaseManager
         }
 
         GameManager.ResetAllPlayers();
-        GameManager.SetSpawnPoints();
+        MapManager.SetSpawnPoints();
 
         foreach (var p in GameManager.GetAllPlayers()) {
-            GameManager.PlacePlayer(p);
-            p.Health = 999999;
+            MapManager.PlacePlayer(p);
         }
 
         yield return new WaitForSeconds(1f);

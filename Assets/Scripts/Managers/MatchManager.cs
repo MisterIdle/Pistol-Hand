@@ -11,9 +11,6 @@ public class MatchManager : BaseManager
     public bool FirstMatch = true;
     private string _lastMapName = null;
 
-    [Header("Map System")]
-    [SerializeField] private GameObject _blocks;
-
     [Header("Draw System")]
     [SerializeField] private float _drawTime = 0.5f;
 
@@ -24,6 +21,10 @@ public class MatchManager : BaseManager
 
         HUDManager.BackgroundImage.enabled = true;
         HUDManager.ShowTitle("LOADING...", "", Color.white, Color.clear);
+
+        AudioManager.Instance.PlaySFX(SFXType.One);
+
+        AudioManager.Instance.PlayMusic(MusicType.InGame);
     }
 
     private void InitializeSingleton()
@@ -66,7 +67,9 @@ public class MatchManager : BaseManager
                 if (p.Wins >= GameManager.NeedToWin)
                 {
                     string winnerName = "Player: " + p.PlayerID;
-                    HUDManager.ShowTitle(winnerName, "Congratulations!", SkinManager.Instance.GetPlayerColor(p.PlayerID), Color.white);
+                    HUDManager.ShowTitle(winnerName.ToUpper(), "CONGRATULATIONS!", SkinManager.Instance.GetPlayerColor(p.PlayerID), Color.white);
+                    AudioManager.Instance.PlaySFX(SFXType.Firework);
+
                     IsLoading = false;
                     StartCoroutine(TeleportToTrophy());
                     yield break;
@@ -92,11 +95,11 @@ public class MatchManager : BaseManager
         }
 
         GameManager.ResetAllPlayers();
-        GameManager.SetSpawnPoints();
+        MapManager.SetSpawnPoints();
 
         foreach (var player in players)
         {
-            GameManager.PlacePlayer(player);
+            MapManager.PlacePlayer(player);
         }
 
         UpdateCrown();
@@ -115,6 +118,7 @@ public class MatchManager : BaseManager
         PlayersController[] players = GameManager.GetAllPlayers();
 
         HUDManager.ShowTitle("READY?", "", Color.white, Color.clear);
+        AudioManager.Instance.PlaySFX(SFXType.Two);
 
         yield return new WaitForSeconds(0.5f);
 
@@ -124,6 +128,8 @@ public class MatchManager : BaseManager
         }
 
         HUDManager.ShowTitle("GO!", "", Color.green, Color.clear);
+        AudioManager.Instance.PlaySFX(SFXType.Three);
+
         yield return new WaitForSeconds(0.5f);
         HUDManager.ClearTitle();
     }
@@ -154,10 +160,13 @@ public class MatchManager : BaseManager
             lastAlivePlayer.Wins++;
             string winnerName = "PLAYER: " + lastAlivePlayer.PlayerID;
             HUDManager.ShowTitle(winnerName.ToUpper(), $"{lastAlivePlayer.Wins} / {GameManager.NeedToWin} FOR THE TROPHY!", SkinManager.Instance.GetPlayerColor(lastAlivePlayer.PlayerID), Color.white);
+            AudioManager.Instance.PlaySFX(SFXType.Firework);
+
         }
         else
         {
             HUDManager.ShowTitle("DRAW!", "", Color.white, Color.clear);
+            AudioManager.Instance.PlaySFX(SFXType.Death);
         }
 
         UpdateCrown();
@@ -199,12 +208,12 @@ public class MatchManager : BaseManager
         var loadedData = SaveManager.LoadMap(randomMapName);
         if (loadedData == null) yield break;
 
-        foreach (Transform child in _blocks.transform)
+        foreach (Transform child in MapManager.MapTile.transform)
         {
             Destroy(child.gameObject);
         }
 
-        var placedBlocks = BlockLoader.LoadBlocks(loadedData, GameManager.blockDatabase, _blocks.transform);
+        var placedBlocks = BlockLoader.LoadBlocks(loadedData, MapManager.blockDatabase, MapManager.MapTile.transform);
         TileManager.RefreshAllTiles(placedBlocks);
 
         foreach (var block in placedBlocks)
