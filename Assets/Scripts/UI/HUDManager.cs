@@ -45,6 +45,11 @@ public class HUDManager : BaseManager
     private void Start()
     {
         UpdateEditorGameButton();
+
+        AudioParameter audio = SettingsManager.GetAudioParameter();
+
+        musicVolumeSlider.value = audio.musicVolume;
+        sfxVolumeSlider.value = audio.sfxVolume;
         
         foreach (var valueModifier in _valueModifiers)
         {
@@ -272,12 +277,15 @@ public class HUDManager : BaseManager
     public void SetMusicVolume()
     {
         AudioManager.MusicVolume(musicVolumeSlider.value);
-        print($"Music Volume: {musicVolumeSlider.value}");
+        SettingsManager.GetAudioParameter().musicVolume = musicVolumeSlider.value;
+        SettingsManager.SaveAudioParameters();
     }
 
     public void SetSFXVolume()
     {
         AudioManager.SFXVolume(sfxVolumeSlider.value);
-        print($"SFX Volume: {sfxVolumeSlider.value}");
+        SettingsManager.GetAudioParameter().sfxVolume = sfxVolumeSlider.value;
+        SettingsManager.SaveAudioParameters();
     }
+
 }

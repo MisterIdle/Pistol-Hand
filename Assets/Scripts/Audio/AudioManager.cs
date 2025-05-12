@@ -1,47 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public enum MusicType 
-{ 
-    MainMenu, 
-    InGame, 
-}
-
-public enum SFXType 
-{
-    Join,
-
-    Dash,
-    Hit,
-    Shoot,
-    Death,
-
-    Bounce,
-    Saw,
-    Crate,
-
-    One,
-    Two,
-    Three,
-
-
-    Firework,
-}
-
-[System.Serializable]
-public struct MusicClip
-{
-    public MusicType type;
-    public AudioClip clip;
-}
-
-[System.Serializable]
-public struct SFXClipGroup
-{
-    public SFXType type;
-    public AudioClip[] clips;
-}
-
+[DefaultExecutionOrder(-120)]
 public class AudioManager : BaseManager
 {
     public static AudioManager Instance { get; private set; }

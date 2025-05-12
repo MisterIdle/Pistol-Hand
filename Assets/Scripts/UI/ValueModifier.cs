@@ -28,7 +28,7 @@ public class ValueModifier
         if (param != null)
         {
             param.value = Mathf.Clamp(param.value + param.stepValue, param.minValue, param.maxValue);
-            settingsManager.SaveParameters();
+            settingsManager.SaveGameParameters();
             UpdateValueText();
         }
     }
@@ -39,7 +39,7 @@ public class ValueModifier
         if (param != null)
         {
             param.value = Mathf.Clamp(param.value - param.stepValue, param.minValue, param.maxValue);
-            settingsManager.SaveParameters();
+            settingsManager.SaveGameParameters();
             UpdateValueText();
         }
     }
@@ -52,7 +52,7 @@ public class ValueModifier
             valueText.text = param.value.ToString();
         }
 
-        SettingsManager.Instance.SaveParameters();
+        SettingsManager.Instance.SaveGameParameters();
     }
 
     private SerializableParameter GetParameter()

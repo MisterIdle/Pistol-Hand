@@ -8,13 +8,22 @@ public class SettingsManager : BaseManager
 {
     public static SettingsManager Instance { get; private set; }
     public GameParametersDatabase gameParametersDatabase;
-    private string savePath = "Settings/GameParams.json";
     private List<SerializableParameter> parametersList = new List<SerializableParameter>();
+
+    private AudioParameter audioParameter = new AudioParameter();
+    
+    private string savePath = "Settings/GameParams.json";
+    private string audioPath = "Settings/AudioParams.json";
 
     private void Awake()
     {
         InitializeSingleton();
-        LoadParameters();
+
+        LoadGameParameters();
+        LoadAudioParameters();
+
+        print(audioParameter.musicVolume);
+        print(audioParameter.sfxVolume);
     }
 
     private void InitializeSingleton()
@@ -29,7 +38,7 @@ public class SettingsManager : BaseManager
         }
     }
 
-    public void SaveParameters()
+    public void SaveGameParameters()
     {
         string directory = Path.GetDirectoryName(savePath);
         if (!Directory.Exists(directory))
@@ -49,7 +58,7 @@ public class SettingsManager : BaseManager
         }
     }
 
-    public void LoadParameters()
+    public void LoadGameParameters()
     {
         if (File.Exists(savePath))
         {
@@ -65,7 +74,7 @@ public class SettingsManager : BaseManager
                 parametersList.Add(new SerializableParameter(param));
             }
 
-            SaveParameters();
+            SaveGameParameters();
         }
 
         Debug.Log("Game parameters loaded from " + savePath);
@@ -84,6 +93,46 @@ public class SettingsManager : BaseManager
             parametersList.Add(new SerializableParameter(param));
         }
 
-        SaveParameters();
+        SaveGameParameters();
     }
+    
+    public void SaveAudioParameters()
+    {
+        string directory = Path.GetDirectoryName(audioPath);
+        if (!Directory.Exists(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        string json = JsonUtility.ToJson(audioParameter, true);
+        File.WriteAllText(audioPath, json);
+    }
+
+    public void LoadAudioParameters()
+    {
+        if (File.Exists(audioPath))
+        {
+            string json = File.ReadAllText(audioPath);
+            audioParameter = JsonUtility.FromJson<AudioParameter>(json);
+        }
+        else
+        {
+            audioParameter = new AudioParameter();
+            SaveAudioParameters();
+        }
+
+        ApplyAudioSettings();
+    }
+
+    private void ApplyAudioSettings()
+    {
+        AudioManager.MusicVolume(audioParameter.musicVolume);
+        AudioManager.SFXVolume(audioParameter.sfxVolume);
+    }
+
+    public AudioParameter GetAudioParameter()
+    {
+        return audioParameter;
+    }
+
 }
