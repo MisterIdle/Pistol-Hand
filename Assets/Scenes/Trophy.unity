@@ -194,7 +194,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 279a23b8d82ade543bff973db61d1fa8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _blocks: {fileID: 1592825336}
+  trophyPrefab: {fileID: 1582225734744569666, guid: 30220c93a0be4cd489e01efd5ad15e13, type: 3}
+  fireworkPrefab: {fileID: 8690182350583564340, guid: 439fb0bbda7e80c41a8a940db65d695a, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

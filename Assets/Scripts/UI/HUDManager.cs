@@ -158,13 +158,20 @@ public class HUDManager : BaseManager
         MessageUIObject.SetActive(true);
     }
 
-    public void ShowTitle(string title, string subtitle, Color titleColor, Color subtitleColor)
+    public void ShowTitle(string title, string subtitle, Color titleColor, Color subtitleColor, float verticalOffset = 0, bool animateTitle = false)
     {
         BackgroundImage.gameObject.SetActive(true);
         _titleText.text = title;
         _subtitleText.text = subtitle;
         _titleText.color = titleColor;
         _subtitleText.color = subtitleColor;
+
+        Vector3 offset = new Vector3(0, verticalOffset, 0);
+        _titleText.rectTransform.localPosition += offset;
+        _subtitleText.rectTransform.localPosition += offset;
+
+        if (animateTitle)
+            StartCoroutine(AnimateTitle());
     }
 
     public void ClearTitle()
@@ -172,8 +179,28 @@ public class HUDManager : BaseManager
         BackgroundImage.gameObject.SetActive(false);
         _titleText.text = string.Empty;
         _subtitleText.text = string.Empty;
+
+        _titleText.rectTransform.localPosition = Vector3.zero;
+        _subtitleText.rectTransform.localPosition = new Vector3(0, -112, 0);
     }
 
+    private IEnumerator AnimateTitle()
+    {
+        Vector3 originalScale = _titleText.transform.localScale;
+        float pulse = 1.05f;
+        float speed = 2f;
+
+        float time = 0f;
+        while (BackgroundImage.gameObject.activeSelf)
+        {
+            float scale = 1 + Mathf.Sin(time * speed) * (pulse - 1);
+            _titleText.transform.localScale = originalScale * scale;
+            time += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        _titleText.transform.localScale = originalScale;
+    }
 
     public void DisplayPlayerCards(int playerID)
     {

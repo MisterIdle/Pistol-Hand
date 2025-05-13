@@ -370,7 +370,7 @@ MonoBehaviour:
   _hand: {fileID: 1294991957395979940}
   _handSprite: {fileID: 3905339446647980527}
   _handSpeed: 7
-  _handMaxDistance: 0.7
+  _handMaxDistance: 0.5
   _dashSpeed: 50
   _dashDuration: 0.1
   _dashCooldown: 1
@@ -378,7 +378,7 @@ MonoBehaviour:
   _shootPoint: {fileID: 2840959411272887346}
   _shootForce: 20
   _reloadTime: 0.5
-  _hitDistance: 0.5
+  _hitDistance: 0.2
   _pistolHitForce: 1
   _punchHitForce: 1
   _stun: 0

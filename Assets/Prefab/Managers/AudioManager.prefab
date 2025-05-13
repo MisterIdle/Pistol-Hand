@@ -307,9 +307,9 @@ MonoBehaviour:
   musicSource: {fileID: 45137999781414177}
   musicClips:
   - type: 0
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a18fac1d30df57743981eff373db8682, type: 3}
   - type: 1
-    clip: {fileID: 0}
+    clip: {fileID: 8300000, guid: a696af0cef586464c962cfba91c0120c, type: 3}
   sfxSource: {fileID: 3754341949774515338}
   sfxClips:
   - type: 0
@@ -348,5 +348,11 @@ MonoBehaviour:
     - {fileID: 8300000, guid: e8668bb513f044c41955a3fe66254d83, type: 3}
     - {fileID: 8300000, guid: a491a8a0525e58c40ac55563b72feaa6, type: 3}
   - type: 8
+    clips:
+    - {fileID: 8300000, guid: 6b613a47ea7d8124bb9598d6bb35f175, type: 3}
+  - type: 9
+    clips:
+    - {fileID: 8300000, guid: 79745fcb74385c54aa24a1b47a81fbc4, type: 3}
+  - type: 10
     clips:
     - {fileID: 8300000, guid: accb1e992760d474e8c6c88ff222363c, type: 3}

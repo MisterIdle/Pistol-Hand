@@ -286,6 +286,8 @@ public class PlayersController : MonoBehaviour
         _animator.SetBool("Dash", true);
         _handAnimator.SetBool("Reload", false);
 
+        AudioManager.Instance.PlaySFX(SFXType.Dash);
+
         _isDashing = true;
         _dashTrail.emitting = true;
         _lastDashTime = Time.time;
@@ -295,8 +297,6 @@ public class PlayersController : MonoBehaviour
         _rb.linearVelocity = dir * _dashSpeed;
 
         _spriteRender.flipX = dir.x < 0;
-
-        AudioManager.Instance.PlaySFX(SFXType.Dash);
 
         StartCoroutine(StopDash());
     }

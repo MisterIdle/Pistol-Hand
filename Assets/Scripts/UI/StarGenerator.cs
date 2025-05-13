@@ -47,8 +47,9 @@ public class StarGenerator : MonoBehaviour
             int attempts = 0;
             do
             {
-                Vector3 randomPos = Random.insideUnitSphere * spawnRadius;
-                position = new Vector3(randomPos.x, randomPos.y, 0f);
+                float angle = Random.Range(0f, 360f) * Mathf.Deg2Rad;
+                float distance = Random.Range(0f, spawnRadius);
+                position = new Vector3(Mathf.Cos(angle) * distance, Mathf.Sin(angle) * distance, 0f);
                 attempts++;
             }
             while (Physics2D.OverlapCircle(position, maxSize) != null && attempts < maxAttempts);

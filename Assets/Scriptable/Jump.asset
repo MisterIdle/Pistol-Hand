@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Jump
   m_EditorClassIdentifier: 
   key: 3
-  value: 8
+  value: 7
   minValue: 1
   maxValue: 20
   stepValue: 1

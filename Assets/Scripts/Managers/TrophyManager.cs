@@ -8,6 +8,14 @@ public class TrophyManager : BaseManager
 
     private bool _animationStarted = false;
 
+    [Header("Trophy Animation")]
+    [SerializeField] private GameObject trophyPrefab;
+    [SerializeField] private GameObject fireworkPrefab;
+
+    private float _fireworkTimer = 0f;
+    [SerializeField] private float fireworkMin = 1f;
+    [SerializeField] private float fireworkMax = 3f;
+
     private void Awake()
     {
         InitializeSingleton();
@@ -28,6 +36,16 @@ public class TrophyManager : BaseManager
         }
     }
 
+    private void Update()
+    {
+        _fireworkTimer += Time.deltaTime;
+        if (_fireworkTimer >= Random.Range(fireworkMin, fireworkMax))
+        {
+            GenerateFirework();
+            _fireworkTimer = 0f;
+        }
+    }
+
     private IEnumerator HandleTrophyAnimation()
     {
         if (_animationStarted) yield break;
@@ -41,6 +59,8 @@ public class TrophyManager : BaseManager
 
         yield return CameraManager.MoveCameraTransition(false, 1f);
 
+        Instantiate(trophyPrefab, MapManager.MapTile.transform, MapManager.MapTile.transform);
+
         var players = GameManager.GetAllPlayers();
 
         GameManager.ResetAllPlayers();
@@ -52,14 +72,14 @@ public class TrophyManager : BaseManager
             player.SetMovementState(true);
         }
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(5f);
 
         foreach (var p in GameManager.GetAllPlayers())
         {
             if (p.Wins != GameManager.NeedToWin)
             {
                 p.KillPlayer();
-                yield return new WaitForSeconds(2f);
+                yield return new WaitForSeconds(3f);
             }
         }
 
@@ -106,6 +126,20 @@ public class TrophyManager : BaseManager
 
         var winner = GameManager.GetAllPlayers().OrderByDescending(p => p.Wins).FirstOrDefault();
         if (winner != null)
-                HUDManager.ShowTitle($"TROPHY CEREMONY", $"WINNER: {winner.name}", Color.yellow, SkinManager.GetPlayerColor(winner.PlayerID));
+                HUDManager.ShowTitle($"TROPHY CEREMONY", $"WINNER: {winner.name}", Color.yellow, SkinManager.GetPlayerColor(winner.PlayerID), 250f, true);
+    }
+
+    public void GenerateFirework()
+    {
+        var firework = Instantiate(fireworkPrefab, MapManager.MapTile.transform);
+        
+        var screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
+        firework.transform.position = new Vector3(
+            Random.Range(-screenBounds.x, screenBounds.x), 
+            Random.Range(-screenBounds.y, screenBounds.y), 
+            0f);
+
+        var color = SkinManager.GetPlayerColor(GameManager.GetAllPlayers().OrderByDescending(p => p.Wins).FirstOrDefault().PlayerID);
+        firework.GetComponent<Firework>().SetColor(color);
     }
 }

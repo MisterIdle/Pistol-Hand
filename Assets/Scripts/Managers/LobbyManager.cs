@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
+[DefaultExecutionOrder(-40)]
 public class LobbyManager : BaseManager
 {
     public static LobbyManager Instance { get; private set; }
@@ -21,7 +22,7 @@ public class LobbyManager : BaseManager
         StartCoroutine(CameraManager.ChangeCameraLens(5f, 0f));
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0, 0, -10), 0f));
 
-        HUDManager.ShowTitle("PRESS ANY KEY TO JOIN", "KILL TO BEGIN", Color.white, Color.red);
+        HUDManager.ShowTitle("PRESS ANY KEY TO JOIN", "KILL TO BEGIN", Color.white, Color.red, 150f, true);
         HUDManager.BackgroundImage.enabled = false;
 
         HUDManager.EnableParameterButton(true);
@@ -82,6 +83,8 @@ public class LobbyManager : BaseManager
         yield return CameraManager.MoveCameraTransition(true, 1f);
 
         _loadNextMap = false;
+
+        HUDManager.ClearTitle();
 
         yield return SceneLoader.LoadScene(GameManager.GameSceneName);
     }
