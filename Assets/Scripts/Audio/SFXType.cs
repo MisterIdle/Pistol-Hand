@@ -11,5 +11,6 @@ public enum SFXType
     One, 
     Two, 
     Three, 
-    Firework
+    Firework,
+    BulletHit,
 }

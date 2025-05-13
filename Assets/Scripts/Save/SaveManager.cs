@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+[DefaultExecutionOrder(-150)]
 public static class SaveManager
 {
     private static string _UserSaveDirectory = "Save";

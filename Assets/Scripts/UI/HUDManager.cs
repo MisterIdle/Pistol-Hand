@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 [DefaultExecutionOrder(-50)]
 public class HUDManager : BaseManager
@@ -73,7 +74,7 @@ public class HUDManager : BaseManager
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) || Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame)
         {
             TogglePause();
         }
@@ -162,13 +163,14 @@ public class HUDManager : BaseManager
     {
         BackgroundImage.gameObject.SetActive(true);
         _titleText.text = title;
-        _subtitleText.text = subtitle;
         _titleText.color = titleColor;
         _subtitleText.color = subtitleColor;
 
         Vector3 offset = new Vector3(0, verticalOffset, 0);
         _titleText.rectTransform.localPosition += offset;
         _subtitleText.rectTransform.localPosition += offset;
+        
+        _subtitleText.text = subtitle;
 
         if (animateTitle)
             StartCoroutine(AnimateTitle());

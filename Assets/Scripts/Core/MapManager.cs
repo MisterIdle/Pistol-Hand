@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Linq;
 
+[DefaultExecutionOrder(-100)]
 public class MapManager : BaseManager
 {
     public static MapManager Instance { get; private set; }

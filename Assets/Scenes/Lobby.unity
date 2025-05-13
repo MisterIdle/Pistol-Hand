@@ -760,7 +760,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1365188571222312537, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1395717853254458748, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
       propertyPath: m_fontSize
@@ -1666,9 +1666,21 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8861350158439538757, guid: cf00c5ea991fe4b4a8cd4c89246930d2, type: 3}
+      propertyPath: musicClips.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8861350158439538757, guid: cf00c5ea991fe4b4a8cd4c89246930d2, type: 3}
       propertyPath: musicClips.Array.data[1].clip
       value: 
       objectReference: {fileID: 8300000, guid: d08f0cba0be753e40a5ca944dc79f8f2, type: 3}
+    - target: {fileID: 8861350158439538757, guid: cf00c5ea991fe4b4a8cd4c89246930d2, type: 3}
+      propertyPath: musicClips.Array.data[2].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: 854559edd99546741bc9ec25dcf241db, type: 3}
+    - target: {fileID: 8861350158439538757, guid: cf00c5ea991fe4b4a8cd4c89246930d2, type: 3}
+      propertyPath: musicClips.Array.data[2].type
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 8861350158439538757, guid: cf00c5ea991fe4b4a8cd4c89246930d2, type: 3}
       propertyPath: 'sfxClips.Array.data[4].clips.Array.data[1]'
       value: 
@@ -1972,6 +1984,10 @@ PrefabInstance:
     - target: {fileID: 10358084779543191, guid: 01989a06889190f4ca4486ca52c8db64, type: 3}
       propertyPath: m_Name
       value: SkinManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 747052011629030966, guid: 01989a06889190f4ca4486ca52c8db64, type: 3}
+      propertyPath: AvailableColors.Array.size
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8117542089873977076, guid: 01989a06889190f4ca4486ca52c8db64, type: 3}
       propertyPath: m_LocalPosition.x

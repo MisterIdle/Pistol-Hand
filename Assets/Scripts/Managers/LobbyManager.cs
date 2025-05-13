@@ -47,17 +47,10 @@ public class LobbyManager : BaseManager
     }
 
     public void LoadLobbyMap() {
-        var data = SaveManager.LoadMap("Lobby");
-        if (data == null)
-        {
-            Debug.LogWarning("Lobby map not found.");
-        }
-
         foreach (Transform child in MapManager.MapTile.transform)
-        {
             Destroy(child.gameObject);
-        }
-
+            
+        var data = SaveManager.LoadMap("Lobby");
         var blocks = BlockLoader.LoadBlocks(data, MapManager.blockDatabase, MapManager.MapTile.transform);
         TileManager.RefreshAllTiles(blocks);
     }

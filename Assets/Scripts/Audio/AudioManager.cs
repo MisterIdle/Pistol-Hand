@@ -56,6 +56,7 @@ public class AudioManager : BaseManager
         if (musicSource != null && musicDict.ContainsKey(type))
         {
             musicSource.clip = musicDict[type];
+            musicSource.loop = true;
             musicSource.Play();
         }
     }

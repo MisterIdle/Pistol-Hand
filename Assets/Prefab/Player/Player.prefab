@@ -569,6 +569,70 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 75d37f8d-845d-479e-b3c3-f3c378e97b17
     m_ActionName: Player/Sensivity
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 55864869084325322, guid: 4cc7413368b55364494ad3e867cddf30, type: 3}
+        m_TargetAssemblyTypeName: MapEditor, Assembly-CSharp
+        m_MethodName: OnLeftClick
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: d25b5d56-4940-437d-a491-e091b881f5b9
+    m_ActionName: Editor/Left
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 55864869084325322, guid: 4cc7413368b55364494ad3e867cddf30, type: 3}
+        m_TargetAssemblyTypeName: MapEditor, Assembly-CSharp
+        m_MethodName: OnRightClick
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: b2801f27-58fc-4f38-9843-c7cd38a52dbc
+    m_ActionName: 'Editor/Right[/Mouse/rightButton]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 55864869084325322, guid: 4cc7413368b55364494ad3e867cddf30, type: 3}
+        m_TargetAssemblyTypeName: MapEditor, Assembly-CSharp
+        m_MethodName: OnMiddleClick
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 2b236b45-28d5-4037-a4d9-93f7f40e5fa1
+    m_ActionName: 'Editor/Middle[/Mouse/middleButton]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8389790336599802754, guid: 6e04d87d051ec3548a0c4a791a6a6bf8, type: 3}
+        m_TargetAssemblyTypeName: HUDManager, Assembly-CSharp
+        m_MethodName: OnPauseMenu
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: a30deb44-f9f7-4093-be35-1e6d19e984d1
+    m_ActionName: 'Pause/Pause[/Keyboard/escape,/XInputControllerWindows/start,/XInputControllerWindows1/start]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player

@@ -37,6 +37,11 @@ public class MapEditor : BaseManager
         InitializeSingleton();
         GameManager.SetGameState(GameState.Editor);
 
+        AudioManager.PlayMusic(MusicType.Editor);
+
+        foreach (Transform child in MapManager.MapTile.transform)
+            Destroy(child.gameObject);
+
         StarGenerator.Instance.ClearStars();
     }
 

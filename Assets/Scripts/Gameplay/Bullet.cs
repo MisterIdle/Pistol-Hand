@@ -3,10 +3,38 @@ using UnityEngine;
 public class Bullet : MonoBehaviour
 {
     public PlayersController Shooter;
+    public SpriteRenderer BulletSprite;
+    public TrailRenderer Trail;
 
     void Start()
     {
         Destroy(gameObject, 3f);
+    }
+
+    public void SetColor(Color color)
+    {
+        if (BulletSprite != null)
+        {
+            BulletSprite.color = color;
+        }
+    }
+
+    public void SetTrailColor(Color color)
+    {
+        if (Trail != null)
+        {
+            Trail.startColor = color;
+            Trail.endColor = Color.white;
+        }
+    }
+
+    public void Launch(Vector3 direction, float force)
+    {
+        var rb = GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.AddForce(direction * force, ForceMode2D.Impulse);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -20,6 +48,11 @@ public class Bullet : MonoBehaviour
                 players.LastHitBy = Shooter;
                 Destroy(gameObject);
             }
+        }
+
+        if (collision.gameObject.tag == "Bullet")
+        {
+            AudioManager.Instance.PlaySFX(SFXType.BulletHit);
         }
 
         if (collision.gameObject.layer == 3)

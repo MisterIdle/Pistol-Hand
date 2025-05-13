@@ -1040,7 +1040,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6771912915684804251}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &689519299103208277
 GameObject:
   m_ObjectHideFlags: 0
@@ -3353,7 +3365,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8838167696118301822}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2102454580306482122
 GameObject:
   m_ObjectHideFlags: 0
@@ -3610,7 +3634,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8469622837796711840}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2158912415231445152
 GameObject:
   m_ObjectHideFlags: 0
@@ -3731,7 +3767,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6799988264560616162}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2216337379743438943
 GameObject:
   m_ObjectHideFlags: 0
@@ -4956,6 +5004,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: HUDManager, Assembly-CSharp
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 8389790336599802754}
         m_TargetAssemblyTypeName: HUDManager, Assembly-CSharp
         m_MethodName: OnGameButtonClick
@@ -5525,7 +5585,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2028366607314993092
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5628,6 +5688,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: HUDManager, Assembly-CSharp
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 8389790336599802754}
         m_TargetAssemblyTypeName: HUDManager, Assembly-CSharp
         m_MethodName: OnEditorButtonClick
@@ -5913,7 +5985,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8652995992054108924}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &3348116800197752308
 GameObject:
   m_ObjectHideFlags: 0
@@ -7780,7 +7864,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3077764072976315983}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &4832735969215748063
 GameObject:
   m_ObjectHideFlags: 0
@@ -9041,7 +9137,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6340813554933172570}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &5486201278332098391
 GameObject:
   m_ObjectHideFlags: 0
@@ -9677,7 +9785,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 7101142559511041566}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &5961501828119526159
 GameObject:
   m_ObjectHideFlags: 0
@@ -10020,7 +10140,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3845696972164498849}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &6439475994740465642
 GameObject:
   m_ObjectHideFlags: 0
@@ -11099,7 +11231,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 9043438209776531135}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &7015402503593306173
 GameObject:
   m_ObjectHideFlags: 0
@@ -12968,7 +13112,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6815891791198376827}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &7981614698755051730
 GameObject:
   m_ObjectHideFlags: 0
@@ -14931,7 +15087,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1836353547201533568}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8300000, guid: 44d7aa00af16b4b4aaf7051dd77c1728, type: 3}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &9108003177054612950
 GameObject:
   m_ObjectHideFlags: 0

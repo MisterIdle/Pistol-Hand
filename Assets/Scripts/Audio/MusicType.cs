@@ -1,5 +1,6 @@
 public enum MusicType 
 { 
     MainMenu, 
-    InGame 
+    InGame,
+    Editor,
 }

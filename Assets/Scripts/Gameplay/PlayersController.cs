@@ -346,18 +346,19 @@ public class PlayersController : MonoBehaviour
         Vector3 dir = (_hand.position - transform.position).normalized;
         GameObject bullet = Instantiate(_projectilePrefab, _shootPoint.position, _hand.rotation);
 
-        var bulletRb = bullet.GetComponent<Rigidbody2D>();
-        if (bulletRb != null)
-            bulletRb.AddForce(dir * _shootForce, ForceMode2D.Impulse);  
-
         var bulletComponent = bullet.GetComponent<Bullet>();
         if (bulletComponent != null)
-            bulletComponent.Shooter = this; 
+        {
+            bulletComponent.Shooter = this;
+            bulletComponent.SetColor(SkinManager.Instance.GetPlayerColor(PlayerID));
+            bulletComponent.SetTrailColor(SkinManager.Instance.GetPlayerColor(PlayerID));
+            bulletComponent.Launch(dir, _shootForce);
+        }
 
         AudioManager.Instance.PlaySFX(SFXType.Shoot);
 
         StartCoroutine(ShootingCooldown());
-    }   
+    }
 
     private IEnumerator ShootingCooldown()
     {
@@ -540,7 +541,6 @@ public class PlayersController : MonoBehaviour
     public void OnChangeColor(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
-
         if (GameManager.Instance.CurrentState != GameState.WaitingForPlayers && GameManager.Instance.CurrentState != GameState.Editor) return;
     
         Vector2 dpadInput = context.ReadValue<Vector2>();
