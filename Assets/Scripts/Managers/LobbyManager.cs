@@ -24,6 +24,8 @@ public class LobbyManager : BaseManager
         HUDManager.ShowTitle("PRESS ANY KEY TO JOIN", "KILL TO BEGIN", Color.white, Color.red);
         HUDManager.BackgroundImage.enabled = false;
 
+        HUDManager.EnableParameterButton(true);
+
         LoadLobbyMap();
 
         AudioManager.Instance.PlayMusic(MusicType.MainMenu);

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[DefaultExecutionOrder(-50)]
 public class SkinManager : BaseManager
 {
     public static SkinManager Instance;

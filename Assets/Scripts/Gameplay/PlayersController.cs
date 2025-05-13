@@ -129,6 +129,9 @@ public class PlayersController : MonoBehaviour
 
         AudioManager.Instance.PlaySFX(SFXType.Join);
 
+        _spriteRender.sortingOrder = PlayerID;
+        _handSprite.sortingOrder = PlayerID;
+
         LoadPlayerSettings();
 
         DontDestroyOnLoad(gameObject);

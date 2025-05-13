@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+[DefaultExecutionOrder(-50)]
 public class StarGenerator : MonoBehaviour
 {
     public static StarGenerator Instance { get; private set; }

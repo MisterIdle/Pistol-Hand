@@ -37,6 +37,7 @@ public class HUDEditorManager : BaseManager
     private void Awake()
     {
         InitializeSingleton();
+        HUDManager.EnableParameterButton(true);
     }
 
     private void InitializeSingleton()

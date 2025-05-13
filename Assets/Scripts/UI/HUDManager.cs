@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Collections;
 using TMPro;
 using System.Collections.Generic;
-using UnityEngine.EventSystems;
 
 [DefaultExecutionOrder(-50)]
 public class HUDManager : BaseManager
@@ -18,8 +17,10 @@ public class HUDManager : BaseManager
     [SerializeField] private GameObject _gameButton;
     [SerializeField] private GameObject _editorButton;
 
+    [Header("Game HUD")]
+    [SerializeField] private List<Button> _parametersButtons = new List<Button>();
+
     [Header("Audio Settings")]
-    [SerializeField] private Slider masterVolumeSlider;
     [SerializeField] private Slider musicVolumeSlider;
     [SerializeField] private Slider sfxVolumeSlider;
 
@@ -288,4 +289,12 @@ public class HUDManager : BaseManager
         SettingsManager.SaveAudioParameters();
     }
 
+    public void EnableParameterButton(bool enable)
+    {
+        foreach (var button in _parametersButtons)
+        {
+            button.gameObject.SetActive(enable);
+            button.interactable = enable;
+        }
+    }
 }

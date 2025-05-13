@@ -16,7 +16,7 @@ public class TrophyManager : BaseManager
         HUDManager.BackgroundImage.enabled = false;
     }
 
-     private void InitializeSingleton()
+    private void InitializeSingleton()
     {
         if (Instance == null)
         {
@@ -28,53 +28,29 @@ public class TrophyManager : BaseManager
         }
     }
 
-
-    public IEnumerator LoadTrophyMapAndPlacePlayers()
-    {
-        var data = SaveManager.LoadMap("Trophy");
-        if (data == null)
-        {
-            Debug.LogWarning("Trophy map not found.");
-            yield break;
-        }
-
-        foreach (Transform child in MapManager.MapTile.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
-        var blocks = BlockLoader.LoadBlocks(data, MapManager.blockDatabase, MapManager.MapTile.transform);
-        TileManager.RefreshAllTiles(blocks);
-
-        foreach (var b in blocks)
-            if (b.type == BlockType.Spawn)
-                if (b.instance.TryGetComponent<SpriteRenderer>(out var sr))
-                    sr.enabled = false;
-
-        var winner = GameManager.GetAllPlayers().OrderByDescending(p => p.Wins).FirstOrDefault();
-        if (winner != null)
-        {
-                HUDManager.ShowTitle($"TROPHY CEREMONY", $"WINNER: {winner.name}", Color.yellow, SkinManager.GetPlayerColor(winner.PlayerID));
-        }
-
-        GameManager.ResetAllPlayers();
-        MapManager.SetSpawnPoints();
-
-        foreach (var p in GameManager.GetAllPlayers()) {
-            MapManager.PlacePlayer(p);
-        }
-
-        yield return new WaitForSeconds(1f);
-    }
-
     private IEnumerator HandleTrophyAnimation()
     {
         if (_animationStarted) yield break;
         _animationStarted = true;
 
+        StarGenerator.Instance.ClearStars();
+        yield return new WaitForSeconds(0.5f);
+        StarGenerator.Instance.GenerateStars();
+
+        StartCoroutine(LoadTrophyMap());
+
         yield return CameraManager.MoveCameraTransition(false, 1f);
 
-        StartCoroutine(LoadTrophyMapAndPlacePlayers());
+        var players = GameManager.GetAllPlayers();
+
+        GameManager.ResetAllPlayers();
+        MapManager.SetSpawnPoints();
+
+        foreach (var player in players)
+        {
+            MapManager.PlacePlayer(player);
+            player.SetMovementState(true);
+        }
 
         yield return new WaitForSeconds(3f);
 
@@ -97,6 +73,39 @@ public class TrophyManager : BaseManager
         GameManager.PlayerDeath = 0;
 
         HUDManager.ClearTitle();
+     
         yield return SceneLoader.LoadScene(GameManager.LobbySceneName);
+    }
+
+    public IEnumerator LoadTrophyMap()
+    {
+        var data = SaveManager.LoadMap("Trophy");
+        if (data == null)
+        {
+            Debug.LogWarning("Trophy map not found.");
+            yield break;
+        }
+
+        foreach (Transform child in MapManager.MapTile.transform)
+            Destroy(child.gameObject);
+
+        var placedBlocks = BlockLoader.LoadBlocks(data, MapManager.blockDatabase, MapManager.MapTile.transform);
+        TileManager.RefreshAllTiles(placedBlocks);
+
+        foreach (var block in placedBlocks)
+        {
+            if (block.type == BlockType.Spawn)
+            {
+                var spriteRenderer = block.instance.GetComponent<SpriteRenderer>();
+                if (spriteRenderer != null)
+                {
+                    spriteRenderer.enabled = false;
+                }
+            }
+        }
+
+        var winner = GameManager.GetAllPlayers().OrderByDescending(p => p.Wins).FirstOrDefault();
+        if (winner != null)
+                HUDManager.ShowTitle($"TROPHY CEREMONY", $"WINNER: {winner.name}", Color.yellow, SkinManager.GetPlayerColor(winner.PlayerID));
     }
 }

@@ -25,6 +25,8 @@ public class MatchManager : BaseManager
         AudioManager.Instance.PlaySFX(SFXType.One);
 
         AudioManager.Instance.PlayMusic(MusicType.InGame);
+
+        HUDManager.EnableParameterButton(false);
     }
 
     private void InitializeSingleton()
@@ -83,7 +85,7 @@ public class MatchManager : BaseManager
 
         StarGenerator.Instance.ClearStars();
 
-        yield return StartCoroutine(LoadRandomMapAndPlacePlayers());
+        yield return StartCoroutine(LoadRandomMap());
 
         HUDManager.ClearTitle();
 
@@ -185,7 +187,7 @@ public class MatchManager : BaseManager
             p.CrownSprite.enabled = !p.IsDead && p.Wins == maxWins && maxWins > 0;
     }
 
-    public IEnumerator LoadRandomMapAndPlacePlayers()
+    public IEnumerator LoadRandomMap()
     {
         var allMaps = new List<string>();
         allMaps.AddRange(SaveManager.GetAllDefaultMaps());
@@ -209,9 +211,7 @@ public class MatchManager : BaseManager
         if (loadedData == null) yield break;
 
         foreach (Transform child in MapManager.MapTile.transform)
-        {
             Destroy(child.gameObject);
-        }
 
         var placedBlocks = BlockLoader.LoadBlocks(loadedData, MapManager.blockDatabase, MapManager.MapTile.transform);
         TileManager.RefreshAllTiles(placedBlocks);
@@ -244,6 +244,14 @@ public class MatchManager : BaseManager
 
         yield return new WaitForSeconds(1f);
         yield return CameraManager.MoveCameraTransition(true, 1f);
+
+        var players = GameManager.GetAllPlayers();
+
+        foreach (var player in players)
+        {
+            player.KillPlayer();
+            player.SetMovementState(false);
+        }
 
         IsLoading = false;
         yield return SceneLoader.LoadScene(GameManager.TrophySceneName);
