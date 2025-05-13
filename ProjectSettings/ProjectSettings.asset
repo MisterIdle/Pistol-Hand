@@ -14,7 +14,7 @@ PlayerSettings:
   accelerometerFrequency: 60
   companyName: MisterIdle Games
   productName: Pistol Hand
-  defaultCursor: {fileID: 0}
+  defaultCursor: {fileID: 2800000, guid: 95e8da0103bfe954a8c7af9f55d19738, type: 3}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_ShowUnitySplashScreen: 1

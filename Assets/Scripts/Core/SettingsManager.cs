@@ -21,9 +21,6 @@ public class SettingsManager : BaseManager
 
         LoadGameParameters();
         LoadAudioParameters();
-
-        print(audioParameter.musicVolume);
-        print(audioParameter.sfxVolume);
     }
 
     private void InitializeSingleton()

@@ -544,7 +544,7 @@ public class PlayersController : MonoBehaviour
         if (GameManager.Instance.CurrentState != GameState.WaitingForPlayers && GameManager.Instance.CurrentState != GameState.Editor) return;
     
         Vector2 dpadInput = context.ReadValue<Vector2>();
-        int direction = dpadInput.x > 0.1f ? -1 : (dpadInput.x < -0.1f ? 1 : 0);
+        int direction = dpadInput.x > 0.1f ? 1 : (dpadInput.x < -0.1f ? -1 : 0);
     
         if (direction == 0) return;
     

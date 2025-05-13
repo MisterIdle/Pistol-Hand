@@ -17,6 +17,7 @@ public class HUDManager : BaseManager
     [SerializeField] private GameObject _audioMenu;
     [SerializeField] private GameObject _gameButton;
     [SerializeField] private GameObject _editorButton;
+    [SerializeField] private GameObject _creditMenu;
 
     [Header("Game HUD")]
     [SerializeField] private List<Button> _parametersButtons = new List<Button>();
@@ -74,11 +75,20 @@ public class HUDManager : BaseManager
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) || Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame)
+        bool escapePressed = Input.GetKeyDown(KeyCode.Escape) || (Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame);
+
+        if (escapePressed)
         {
+            if (_creditMenu.activeSelf)
+            {
+                CloseCreditMenu();
+                return;
+            }
+
             TogglePause();
         }
     }
+
 
     public void TogglePause()
     {
@@ -325,5 +335,22 @@ public class HUDManager : BaseManager
             button.gameObject.SetActive(enable);
             button.interactable = enable;
         }
+    }
+
+    public void OnCreditButtonClick()
+    {
+        _mainMenu.SetActive(false);
+        _creditMenu.SetActive(true);
+    }
+
+    public void CloseCreditMenu()
+    {
+        _creditMenu.SetActive(false);
+        _mainMenu.SetActive(true);
+    }
+
+    public void OnQuitButtonClick()
+    {
+        Application.Quit();
     }
 }

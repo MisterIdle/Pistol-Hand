@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DashSpeed
   m_EditorClassIdentifier: 
   key: 9
-  value: 30
+  value: 20
   minValue: 0.5
   maxValue: 100
   stepValue: 0.5
