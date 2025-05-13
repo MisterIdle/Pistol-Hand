@@ -53,6 +53,7 @@ MonoBehaviour:
   GameSceneName: Match
   TrophySceneName: Trophy
   EditorSceneName: Editor
+  DisconnectTimeout: 40
 --- !u!114 &435483722959023007
 MonoBehaviour:
   m_ObjectHideFlags: 0

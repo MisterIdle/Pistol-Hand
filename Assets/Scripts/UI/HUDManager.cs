@@ -17,6 +17,7 @@ public class HUDManager : BaseManager
     [SerializeField] private GameObject _audioMenu;
     [SerializeField] private GameObject _gameButton;
     [SerializeField] private GameObject _editorButton;
+    [SerializeField] private GameObject _stopButton;
     [SerializeField] private GameObject _creditMenu;
 
     [Header("Game HUD")]
@@ -102,14 +103,35 @@ public class HUDManager : BaseManager
     {
         if (IsPaused)
         {
-            bool inEditor = GameManager.CurrentState == GameState.Editor;
-            _gameButton.SetActive(inEditor);
-            _editorButton.SetActive(!inEditor);
+            switch (GameManager.CurrentState)
+            {
+                case GameState.WaitingForPlayers:
+                    _gameButton.SetActive(false);
+                    _editorButton.SetActive(true);
+                    _stopButton.SetActive(false);
+                    break;
+                case GameState.Editor:
+                    _gameButton.SetActive(true);
+                    _editorButton.SetActive(false);
+                    _stopButton.SetActive(false);
+                    break;
+                case GameState.Playing:
+                    _gameButton.SetActive(false);
+                    _editorButton.SetActive(false);
+                    _stopButton.SetActive(true);
+                    break;
+                default:
+                    _gameButton.SetActive(false);
+                    _editorButton.SetActive(false);
+                    _stopButton.SetActive(false);
+                    break;
+            }
         }
         else
         {
             _gameButton.SetActive(false);
             _editorButton.SetActive(false);
+            _stopButton.SetActive(false);
         }
     }
 
@@ -151,6 +173,11 @@ public class HUDManager : BaseManager
         StartCoroutine(TransitionToEditorScene());
     }
 
+    public void OnStopButtonClick()
+    {
+        StartCoroutine(TransitionToGameScene());
+    }
+
     public IEnumerator TransitionToEditorScene()
     {
         TogglePause();
@@ -160,9 +187,11 @@ public class HUDManager : BaseManager
         StartCoroutine(SceneLoader.LoadScene(GameManager.EditorSceneName));
     }
 
-    public IEnumerator TransitionToGameScene()
+    public IEnumerator TransitionToGameScene(bool togglePause = true)
     {
-        TogglePause();
+        if (togglePause)
+            TogglePause();
+
         SetTransition(false);
         yield return new WaitForSeconds(1f);
         StartCoroutine(SceneLoader.LoadScene(GameManager.LobbySceneName));

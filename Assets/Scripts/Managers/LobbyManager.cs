@@ -27,11 +27,15 @@ public class LobbyManager : BaseManager
 
         HUDManager.EnableParameterButton(true);
 
+        GameManager.ResetGame();
+
         LoadLobbyMap();
 
         AudioManager.Instance.PlayMusic(MusicType.MainMenu);
 
         StarGenerator.Instance.GenerateStars();
+
+        print("LobbyManager Awake");
     }
 
     private void InitializeSingleton()
