@@ -34,8 +34,6 @@ public class LobbyManager : BaseManager
         AudioManager.Instance.PlayMusic(MusicType.MainMenu);
 
         StarGenerator.Instance.GenerateStars();
-
-        print("LobbyManager Awake");
     }
 
     private void InitializeSingleton()

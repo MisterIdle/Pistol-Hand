@@ -184,6 +184,7 @@ public class HUDManager : BaseManager
         SetTransition(false);
         MessageUIObject.SetActive(false);
         yield return new WaitForSeconds(1f);
+        HUDManager.HideAllPlayerCards();
         StartCoroutine(SceneLoader.LoadScene(GameManager.EditorSceneName));
     }
 
@@ -195,6 +196,7 @@ public class HUDManager : BaseManager
         SetTransition(false);
         yield return new WaitForSeconds(1f);
         StartCoroutine(SceneLoader.LoadScene(GameManager.LobbySceneName));
+        HUDManager.HideAllPlayerCards();
         MessageUIObject.SetActive(true);
     }
 
@@ -290,6 +292,18 @@ public class HUDManager : BaseManager
             }
         }
     }
+
+    public void HideAllPlayerCards()
+    {
+        foreach (var playerCard in _playerCardsData)
+        {
+            if (playerCard.PlayerCard != null)
+            {
+                playerCard.PlayerCard.SetActive(false);
+            }
+        }
+    }
+
 
     public void DeleteAllPlayerCards()
     {

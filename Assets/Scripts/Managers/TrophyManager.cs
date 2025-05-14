@@ -72,6 +72,8 @@ public class TrophyManager : BaseManager
             player.SetMovementState(true);
         }
 
+        UpdateCrown();
+
         yield return new WaitForSeconds(5f);
 
         foreach (var p in GameManager.GetAllPlayers())
@@ -93,6 +95,7 @@ public class TrophyManager : BaseManager
         GameManager.PlayerDeath = 0;
 
         HUDManager.ClearTitle();
+        HUDManager.HideAllPlayerCards();
      
         yield return SceneLoader.LoadScene(GameManager.LobbySceneName);
     }
@@ -141,5 +144,18 @@ public class TrophyManager : BaseManager
 
         var color = SkinManager.GetPlayerColor(GameManager.GetAllPlayers().OrderByDescending(p => p.Wins).FirstOrDefault().PlayerID);
         firework.GetComponent<Firework>().SetColor(color);
+    }
+
+    private void UpdateCrown()
+    {
+        PlayersController[] players = GameManager.GetAllPlayers();
+        int maxWins = -1;
+
+        foreach (var p in players)
+            if (!p.IsDead && p.Wins > maxWins)
+                maxWins = p.Wins;
+
+        foreach (var p in players)
+            p.CrownSprite.enabled = !p.IsDead && p.Wins == maxWins && maxWins > 0;
     }
 }

@@ -861,10 +861,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1795388355167634888, guid: 16a872da5fb5b94408a1842b9d548326, type: 3}
-      propertyPath: DisconnectTimeout
-      value: 5
-      objectReference: {fileID: 0}
     - target: {fileID: 4484996508134443974, guid: 16a872da5fb5b94408a1842b9d548326, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
