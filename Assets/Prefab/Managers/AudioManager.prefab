@@ -178,7 +178,7 @@ MonoBehaviour:
   musicSource: {fileID: 2011053902539126650}
   musicClips:
   - type: 0
-    clip: {fileID: 8300000, guid: a18fac1d30df57743981eff373db8682, type: 3}
+    clip: {fileID: 8300000, guid: d08f0cba0be753e40a5ca944dc79f8f2, type: 3}
   - type: 1
     clip: {fileID: 8300000, guid: d08f0cba0be753e40a5ca944dc79f8f2, type: 3}
   - type: 2

@@ -65,3 +65,5 @@ MonoBehaviour:
     Color: {r: 0.6320754, g: 0, b: 0.15801886, a: 1}
   - Name: Brown
     Color: {r: 0.5849056, g: 0.2559392, b: 0.013794942, a: 1}
+  - Name: Purple
+    Color: {r: 0.7264151, g: 0, b: 0.44257537, a: 1}

@@ -104,7 +104,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Shooter: {fileID: 0}
-  BulletColor: {r: 0, g: 0, b: 0, a: 0}
+  BulletSprite: {fileID: 8569873598199555343}
   Trail: {fileID: 1808314504299968756}
 --- !u!50 &4954595672448540591
 Rigidbody2D:

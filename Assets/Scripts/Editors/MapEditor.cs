@@ -43,6 +43,15 @@ public class MapEditor : BaseManager
             Destroy(child.gameObject);
 
         StarGenerator.Instance.ClearStars();
+
+        if (MapManager.MapTile != null)
+        {
+            Map = MapManager.MapTile.gameObject;
+        }
+        else
+        {
+            Debug.LogError("MapTile is not assigned in MapManager.");
+        }
     }
 
     private void InitializeSingleton()

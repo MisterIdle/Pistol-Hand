@@ -280,37 +280,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1506577274
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1506577275}
-  m_Layer: 0
-  m_Name: Map
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1506577275
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1506577274}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.7879017, y: -0.63661945, z: -0.06541598}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2005079330 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7744054478615261536, guid: cb9fafca20076734a9ae2af6e5220892, type: 3}
@@ -516,11 +485,11 @@ PrefabInstance:
     - target: {fileID: 55864869084325322, guid: 4cc7413368b55364494ad3e867cddf30, type: 3}
       propertyPath: Map
       value: 
-      objectReference: {fileID: 1506577274}
+      objectReference: {fileID: 0}
     - target: {fileID: 55864869084325322, guid: 4cc7413368b55364494ad3e867cddf30, type: 3}
       propertyPath: map
       value: 
-      objectReference: {fileID: 1506577274}
+      objectReference: {fileID: 0}
     - target: {fileID: 55864869084325322, guid: 4cc7413368b55364494ad3e867cddf30, type: 3}
       propertyPath: Grid
       value: 
@@ -587,7 +556,6 @@ SceneRoots:
   - {fileID: 1490608823850696042}
   - {fileID: 219155918}
   - {fileID: 589373002112721266}
-  - {fileID: 1506577275}
   - {fileID: 1450167305}
   - {fileID: 1416779877}
   - {fileID: 2008114633}

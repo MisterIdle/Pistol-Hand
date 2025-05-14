@@ -567,17 +567,4 @@ public class PlayersController : MonoBehaviour
 
         HUDManager.Instance.UpdateColorPlayerCard(PlayerID, SkinManager.Instance.GetPlayerColor(PlayerID));
     }
-
-    public void OnChangeSensitivity(InputAction.CallbackContext context)
-    {
-        if (!context.performed) return;
-
-        Vector2 dpadInput = context.ReadValue<Vector2>();
-        int direction = dpadInput.y > 0.1f ? -1 : (dpadInput.y < -0.1f ? 1 : 0);
-
-        if (direction == 0) return;
-
-        _handSpeed -= direction * 0.5f;
-        _handSpeed = Mathf.Clamp(_handSpeed, 3f, 15f);
-    }
 }
