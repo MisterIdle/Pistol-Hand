@@ -480,6 +480,9 @@ public class PlayersController : MonoBehaviour
         _handSprite.enabled = false;
         CrownSprite.enabled = false;
 
+        _spriteRender.transform.rotation = Quaternion.identity;
+        transform.rotation = Quaternion.identity;
+
         GameManager.Instance.PlayerDeath++;
     }
 
@@ -504,6 +507,7 @@ public class PlayersController : MonoBehaviour
         _handSprite.enabled = true;
 
         transform.rotation = Quaternion.identity;
+        _spriteRender.transform.rotation = Quaternion.identity;
     }
 
     private void CheckBounds()
