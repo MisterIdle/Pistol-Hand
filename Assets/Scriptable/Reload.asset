@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   key: 6
   value: 0.5
-  minValue: 0.5
+  minValue: 0
   maxValue: 20
   stepValue: 0.5

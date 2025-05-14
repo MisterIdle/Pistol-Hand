@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DashDuration
   m_EditorClassIdentifier: 
   key: 10
-  value: 0.3
+  value: 0.2
   minValue: 0.1
   maxValue: 20
   stepValue: 0.1

@@ -170,6 +170,8 @@ public class PlayersController : MonoBehaviour
 
     public void Update()
     {
+        if (IsDead) return;
+
         UpdateJumpTimers();
         
         if (_canMoveHand) UpdateHand();
@@ -192,6 +194,7 @@ public class PlayersController : MonoBehaviour
     public void FixedUpdate()
     {
         if (_isDashing || _stunned || !_canJump) return;
+        if (IsDead) return;
 
         HandleMovement();
         HandleJump();
@@ -480,6 +483,8 @@ public class PlayersController : MonoBehaviour
         _handSprite.enabled = false;
         CrownSprite.enabled = false;
 
+        Health = 0;
+
         _spriteRender.transform.rotation = Quaternion.identity;
         transform.rotation = Quaternion.identity;
 
@@ -516,7 +521,7 @@ public class PlayersController : MonoBehaviour
         if (IsDead || GameManager.Instance.CheckPlayer()) return;
 
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
-        if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0) 
+        if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0 || screenPos.y > Screen.height + 300) 
             KillPlayer();
     }
 

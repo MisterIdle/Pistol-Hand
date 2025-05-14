@@ -369,7 +369,7 @@ MonoBehaviour:
   _jumpBufferTime: 0.1
   _hand: {fileID: 1294991957395979940}
   _handSprite: {fileID: 3905339446647980527}
-  _handSpeed: 7
+  _handSpeed: 8
   _handMaxDistance: 0.5
   _dashSpeed: 50
   _dashDuration: 0.1

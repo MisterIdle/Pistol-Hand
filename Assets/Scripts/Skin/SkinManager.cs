@@ -8,6 +8,7 @@ public class SkinManager : BaseManager
 
     public List<SkinColor> AvailableColors;
     private Dictionary<int, SkinColor> _assignedColors = new();
+    private readonly object _lock = new();
 
     private void Awake()
     {
@@ -29,19 +30,19 @@ public class SkinManager : BaseManager
 
     public bool AssignColor(int playerID, int colorIndex)
     {
-        if (colorIndex < 0 || colorIndex >= AvailableColors.Count)
-            return false;
-
-        SkinColor selected = AvailableColors[colorIndex];
-
-        foreach (var color in _assignedColors.Values)
+        lock (_lock)
         {
-            if (color == selected)
+            if (colorIndex < 0 || colorIndex >= AvailableColors.Count)
                 return false;
-        }
 
-        _assignedColors[playerID] = selected;
-        return true;
+            SkinColor selected = AvailableColors[colorIndex];
+
+            if (_assignedColors.ContainsValue(selected))
+                return false;
+
+            _assignedColors[playerID] = selected;
+            return true;
+        }
     }
 
     public Color GetPlayerColor(int playerID)
@@ -73,19 +74,22 @@ public class SkinManager : BaseManager
 
     public bool ChangeColor(int playerID, int newColorIndex)
     {
-        if (newColorIndex < 0 || newColorIndex >= AvailableColors.Count)
-            return false;
-
-        SkinColor newColor = AvailableColors[newColorIndex];
-
-        foreach (var entry in _assignedColors)
+        lock (_lock)
         {
-            if (entry.Value == newColor && entry.Key != playerID)
+            if (newColorIndex < 0 || newColorIndex >= AvailableColors.Count)
                 return false;
+    
+            SkinColor newColor = AvailableColors[newColorIndex];
+    
+            foreach (var entry in _assignedColors)
+            {
+                if (entry.Value == newColor && entry.Key != playerID)
+                    return false;
+            }
+    
+            _assignedColors[playerID] = newColor;
+            return true;
         }
-
-        _assignedColors[playerID] = newColor;
-        return true;
     }
 
     public void ClearAssignedColors()
