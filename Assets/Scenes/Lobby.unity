@@ -119,11 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!20 &84868130 stripped
-Camera:
-  m_CorrespondingSourceObject: {fileID: 7101086217448443906, guid: 482ee3d7659755a438d4be6a1fd11c48, type: 3}
-  m_PrefabInstance: {fileID: 2075503564728807579}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &947989183
 GameObject:
   m_ObjectHideFlags: 0
@@ -317,11 +312,14 @@ PrefabInstance:
     - target: {fileID: 4545367020464854298, guid: 1fe38cb9d5522704e8f9cc970fc116df, type: 3}
       propertyPath: m_Camera
       value: 
-      objectReference: {fileID: 84868130}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2819471540828294106, guid: 1fe38cb9d5522704e8f9cc970fc116df, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2057425315}
   m_SourcePrefab: {fileID: 100100000, guid: 1fe38cb9d5522704e8f9cc970fc116df, type: 3}
 --- !u!1 &1751620504
 GameObject:
@@ -385,6 +383,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2057425310 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2819471540828294106, guid: 1fe38cb9d5522704e8f9cc970fc116df, type: 3}
+  m_PrefabInstance: {fileID: 1701211191}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2057425315
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2057425310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9943446214297224489b532cde46b890, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _camera: {fileID: 0}
 --- !u!1001 &2006172886014331457
 PrefabInstance:
   m_ObjectHideFlags: 0
