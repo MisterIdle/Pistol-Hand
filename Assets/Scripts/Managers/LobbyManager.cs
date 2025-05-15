@@ -22,6 +22,7 @@ public class LobbyManager : BaseManager
         StartCoroutine(CameraManager.ChangeCameraLens(5f, 0f));
         StartCoroutine(CameraManager.SetCameraPosition(new Vector3(0, 0, -10), 0f));
 
+        HUDManager.ClearTitle();
         HUDManager.ShowTitle("PRESS ANY KEY TO JOIN", "KILL TO BEGIN", Color.white, Color.red, 300f, true);
         HUDManager.BackgroundImage.enabled = false;
 
