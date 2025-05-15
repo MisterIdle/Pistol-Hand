@@ -69,6 +69,8 @@ public class PlayersController : MonoBehaviour
     [SerializeField] private Animator _animator;
     [SerializeField] private Animator _handAnimator;
 
+    [SerializeField] private int maxScreenHeight = 1000;
+
     private Rigidbody2D _rb;
     private SpriteRenderer _spriteRender;
     private Collider2D _collider;
@@ -521,7 +523,7 @@ public class PlayersController : MonoBehaviour
         if (IsDead || GameManager.Instance.CheckPlayer()) return;
 
         Vector3 screenPos = Camera.main.WorldToScreenPoint(transform.position);
-        if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0 || screenPos.y > Screen.height + 300) 
+        if (screenPos.x < 0 || screenPos.x > Screen.width || screenPos.y < 0 || screenPos.y > Screen.height + maxScreenHeight) 
             KillPlayer();
     }
 
