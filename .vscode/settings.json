@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "PistolHand.sln"
+    "dotnet.defaultSolution": "Pistol-Hand.sln"
 }

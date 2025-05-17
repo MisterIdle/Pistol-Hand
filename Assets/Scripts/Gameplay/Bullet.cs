@@ -1,6 +1,7 @@
 using UnityEngine;
+using Mirror;
 
-public class Bullet : MonoBehaviour
+public class Bullet : NetworkBehaviour
 {
     public PlayersController Shooter;
     public SpriteRenderer BulletSprite;
@@ -37,6 +38,7 @@ public class Bullet : MonoBehaviour
         }
     }
 
+    [ServerCallback]
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Player")
@@ -44,7 +46,7 @@ public class Bullet : MonoBehaviour
             PlayersController players = collision.gameObject.GetComponent<PlayersController>();
             if (players != Shooter)
             {
-                players.TakeHit(5, gameObject, true);
+                players.TakeHit((int)players.PistolHitForce, gameObject, true);
                 players.LastHitBy = Shooter;
                 Destroy(gameObject);
             }

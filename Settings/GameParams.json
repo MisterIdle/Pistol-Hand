@@ -9,7 +9,7 @@
         },
         {
             "key": 5,
-            "value": 1.0,
+            "value": 3.0,
             "minValue": 1.0,
             "maxValue": 20.0,
             "stepValue": 1.0
@@ -58,7 +58,7 @@
         },
         {
             "key": 4,
-            "value": 3.0,
+            "value": 8.0,
             "minValue": 1.0,
             "maxValue": 20.0,
             "stepValue": 1.0

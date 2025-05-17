@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System;
+using Mirror;
 
-public class PlayersController : MonoBehaviour
+public class PlayersController : NetworkBehaviour
 {
     [Header("Stats")]
     private int _baseHealth;
@@ -41,13 +42,13 @@ public class PlayersController : MonoBehaviour
     [Header("Shoot")]
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private Transform _shootPoint;
-    [SerializeField] private float _shootForce;
     [SerializeField] private float _reloadTime;
+    [SerializeField] private float _bulletSpeed;
 
     [Header("Hit")]
     [SerializeField] private float _hitDistance = 0.5f;
-    [SerializeField] private float _pistolHitForce;
-    [SerializeField] private float _punchHitForce;
+    [SerializeField] public float PistolHitForce;
+    [SerializeField] private float PunchHitForce;
 
     [Header("Stun")]
     [SerializeField] private float _stun;
@@ -68,8 +69,11 @@ public class PlayersController : MonoBehaviour
     [Header("Animation")]
     [SerializeField] private Animator _animator;
     [SerializeField] private Animator _handAnimator;
-
     [SerializeField] private int maxScreenHeight = 1000;
+
+    [SyncVar(hook = nameof(OnFlipChanged))]
+    private bool _isFlipped;
+
 
     private Rigidbody2D _rb;
     private SpriteRenderer _spriteRender;
@@ -146,9 +150,9 @@ public class PlayersController : MonoBehaviour
             { GameParameterType.Health, value => { _baseHealth = (int)value; Health = _baseHealth; } },
             { GameParameterType.Speed, value => _speed = value },
             { GameParameterType.Jump, value => _jump = value },
-            { GameParameterType.PunchForce, value => _punchHitForce = value },
-            { GameParameterType.CrossbowForce, value => _shootForce = value },
-            { GameParameterType.BulletSpeed, value => _shootForce = value },
+            { GameParameterType.PunchForce, value => PunchHitForce = value },
+            { GameParameterType.CrossbowForce, value => PistolHitForce = value },
+            { GameParameterType.BulletSpeed, value => _bulletSpeed = value },
             { GameParameterType.Reload, value => _reloadTime = value },
             { GameParameterType.DashCooldown, value => _dashCooldown = value },
             { GameParameterType.DashSpeed, value => _dashSpeed = value },
@@ -172,6 +176,8 @@ public class PlayersController : MonoBehaviour
 
     public void Update()
     {
+        if (!isLocalPlayer) return;
+
         if (IsDead) return;
 
         UpdateJumpTimers();
@@ -195,6 +201,8 @@ public class PlayersController : MonoBehaviour
 
     public void FixedUpdate()
     {
+        if (!isLocalPlayer) return;
+        
         if (_isDashing || _stunned || !_canJump) return;
         if (IsDead) return;
 
@@ -272,7 +280,7 @@ public class PlayersController : MonoBehaviour
         _hand.position = Vector3.MoveTowards(_hand.position, _hand.position + dir * _handSpeed, _handSpeed * Time.deltaTime);
 
         Vector3 toHand = _hand.position - transform.position;
-        
+
         _hand.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(toHand.y, toHand.x) * Mathf.Rad2Deg);
 
         _handSprite.flipY = toHand.x < 0;
@@ -281,6 +289,23 @@ public class PlayersController : MonoBehaviour
 
         if (toHand.magnitude > _handMaxDistance)
             _hand.position = transform.position + toHand.normalized * _handMaxDistance;
+
+        bool handIsLeft = toHand.x < 0;
+        if (handIsLeft && !_isFlipped) CmdSetFlip(true);
+        else if (!handIsLeft && _isFlipped) CmdSetFlip(false);
+    }
+
+    [Command]
+    private void CmdSetFlip(bool flipped)
+    {
+        _isFlipped = flipped;
+    }
+
+    private void OnFlipChanged(bool oldValue, bool newValue)
+    {
+        _spriteRender.flipX = newValue;
+        _handSprite.flipY = newValue;
+        if (!newValue) _handSprite.flipX = false;
     }
 
     private void Dash()
@@ -330,7 +355,7 @@ public class PlayersController : MonoBehaviour
             {
                 PlayersController target = hit.GetComponent<PlayersController>();
                 if (target.PlayerID != PlayerID)
-                    target.TakeHit(10, gameObject, false);
+                    target.TakeHit((int)PistolHitForce, gameObject, false);
             }
         }
     }
@@ -357,7 +382,7 @@ public class PlayersController : MonoBehaviour
             bulletComponent.Shooter = this;
             bulletComponent.SetColor(SkinManager.Instance.GetPlayerColor(PlayerID));
             bulletComponent.SetTrailColor(SkinManager.Instance.GetPlayerColor(PlayerID));
-            bulletComponent.Launch(dir, _shootForce);
+            bulletComponent.Launch(dir, _bulletSpeed);
         }
 
         AudioManager.Instance.PlaySFX(SFXType.Shoot);
@@ -393,7 +418,7 @@ public class PlayersController : MonoBehaviour
         Vector2 dir = (transform.position - source.transform.position).normalized;
         Vector2 knockback = new Vector2(dir.x, Mathf.Abs(dir.y) * 0.5f).normalized;
 
-        _rb.AddForce(knockback * (pistol ? _pistolHitForce : _punchHitForce) * force, ForceMode2D.Impulse);
+        _rb.AddForce(knockback * (pistol ? PistolHitForce : PunchHitForce) * force, ForceMode2D.Impulse);
 
         if (source.TryGetComponent<PlayersController>(out var attacker))
             LastHitBy = attacker;
