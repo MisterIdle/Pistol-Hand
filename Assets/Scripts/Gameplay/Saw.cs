@@ -11,7 +11,7 @@ public class Saw : MonoBehaviour
             var playerController = collision.gameObject.GetComponent<PlayersController>();
             if (playerController != null)
             {
-                playerController.TakeHit(_hitForce, gameObject, false);
+                playerController.CmdTakeHit(_hitForce, gameObject, false);
                 AudioManager.Instance.PlaySFX(SFXType.Saw);
             }
         }

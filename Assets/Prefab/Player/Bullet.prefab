@@ -108,9 +108,10 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  Shooter: {fileID: 0}
-  BulletSprite: {fileID: 8569873598199555343}
-  Trail: {fileID: 1808314504299968756}
+  lifetime: 5
+  _rb: {fileID: 4954595672448540591}
+  _spriteRenderer: {fileID: 8569873598199555343}
+  _trail: {fileID: 1808314504299968756}
 --- !u!50 &4954595672448540591
 Rigidbody2D:
   serializedVersion: 5

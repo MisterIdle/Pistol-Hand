@@ -3,63 +3,64 @@ using Mirror;
 
 public class Bullet : NetworkBehaviour
 {
-    public PlayersController Shooter;
-    public SpriteRenderer BulletSprite;
-    public TrailRenderer Trail;
+    public float lifetime = 5f;
+    public PlayersController Shooter { get; set; }
 
-    void Start()
+    private Vector3 _direction;
+    private float _speed;
+
+    [SerializeField] private Rigidbody2D _rb;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
+    [SerializeField] private TrailRenderer _trail;
+
+    public void Launch(Vector3 dir, float speed)
     {
-        Destroy(gameObject, 3f);
+        _direction = dir.normalized;
+        _speed = speed;
+
+        if (isServer)
+            _rb.linearVelocity = _direction * _speed;
+
+        Destroy(gameObject, lifetime);
+    }
+
+    [ServerCallback]
+    private void FixedUpdate()
+    {
+        _rb.linearVelocity = _direction * _speed;
     }
 
     public void SetColor(Color color)
     {
-        if (BulletSprite != null)
-        {
-            BulletSprite.color = color;
-        }
+        if (_spriteRenderer != null) _spriteRenderer.color = color;
     }
 
     public void SetTrailColor(Color color)
     {
-        if (Trail != null)
+        if (_trail != null)
         {
-            Trail.startColor = color;
-            Trail.endColor = Color.white;
-        }
-    }
-
-    public void Launch(Vector3 direction, float force)
-    {
-        var rb = GetComponent<Rigidbody2D>();
-        if (rb != null)
-        {
-            rb.AddForce(direction * force, ForceMode2D.Impulse);
+            _trail.startColor = color;
+            _trail.endColor = color;
         }
     }
 
     [ServerCallback]
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (!isServer) return;
+
+        if (collision.gameObject.CompareTag("Player"))
         {
-            PlayersController players = collision.gameObject.GetComponent<PlayersController>();
-            if (players != Shooter)
+            PlayersController target = collision.gameObject.GetComponent<PlayersController>();
+            if (target != null && target != Shooter)
             {
-                players.TakeHit((int)players.PistolHitForce, gameObject, true);
-                players.LastHitBy = Shooter;
-                Destroy(gameObject);
+                target.CmdTakeHit(1, Shooter.gameObject, true);
+                NetworkServer.Destroy(gameObject);
             }
         }
-
-        if (collision.gameObject.tag == "Bullet")
+        else
         {
-            AudioManager.Instance.PlaySFX(SFXType.BulletHit);
-        }
-
-        if (collision.gameObject.layer == 3)
-        {
-            Destroy(gameObject);
+            NetworkServer.Destroy(gameObject);
         }
     }
 }

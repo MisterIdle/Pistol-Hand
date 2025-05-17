@@ -9,7 +9,8 @@ public class PlayersController : NetworkBehaviour
 {
     [Header("Stats")]
     private int _baseHealth;
-    public int Health;
+
+    [SyncVar] public int Health;
     public int PlayerID;
     public int Wins;
     public bool IsDead = false;
@@ -71,9 +72,12 @@ public class PlayersController : NetworkBehaviour
     [SerializeField] private Animator _handAnimator;
     [SerializeField] private int maxScreenHeight = 1000;
 
+
     [SyncVar(hook = nameof(OnFlipChanged))]
     private bool _isFlipped;
 
+    [SyncVar(hook = nameof(OnDashTrailChanged))]
+    private bool _dashTrailEmitting;
 
     private Rigidbody2D _rb;
     private SpriteRenderer _spriteRender;
@@ -182,8 +186,11 @@ public class PlayersController : NetworkBehaviour
 
         UpdateJumpTimers();
         
-        if (_canMoveHand) UpdateHand();
-        if (_isDashing) Punch();
+        if (_canMoveHand)
+            UpdateHand();
+
+        if (_isDashing)
+            CmdPunch();
 
         _animator.SetFloat("Speed", _rb.linearVelocity.magnitude);
 
@@ -192,8 +199,12 @@ public class PlayersController : NetworkBehaviour
         else
             _animator.SetBool("Jump", false);
 
+        if (Health <= 0)
+        {
+            Health = 0;
+            Death();
+        }
 
-        Death();
         CheckBounds();
 
         HUDManager.Instance.UpdatePlayerHealth(PlayerID, Health);
@@ -230,6 +241,7 @@ public class PlayersController : NetworkBehaviour
 
         _rb.constraints = canMove ? RigidbodyConstraints2D.FreezeRotation : RigidbodyConstraints2D.FreezeAll;
     }
+
 
     private void HandleMovement()
     {
@@ -307,9 +319,12 @@ public class PlayersController : NetworkBehaviour
         _handSprite.flipY = newValue;
         if (!newValue) _handSprite.flipX = false;
     }
+    
+    
 
     private void Dash()
     {
+        if (!isLocalPlayer) return;
         if (_isDashing || Time.time < _lastDashTime + _dashCooldown) return;
 
         _animator.SetBool("Jump", false);
@@ -319,7 +334,7 @@ public class PlayersController : NetworkBehaviour
         AudioManager.Instance.PlaySFX(SFXType.Dash);
 
         _isDashing = true;
-        _dashTrail.emitting = true;
+        CmdSetDashTrailEmitting(true);
         _lastDashTime = Time.time;
         _canMoveHand = false;
 
@@ -330,65 +345,110 @@ public class PlayersController : NetworkBehaviour
 
         StartCoroutine(StopDash());
     }
-
+    
+    [Command]
+    private void CmdSetDashTrailEmitting(bool emitting)
+    {
+        _dashTrailEmitting = emitting;
+    }
+    
     private IEnumerator StopDash()
     {
         yield return new WaitForSeconds(_dashDuration);
         _isDashing = false;
         _rb.linearVelocity = Vector2.zero;
         _canMoveHand = true;
-        _dashTrail.emitting = false;
-
+        CmdSetDashTrailEmitting(false);
+    
         _spriteRender.transform.rotation = Quaternion.identity;
-
+    
         _animator.SetBool("Dash", false);
+    }
+
+    private void OnDashTrailChanged(bool oldValue, bool newValue)
+    {
+        _dashTrail.emitting = newValue;
     }
 
     public void ResetDash() => _lastDashTime = Time.time - _dashCooldown;
 
-    private void Punch()
+
+    
+    [Command]
+    private void CmdPunch()
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(_hand.position, _hitDistance);
         foreach (var hit in hits)
         {
             if (hit.CompareTag("Player"))
             {
-                PlayersController target = hit.GetComponent<PlayersController>();
-                if (target.PlayerID != PlayerID)
-                    target.TakeHit((int)PistolHitForce, gameObject, false);
+                var target = hit.GetComponent<PlayersController>();
+                if (target != null && target.PlayerID != PlayerID)
+                {
+                    target.CmdTakeHit((int)PunchHitForce, gameObject, false);
+                }
             }
         }
     }
 
+
     private void Shooting()
     {
-        if (!_shooting || _isShooting || _isDashing || _isReloading) return;    
+        if (!_shooting || _isShooting || _isDashing || _isReloading) return;
 
         _isShooting = true;
-        _isReloading = true;   
-
-        _animator.SetBool("Shoot", true);
+        _isReloading = true;
 
         float reloadAnimDuration = 1f;
         _handAnimator.speed = reloadAnimDuration / _reloadTime;
         _handAnimator.SetTrigger("Shoot");
 
         Vector3 dir = (_hand.position - transform.position).normalized;
-        GameObject bullet = Instantiate(_projectilePrefab, _shootPoint.position, _hand.rotation);
 
-        var bulletComponent = bullet.GetComponent<Bullet>();
-        if (bulletComponent != null)
-        {
-            bulletComponent.Shooter = this;
-            bulletComponent.SetColor(SkinManager.Instance.GetPlayerColor(PlayerID));
-            bulletComponent.SetTrailColor(SkinManager.Instance.GetPlayerColor(PlayerID));
-            bulletComponent.Launch(dir, _bulletSpeed);
-        }
-
-        AudioManager.Instance.PlaySFX(SFXType.Shoot);
-
+        CmdShoot(dir);
         StartCoroutine(ShootingCooldown());
     }
+
+    
+    [Command]
+    private void CmdShoot(Vector3 direction)
+    {
+        GameObject bullet = Instantiate(_projectilePrefab, _shootPoint.position, Quaternion.LookRotation(Vector3.forward, direction));
+    
+        var bulletComponent = bullet.GetComponent<Bullet>();
+        bulletComponent.Shooter = this;
+        bulletComponent.SetColor(SkinManager.Instance.GetPlayerColor(PlayerID));
+        bulletComponent.SetTrailColor(SkinManager.Instance.GetPlayerColor(PlayerID));
+        bulletComponent.Launch(direction, _bulletSpeed);
+    
+        NetworkServer.Spawn(bullet);
+    
+        RpcPlayShootAnimation();
+        RpcPlayShootSFX();
+    }
+
+
+    [ClientRpc]
+    private void RpcPlayShootSFX()
+    {
+        AudioManager.Instance.PlaySFX(SFXType.Shoot);
+    }
+
+    [ClientRpc]
+    private void RpcPlayShootAnimation()
+    {
+        _animator.SetBool("Shoot", true);
+        _handAnimator.SetTrigger("Shoot");
+    
+        StartCoroutine(ResetShootAnimation());
+    }
+    
+    private IEnumerator ResetShootAnimation()
+    {
+        yield return new WaitForSeconds(0.2f);
+        _animator.SetBool("Shoot", false);
+    }
+
 
     private IEnumerator ShootingCooldown()
     {
@@ -398,36 +458,46 @@ public class PlayersController : NetworkBehaviour
 
         _animator.SetBool("Shoot", false);
 
-        yield return new WaitForSeconds(_reloadTime);  
+        yield return new WaitForSeconds(_reloadTime);
 
         _handAnimator.SetBool("Reload", false);
         _handAnimator.speed = 1f;
 
         if (_shooting)
-            _handAnimator.SetTrigger("Shoot"); 
+            _handAnimator.SetTrigger("Shoot");
 
         _isReloading = false;
         _isShooting = false;
     }
 
 
-    public void TakeHit(int force, GameObject source, bool pistol)
+
+    [Command]
+    public void CmdTakeHit(int damage, GameObject source, bool pistol)
     {
+        if (IsDead) return;
         if (_isInvulnerable) return;
 
         Vector2 dir = (transform.position - source.transform.position).normalized;
         Vector2 knockback = new Vector2(dir.x, Mathf.Abs(dir.y) * 0.5f).normalized;
 
-        _rb.AddForce(knockback * (pistol ? PistolHitForce : PunchHitForce) * force, ForceMode2D.Impulse);
+        _rb.AddForce(knockback * (pistol ? PistolHitForce : PunchHitForce) * damage, ForceMode2D.Impulse);
 
         if (source.TryGetComponent<PlayersController>(out var attacker))
             LastHitBy = attacker;
 
-        Health--;
+        Health -= damage;
 
+        RpcPlayHitEffects();
+    }
+
+    [ClientRpc]
+    private void RpcPlayHitEffects()
+    {
         AudioManager.Instance.PlaySFX(SFXType.Hit);
         StartCoroutine(Stun());
     }
+
 
     private IEnumerator Stun()
     {
@@ -484,7 +554,8 @@ public class PlayersController : NetworkBehaviour
         _rb.linearVelocity = Vector2.zero;
     }
 
-    public void SetHealth(int hp) {
+    public void SetHealth(int hp)
+    {
         _baseHealth = hp;
         Health = hp;
     }
@@ -493,8 +564,6 @@ public class PlayersController : NetworkBehaviour
     
     private void Death()
     {
-        if (Health > 0 || IsDead) return;
-
         GameObject blast = Instantiate(_blastPrefab, transform.position, Quaternion.identity);
         blast.GetComponent<Blast>().SetRedColor(SkinManager.Instance.GetPlayerColor(PlayerID));
 
